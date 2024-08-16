@@ -7,14 +7,15 @@ const Likebtn = ({ id }) => {
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(null);
   const [isLiking, setIsLiking] = useState(false);
-  const [token, SetToken] = useState(null);
+  const [token, setToken] = useState(null);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
-      SetToken(localStorage.getItem("mixtube-token"));
+      setToken(localStorage.getItem("mixtube-token"));
     }
   }, []);
 
-  async function CheckLIked() {
+  async function checkLiked() {
     try {
       setLoading(true);
       const results = await fetch(
@@ -33,9 +34,11 @@ const Likebtn = ({ id }) => {
       setLoading(false);
     }
   }
+
   useEffect(() => {
-    if (token) CheckLIked();
+    if (token) checkLiked();
   }, [token]);
+
   const handleLikeToggle = async () => {
     setIsLiking(true);
     const endpoint = liked ? "unlike" : "like";
@@ -62,13 +65,18 @@ const Likebtn = ({ id }) => {
     }
   };
 
+  if (typeof window !== "undefined" || !localStorage.getItem("mixtube-token")) {
+    return null;
+  }
+
   if (loading) {
     return (
       <div>
-        <h3>loading..</h3>
+        <h3>Loading...</h3>
       </div>
     );
   }
+
   return (
     <div>
       {token ? (

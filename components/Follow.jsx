@@ -35,6 +35,9 @@ const Follow = () => {
       setIsFollowingLoading(false);
     }
   };
+  if(!localStorage.getItem("mixtube-token")){
+    return null
+  }
   return (
     <div>
       <div className=" flex  gap-x-2">

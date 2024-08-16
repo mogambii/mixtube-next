@@ -8,7 +8,7 @@ export default async function TopMixList() {
         "https://server-nezz.vercel.app/api/topmixtapes",
         {
           next: {
-            revalidate: 3600,
+            revalidate: 60*30,
           },
         }
       );
