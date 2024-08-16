@@ -10,7 +10,7 @@ function Navbar() {
         <Link href="/" className="flex items-center gap-3">
           <Image
             className="h-10 hidden md:block"
-            src="https://telegra.ph/file/a5282d7a00d9ec58056a5.png"
+            src="https://i.ibb.co/17dxyfD/a5282d7a00d9ec58056a5.png"
             alt="Mixtube Logo"
             width={40}
             height={40}
