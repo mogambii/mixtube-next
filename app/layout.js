@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-              <meta property="og:title" content="MixTube" />
+        <meta property="og:title" content="MixTube" />
         <meta property="og:description" content="Explore, play and download your favourite mixtapes" />
         <meta property="og:image" content="https://i.ibb.co/17dxyfD/a5282d7a00d9ec58056a5.png" />
         <meta name="twitter:card" content="summary_large_image" />

@@ -86,7 +86,7 @@ function AudioPlayer({ audio }) {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(updateProgress, 1000); // Update progress every second
+    const interval = setInterval(updateProgress, 1000);
     return () => clearInterval(interval);
   }, []);
 

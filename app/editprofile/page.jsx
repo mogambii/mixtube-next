@@ -8,7 +8,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const ProfileEdit = () => {
+  var token;
+  var username
   const router = useRouter();
+  if (typeof window !== "undefined"){
+      var token = localStorage.getItem("mixtube-token")
+      var username =  localStorage.getItem("mixtube-tokenname")
+  }
   useEffect(() => {
     document.title = "Edit Profile | MixTube";
   }, []);
@@ -17,7 +23,7 @@ const ProfileEdit = () => {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [form, setForm] = useState({
     profilep: "",
-    username: localStorage.getItem("mixtube-tokenname"),
+    username:username,
     Bio: "",
     Djname: "",
     facebook: "",
@@ -105,7 +111,7 @@ const ProfileEdit = () => {
         {
           method: "PATCH",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("mixtube-token")}`,
+            Authorization: `Bearer ${token}`,
           },
           body: formData,
         }
