@@ -146,8 +146,8 @@ export default async function MixTape({ params: { id } }) {
         </div>
 
         <div className="flex items-center mt-4 gap-x-4">
-          <Share id={mix._id} />
-          <Likebtn id={mix._id} />
+          <Share id={id} />
+          <Likebtn id={id} />
         </div>
 
         <div className="border-t border-gray-200 dark:border-gray-700 mt-6 pt-4">
