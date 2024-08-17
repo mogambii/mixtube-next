@@ -8,6 +8,66 @@ import Download_btn from "@/components/Download_btn";
 import Share from "@/components/Share";
 import Likebtn from "@/components/Like-btn";
 
+// Function to generate metadata dynamically
+export async function generateMetadata({ params: { id } }) {
+  const fetchMixData = async () => {
+    if (!id) return;
+
+    try {
+      const response = await fetch(
+        `https://server-nezz.vercel.app/api/mixtape/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          cache: "no-store",
+        }
+      );
+
+      if (!response.ok)
+        throw new Error(`Failed to fetch mixtape: ${response.statusText}`);
+
+      const record = await response.json();
+      return record;
+    } catch (error) {
+      console.error(error.message);
+      return null;
+    }
+  };
+
+  const mix = await fetchMixData();
+
+  if (!mix) {
+    return {
+      title: "Mixtape Not Found",
+      description: "The mixtape you are looking for does not exist.",
+    };
+  }
+
+  return {
+    title: `${mix.title} | Mixtube`,
+    description: mix.desc || `Explore ${mix.Djname || mix.name}'s mixtape on Mixtube.`,
+    openGraph: {
+      title: `${mix.title} | Mixtube`,
+      description: mix.desc || `Explore ${mix.Djname || mix.name}'s mixtape on Mixtube.`,
+      images: [
+        {
+          url: mix.imgthumb || 'https://default-image-url.com/default.jpg',
+          alt: `${mix.Djname || mix.name}'s mixtape cover`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${mix.title} | Mixtube`,
+      description: mix.desc || `Explore ${mix.Djname || mix.name}'s mixtape on Mixtube.`,
+      images: [mix.imgthumb || 'https://default-image-url.com/default.jpg'],
+    },
+  };
+}
+
+// Component to display mixtape details
 export default async function MixTape({ params: { id } }) {
   const fetchMixData = async () => {
     if (!id) return;
@@ -31,6 +91,7 @@ export default async function MixTape({ params: { id } }) {
       return record;
     } catch (error) {
       console.error(error.message);
+      return null;
     }
   };
 
