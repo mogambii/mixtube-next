@@ -1,4 +1,5 @@
 import ContactsDisplay from "@/components/Contacts";
+import Follow from "@/components/Follow";
 import MyMixxes from "@/components/MyMixxes";
 import Image from "next/image";
 
@@ -66,7 +67,9 @@ const DjProfile = async ({ params: { username } }) => {
                 <h3 className="font-bold">Followers</h3>
                 <h3>{profile.totalFollowers ? profile.totalFollowers : 0}</h3>
               </div>
+
             </div>
+            <Follow/>
           </div>
         </div>
       </div>
