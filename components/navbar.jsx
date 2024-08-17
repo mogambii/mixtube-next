@@ -15,7 +15,7 @@ function Navbar() {
             width={40}
             height={40}
           />
-          <h1 className="text-xl md:text-2xl xl:text-3xl font-bold">
+          <h1 className="text-xl md:text-2xl xl:text-3xl font-bold font-righteous">
             MIX<span className="text-blue-700">TUBE</span>
           </h1>
         </Link>

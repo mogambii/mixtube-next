@@ -47,6 +47,11 @@ const CommentsPage = ({ comment, id }) => {
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    const comment = {
+      postId: id,
+      username,
+      comment: newComment,
+    }
     try {
       const response = await fetch(
         `https://server-nezz.vercel.app/api/comment`,
@@ -56,11 +61,7 @@ const CommentsPage = ({ comment, id }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("mixtube-token")}`,
           },
-          body: JSON.stringify({
-            postId: id,
-            username,
-            comment: newComment,
-          }),
+          body: JSON.stringify(comment)
         }
       );
 

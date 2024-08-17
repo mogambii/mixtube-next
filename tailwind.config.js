@@ -20,14 +20,9 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        orbitron: ["Orbitron"],
-        righteous: ["righteous"],
-      },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
+        orbitron: ["var(--font-orbitron)"],
+        righteous:["var(--font-righteous)"],
+      }
     },
   },
   plugins: [],
