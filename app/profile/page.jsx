@@ -283,7 +283,7 @@ const Profile = () => {
                   <div key={mix.unique} className="relative">
                     <MixCard
                       Djname={mix.Djname}
-                      link={`/mixtape/${mix.unique}`}
+                      link={`/mix/${mix.unique}`}
                       title={mix.title}
                       year={mix.date}
                       name={mix.name}

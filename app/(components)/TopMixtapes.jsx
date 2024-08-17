@@ -27,7 +27,7 @@ export default async function TopMixList() {
   const topMixes = topMix.map((mix) => (
     <div className="w-full" key={mix.unique}>
       <MixCard
-        link={`/mixtape/${mix.unique}`}
+        link={`/mix/${mix.unique}`}
         Djname={mix.Djname}
         title={mix.title}
         name={mix.name}

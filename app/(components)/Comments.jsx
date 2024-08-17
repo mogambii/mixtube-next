@@ -1,25 +1,28 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
+import Link from "next/link";
 
 const CommentsPage = ({ comment, id }) => {
-  const [username, SetToken] = useState(null);
+  const [username, setUsername] = useState(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      SetToken(localStorage.getItem("mixtube-username"));
+      setUsername(localStorage.getItem("mixtube-tokenname"));
     }
   }, []);
+
   const [comments, setComments] = useState(comment);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const handleDeleteComment = async ({ id, commentId }) => {
+
+  const handleDeleteComment = async (commentId) => {
     try {
       const response = await fetch(
-        `https://server-nezz.vercel.app/api/comment/${id}/${commentToDelete}`,
+        `https://server-nezz.vercel.app/api/comment/${id}/${commentId}`,
         {
           method: "DELETE",
           headers: {
@@ -40,6 +43,7 @@ const CommentsPage = ({ comment, id }) => {
       alert("An error occurred while deleting your comment.");
     }
   };
+
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -63,6 +67,7 @@ const CommentsPage = ({ comment, id }) => {
       if (response.ok) {
         const comment = await response.json();
         setComments((prevComments) => [...prevComments, comment.comment]);
+        setNewComment(""); // Clear the input after successful submission
       } else {
         throw new Error("Failed to add comment");
       }
@@ -74,15 +79,15 @@ const CommentsPage = ({ comment, id }) => {
     }
   };
 
-  const confirmDelete = async (commentId) => {
-    await handleDeleteComment(commentId);
+  const confirmDelete = (commentId) => {
+    setCommentToDelete(commentId);
     setIsModalOpen(true);
   };
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await onDelete(commentToDelete);
+      await handleDeleteComment(commentToDelete);
     } catch (error) {
       console.error("Error deleting comment:", error);
       alert("An error occurred while deleting the comment.");
@@ -98,22 +103,32 @@ const CommentsPage = ({ comment, id }) => {
       <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">
         Comments
       </h3>
-      <form onSubmit={handleCommentSubmit} className="mt-4">
-        <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Add a comment..."
-          className="w-full p-3 border rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition duration-300"
-          rows="3"
-        ></textarea>
-        <button
-          type="submit"
-          className="mt-2 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? <FaSpinner className="animate-spin" /> : "Submit"}
-        </button>
-      </form>
+      {username ? (
+        <form onSubmit={handleCommentSubmit} className="mt-4">
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+            className="w-full p-3 border rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition duration-300"
+            rows="3"
+            required
+          ></textarea>
+          <button
+            type="submit"
+            className="mt-2 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? <FaSpinner className="animate-spin" /> : "Submit"}
+          </button>
+        </form>
+      ) : (
+        <p className="mt-4 text-gray-600 dark:text-gray-400">
+          <Link href="/login" className="text-blue-500 underline">
+            Login
+          </Link>{" "}
+          to add a comment.
+        </p>
+      )}
       <div className="mt-4 space-y-4">
         {comments.length > 0 ? (
           comments.map((comment) => (
@@ -159,6 +174,7 @@ const CommentsPage = ({ comment, id }) => {
               <button
                 onClick={handleDelete}
                 className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition duration-300 w-20 text-center"
+                disabled={isDeleting}
               >
                 {isDeleting ? (
                   <FaSpinner className="animate-spin" />

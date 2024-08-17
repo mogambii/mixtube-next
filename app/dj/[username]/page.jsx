@@ -3,6 +3,56 @@ import Follow from "@/components/Follow";
 import MyMixxes from "@/components/MyMixxes";
 import Image from "next/image";
 
+export async function generateMetadata({ params: { username } }) {
+  async function getProfile() {
+    try {
+      const response = await fetch(
+        `https://server-nezz.vercel.app/api/user/dj/profile/?username=${username}`,
+        {
+          method: "GET",
+        }
+      );
+      if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+
+      const profileData = await response.json();
+      return profileData;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  const profile = await getProfile();
+
+  if (!profile) {
+    return {
+      title: "DJ Profile Not Found",
+      description: "The DJ profile you are looking for does not exist.",
+    };
+  }
+
+  return {
+    title: `${profile.Djname || username} | Mixtube`,
+    description: profile.Bio || `Explore ${profile.Djname || username}'s mixtapes on Mixtube.`,
+    openGraph: {
+      title: `${profile.Djname || username} | Mixtube`,
+      description: profile.Bio || `Explore ${profile.Djname || username}'s mixtapes on Mixtube.`,
+      images: [
+        {
+          url: profile.profilep || 'https://default-image-url.com/default.jpg',
+          alt: `${profile.Djname || username}'s profile picture`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${profile.Djname || username} | Mixtube`,
+      description: profile.Bio || `Explore ${profile.Djname || username}'s mixtapes on Mixtube.`,
+      images: [profile.profilep || 'https://default-image-url.com/default.jpg'],
+    },
+  };
+}
+
 const DjProfile = async ({ params: { username } }) => {
   async function getProfile() {
     try {
@@ -18,6 +68,7 @@ const DjProfile = async ({ params: { username } }) => {
       return profileData;
     } catch (error) {
       console.error(error);
+      return null;
     }
   }
 
@@ -30,6 +81,7 @@ const DjProfile = async ({ params: { username } }) => {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen px-4">
       <div className="grid items-center justify-center grid-cols-1 md:grid-cols-2 mb-6">
@@ -67,9 +119,8 @@ const DjProfile = async ({ params: { username } }) => {
                 <h3 className="font-bold">Followers</h3>
                 <h3>{profile.totalFollowers ? profile.totalFollowers : 0}</h3>
               </div>
-
             </div>
-            <Follow/>
+            <Follow username={username} />
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { FaHeart, FaSpinner } from "react-icons/fa";
@@ -8,12 +9,20 @@ const Likebtn = ({ id }) => {
   const [liked, setLiked] = useState(null);
   const [isLiking, setIsLiking] = useState(false);
   const [token, setToken] = useState(null);
+  const [isMounted, setIsMounted] = useState(false); // New state to track mounting
 
   useEffect(() => {
+    setIsMounted(true); // Set the component as mounted when the client-side rendering occurs
     if (typeof window !== "undefined") {
       setToken(localStorage.getItem("mixtube-token"));
     }
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      checkLiked();
+    }
+  }, [token]);
 
   async function checkLiked() {
     try {
@@ -34,10 +43,6 @@ const Likebtn = ({ id }) => {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-    if (token) checkLiked();
-  }, [token]);
 
   const handleLikeToggle = async () => {
     setIsLiking(true);
@@ -65,7 +70,7 @@ const Likebtn = ({ id }) => {
     }
   };
 
-  if (typeof window !== "undefined" || !localStorage.getItem("mixtube-token")) {
+  if (!isMounted || !token) {
     return null;
   }
 

@@ -74,7 +74,7 @@ const MyMixxes = ({ username }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {mixes.map((mix) => (
               <MixCard
-                link={`/mixtape/${mix.unique}`}
+                link={`/mix/${mix.unique}`}
                 key={mix.unique}
                 Djname={mix.Djname}
                 title={mix.title}

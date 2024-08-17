@@ -27,7 +27,7 @@ export default async function TopMixList() {
     return newMix.map((mix) => (
       <div className="w-full" key={mix._id}>
         <MixCard
-          link={`/mixtape/${mix.unique}`}
+          link={`/mix/${mix.unique}`}
           Djname={mix.Djname}
           title={mix.title}
           year={mix.date}
