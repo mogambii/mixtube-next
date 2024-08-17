@@ -8,7 +8,6 @@ import Download_btn from "@/components/Download_btn";
 import Share from "@/components/Share";
 import Likebtn from "@/components/Like-btn";
 
-// Function to generate metadata dynamically
 export async function generateMetadata({ params: { id } }) {
   const fetchMixData = async () => {
     if (!id) return;
@@ -45,6 +44,8 @@ export async function generateMetadata({ params: { id } }) {
     };
   }
 
+  const imageUrl = mix.imgthumb || 'https://default-image-url.com/default.jpg';
+
   return {
     title: `${mix.title} | Mixtube`,
     description: mix.desc || `Explore ${mix.Djname || mix.name}'s mixtape on Mixtube.`,
@@ -53,19 +54,23 @@ export async function generateMetadata({ params: { id } }) {
       description: mix.desc || `Explore ${mix.Djname || mix.name}'s mixtape on Mixtube.`,
       images: [
         {
-          url: mix.imgthumb || 'https://default-image-url.com/default.jpg',
+          url: imageUrl,
+          width: 1200,
+          height: 630,
           alt: `${mix.Djname || mix.name}'s mixtape cover`,
         },
       ],
+      type: 'music.song',
     },
     twitter: {
-      card: 'summary_large_image',
+      card: 'summary_large_image',  // This enables the large image preview
       title: `${mix.title} | Mixtube`,
       description: mix.desc || `Explore ${mix.Djname || mix.name}'s mixtape on Mixtube.`,
-      images: [mix.imgthumb || 'https://default-image-url.com/default.jpg'],
+      images: [imageUrl],
     },
   };
 }
+
 
 // Component to display mixtape details
 export default async function MixTape({ params: { id } }) {
