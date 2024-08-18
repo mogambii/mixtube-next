@@ -76,8 +76,9 @@ const Likebtn = ({ id }) => {
 
   if (loading) {
     return (
-      <div>
-        <h3>Loading...</h3>
+      <div className=" w-full">
+             <FaSpinner className="dark:text-slate-50 animate-spin" />
+
       </div>
     );
   }
