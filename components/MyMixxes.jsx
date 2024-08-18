@@ -23,8 +23,6 @@ const MyMixxes = ({ username }) => {
         const mixData = await mixResponse.json();
 
         setMixes(mixData.results);
-        setDownloads(mixData.totalDownloads);
-        setLikes(mixData.totalLikes);
         setPageCount(Math.ceil(mixData.totalmixtapes / itemsPerPage));
       } catch (error) {
         console.error(error);

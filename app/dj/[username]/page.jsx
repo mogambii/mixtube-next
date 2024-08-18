@@ -3,26 +3,28 @@ import Follow from "@/components/Follow";
 import MyMixxes from "@/components/MyMixxes";
 import Image from "next/image";
 
-export async function generateMetadata({ params: { username } }) {
-  async function getProfile() {
-    try {
-      const response = await fetch(
-        `https://server-nezz.vercel.app/api/user/dj/profile/?username=${username}`,
-        {
-          method: "GET",
-        }
-      );
-      if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+// Shared function to fetch the DJ profile data
+async function fetchProfile(username, cacheOption = "force-cache") {
+  try {
+    const response = await fetch(
+      `https://server-nezz.vercel.app/api/user/dj/profile/?username=${username}`,
+      {
+        method: "GET",
+        cache: cacheOption,
+      }
+    );
+    if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
-      const profileData = await response.json();
-      return profileData;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
+    const profileData = await response.json();
+    return profileData;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
+}
 
-  const profile = await getProfile();
+export async function generateMetadata({ params: { username } }) {
+  const profile = await fetchProfile(username);
 
   if (!profile) {
     return {
@@ -54,25 +56,7 @@ export async function generateMetadata({ params: { username } }) {
 }
 
 const DjProfile = async ({ params: { username } }) => {
-  async function getProfile() {
-    try {
-      const response = await fetch(
-        `https://server-nezz.vercel.app/api/user/dj/profile/?username=${username}`,
-        {
-          method: "GET",
-        }
-      );
-      if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-
-      const profileData = await response.json();
-      return profileData;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  }
-
-  const profile = await getProfile();
+  const profile = await fetchProfile(username, "no-cache");
 
   if (!profile) {
     return (
@@ -109,11 +93,11 @@ const DjProfile = async ({ params: { username } }) => {
             <div className="flex gap-6 mb-4">
               <div className="text-center">
                 <h3 className="font-bold">Downloads</h3>
-                <h3>{profile.downloads}</h3>
+                <h3>{profile.totalDownloads}</h3>
               </div>
               <div className="text-center">
                 <h3 className="font-bold">Likes</h3>
-                <h3>{profile.likes}</h3>
+                <h3>{profile.totalLikes}</h3>
               </div>
               <div className="text-center">
                 <h3 className="font-bold">Followers</h3>
