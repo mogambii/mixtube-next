@@ -5,6 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { handleLogin } from "@/actions/handlers";
 
 const schema = yup
   .object({
@@ -38,41 +39,12 @@ const Login = () => {
   const onSubmit = async (data) => {
     setError("");
     try {
-      const response = await fetch(
-        "https://server-nezz.vercel.app/api/user/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem("mixtube-token", result.token);
-        const profileResponse = await fetch(
-          "https://server-nezz.vercel.app/api/user/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${result.token}`,
-            },
-          }
-        );
-        const profile = await profileResponse.json();
-        localStorage.setItem("mixtube-tokenname", profile.username);
-        if (profile.Djname) {
-          localStorage.setItem("mixtube-Djname", profile.Djname);
-        }
-        localStorage.setItem("mixtube-type", profile.type);
-
-        // Ensure router is available and component is mounted before navigating
-        router.push("/");
-      } else {
-        setError(result.error);
-      }
+     const res =  await handleLogin(data)
+     if(res.status !== 200){
+      setError(res.message)
+     }else{
+     router.push("/")
+     }
     } catch (error) {
       console.error(error);
       setError("An unexpected error occurred. Please try again later.");
