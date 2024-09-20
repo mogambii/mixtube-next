@@ -18,12 +18,6 @@ const Likebtn = ({ id,likedparam }) => {
     }
   }, []);
 
-  useEffect(() => {
-    if (token) {
-      checkLiked();
-    }
-  }, [token]);
-
 
   const handleLikeToggle = async () => {
     setIsLiking(true);
