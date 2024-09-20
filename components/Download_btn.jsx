@@ -1,41 +1,40 @@
 "use client";
 import React from "react";
 
-const Download_btn = ({ url }) => {
-  const updateDownloads = async () => {
-    if (!id) return;
-
-    try {
-      await fetch(`https://server-nezz.vercel.app/api/download/${id}`, {
-        method: "PUT",
-      });
-    } catch (error) {
-      console.error("Failed to update downloads:", error);
-    }
-  };
+const Download_btn = ({ url, id }) => {
+  // Function to handle the download
   const handleDownload = async () => {
     try {
-      await updateDownloads();
-      const downloadUrl = url;
-      const response = await fetch(downloadUrl);
-      if (!response.ok) throw new Error("Failed to download file");
+      // Use the proxy API to download the file
+      const response = await fetch(`/api/download?url=${encodeURIComponent(url)}`, {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch the file");
+      }
 
       const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
 
+      // Create a Blob URL and trigger the download
+      const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = blobUrl;
-      link.download = `${mix.title || id}.mp3`;
+      link.setAttribute("download", `${id}.mp3`); // Set a default filename or custom one
+
+      // Programmatically trigger the download
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
+      // Clean up the blob URL after download
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      console.error("Error downloading file:", error);
+      console.error("Error downloading the file:", error);
       alert("An error occurred while downloading the file.");
     }
   };
+
   return (
     <div>
       <button

@@ -165,7 +165,7 @@ export default async function MixTape({ params: { id } }) {
           <AudioPlayer audio={mix.audio} />
         </div>
         <div>
-          <Download_btn url={mix.audio} />
+          <Download_btn url={mix.audio} id={id} />
         </div>
 
       <CommentsPage comment={mix.comments} id={id} token={token}  username={username}/>
