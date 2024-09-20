@@ -6,7 +6,7 @@ const Download_btn = ({ url, id }) => {
   const handleDownload = async () => {
     try {
       // Use the proxy API to download the file
-      const response = await fetch(`/api/download?url=${encodeURIComponent(url)}`, {
+      const response = await fetch(`/api/download?id=${id}`, {
         method: "GET",
       });
 

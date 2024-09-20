@@ -50,7 +50,7 @@ export async function LogOut() {
     await cookies().delete("mixtube-type")
    cookies().delete("mixtube-token")
   } catch (error) {
-    
+    console.log(error)
   }
   
 }

@@ -94,8 +94,6 @@ export default async function MixTape({ params: { id } }) {
       return res;
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoading(false);
     }
   }
   
