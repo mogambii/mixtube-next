@@ -7,11 +7,13 @@ import CommentsPage from "@/app/(components)/Comments";
 import Download_btn from "@/components/Download_btn";
 import Share from "@/components/Share";
 import Likebtn from "@/components/Like-btn";
+import { cookies } from "next/headers";
+let liked;
 
-// Shared function to fetch mixtape data
+
 async function fetchMixData(id) {
   if (!id) return null;
-
+  
   try {
     const response = await fetch(
       `https://server-nezz.vercel.app/api/mixtape/${id}`,
@@ -23,7 +25,7 @@ async function fetchMixData(id) {
         cache: "no-store",
       }
     );
-
+    
     if (!response.ok)
       throw new Error(`Failed to fetch mixtape: ${response.statusText}`);
 
@@ -37,14 +39,14 @@ async function fetchMixData(id) {
 
 export async function generateMetadata({ params: { id } }) {
   const mix = await fetchMixData(id);
-
+  
   if (!mix) {
     return {
       title: "Mixtape Not Found",
       description: "The mixtape you are looking for does not exist.",
     };
   }
-
+  
   const imageUrl = mix.imgthumb || 'https://default-image-url.com/default.jpg';
 
   return {
@@ -73,7 +75,33 @@ export async function generateMetadata({ params: { id } }) {
 }
 
 export default async function MixTape({ params: { id } }) {
+  const token = cookies().get("mixtube-token")?.value
+  const username = cookies().get("mixtube-tokenname")?.value
+
   const mix = await fetchMixData(id);
+  async function checkLiked() {
+    try {
+      setLoading(true);
+      const results = await fetch(
+        `https://server-nezz.vercel.app/api/checkliked?post=${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const res = await results.json();
+      return res;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  
+  if(token){
+    liked = await checkLiked();
+  }
 
   if (!mix) {
     return (
@@ -125,7 +153,9 @@ export default async function MixTape({ params: { id } }) {
 
         <div className="flex items-center mt-4 gap-x-4">
           <Share id={id} />
-          <Likebtn id={id} />
+         {
+          token &&  <Likebtn likedparam={liked} id={id} />
+         }
         </div>
 
         <div className="border-t border-gray-200 dark:border-gray-700 mt-6 pt-4">
@@ -138,7 +168,7 @@ export default async function MixTape({ params: { id } }) {
           <Download_btn url={mix.audio} />
         </div>
 
-        <CommentsPage comment={mix.comments} id={id} />
+      <CommentsPage comment={mix.comments} id={id} token={token}  username={username}/>
       </div>
     </div>
   );

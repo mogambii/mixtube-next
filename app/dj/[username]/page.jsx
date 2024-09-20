@@ -1,6 +1,7 @@
 import ContactsDisplay from "@/components/Contacts";
 import Follow from "@/components/Follow";
 import MyMixxes from "@/components/MyMixxes";
+import { cookies } from "next/headers";
 import Image from "next/image";
 
 // Shared function to fetch the DJ profile data
@@ -56,6 +57,7 @@ export async function generateMetadata({ params: { username } }) {
 }
 
 const DjProfile = async ({ params: { username } }) => {
+  const cookie = cookies().get("mixtube-token")?.value;
   const profile = await fetchProfile(username, "no-cache");
 
   if (!profile) {
@@ -104,7 +106,9 @@ const DjProfile = async ({ params: { username } }) => {
                 <h3>{profile.totalFollowers ? profile.totalFollowers : 0}</h3>
               </div>
             </div>
-            <Follow username={username} />
+           {
+             cookie && <Follow username={username} />
+           }
           </div>
         </div>
       </div>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { FaHeart, FaSpinner } from "react-icons/fa";
 
-const Likebtn = ({ id }) => {
+const Likebtn = ({ id,likedparam }) => {
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(null);
   const [isLiking, setIsLiking] = useState(false);
@@ -12,7 +12,7 @@ const Likebtn = ({ id }) => {
   const [isMounted, setIsMounted] = useState(false); // New state to track mounting
 
   useEffect(() => {
-    setIsMounted(true); // Set the component as mounted when the client-side rendering occurs
+    setIsMounted(true);
     if (typeof window !== "undefined") {
       setToken(localStorage.getItem("mixtube-token"));
     }
@@ -24,25 +24,6 @@ const Likebtn = ({ id }) => {
     }
   }, [token]);
 
-  async function checkLiked() {
-    try {
-      setLoading(true);
-      const results = await fetch(
-        `https://server-nezz.vercel.app/api/checkliked?post=${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const res = await results.json();
-      setLiked(res.liked);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const handleLikeToggle = async () => {
     setIsLiking(true);

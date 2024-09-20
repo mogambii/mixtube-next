@@ -3,14 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import Link from "next/link";
 
-const CommentsPage = ({ comment, id }) => {
-  const [username, setUsername] = useState(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setUsername(localStorage.getItem("mixtube-tokenname"));
-    }
-  }, []);
+const CommentsPage = ({ comment, id, username,token }) => {
 
   const [comments, setComments] = useState(comment);
   const [newComment, setNewComment] = useState("");
@@ -26,7 +19,7 @@ const CommentsPage = ({ comment, id }) => {
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("mixtube-token")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -59,7 +52,7 @@ const CommentsPage = ({ comment, id }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("mixtube-token")}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(comment)
         }
