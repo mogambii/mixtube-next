@@ -11,6 +11,7 @@ import Image from "next/image";
 import ContactsDisplay from "@/components/Contacts";
 import MixCard from "../(components)/MixCard";
 import Share from "@/components/Share";
+import { LogOut } from "@/actions/handlers";
 
 const Profile = () => {
   var username;
@@ -84,8 +85,8 @@ const Profile = () => {
     fetchMixes();
   }, [fetchProfile, fetchMixes]);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async  () => {
+    await LogOut();
     router.push("/");
   };
 

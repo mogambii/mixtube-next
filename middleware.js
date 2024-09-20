@@ -5,7 +5,6 @@ export default function middleware(req) {
   const { pathname } = req.nextUrl;
   const cookieStore = cookies();
 
-  const mixtubeToken = cookieStore.get('mixtube-token');
   const mixtubeType = cookieStore.get('mixtube-type');
   const mixtubeUsername = cookieStore.get('mixtube-tokenname');
 

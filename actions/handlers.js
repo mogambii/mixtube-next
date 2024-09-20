@@ -44,7 +44,7 @@ export async function handleLogin(data) {
 
 export async function LogOut() {
   try {
-    await cookies().delete("mixtube-username")
+    cookies().delete("mixtube-username")
     await cookies().delete("mixtube-tokenname")
     await cookies().delete("mixtube-Djname")
     await cookies().delete("mixtube-type")
