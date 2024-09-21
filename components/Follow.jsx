@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 
-const Follow = ({ username,following }) => {
+const Follow = ({ username, following }) => {
   const [isFollowing, setIsFollowing] = useState(following);
   const [isFollowingLoading, setIsFollowingLoading] = useState(false);
 
@@ -10,18 +10,19 @@ const Follow = ({ username,following }) => {
   const handleFollowToggle = async () => {
     setIsFollowingLoading(true);
     const endpoint = isFollowing ? "unfollow" : "follow";
-    try {
-      await handleFollowToggle({ action: endpoint, username: username });
 
+    try {
+      // Call the API to toggle follow/unfollow
+      await handleFollowToggle(endpoint, username);
+
+      // Toggle the local state
       setIsFollowing((prev) => !prev);
     } catch (error) {
-      console.error(`Error trying to ${endpoint}:`, error);
       alert("An error occurred while trying to follow/unfollow.");
     } finally {
       setIsFollowingLoading(false);
     }
   };
-
 
   return (
     <div>

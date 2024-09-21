@@ -91,6 +91,7 @@ export default async function MixTape({ params: { id } }) {
         }
       );
       const res = await results.json();
+      console.log(res);
       return res;
     } catch (error) {
       console.log(error);

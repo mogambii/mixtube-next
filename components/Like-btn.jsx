@@ -29,10 +29,6 @@ const Likebtn = ({ id, likedparam }) => {
     }
   };
 
-  if (!isMounted || !token) {
-    return null;
-  }
-
   return (
         <button
           onClick={handleLikeToggle}
