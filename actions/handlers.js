@@ -136,7 +136,7 @@ export async function handleFollowToggle(data) {
 export async function handleUpdateDownloads(id) {
   try {
     const response = await fetch(
-      `https://fuzzy-garbanzo-xx6vp7q96x63vwr-5050.app.github.dev/api/download/${id}`,
+      `https://server-nezz.vercel.app/api/download/${id}`,
       {
         method: "PUT",
         headers: {
