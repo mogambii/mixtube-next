@@ -43,6 +43,10 @@ const Login = () => {
      if(res.status !== 200){
       setError(res.message)
      }else{
+      localStorage.setItem("mixtube-token", res.data.token);
+      localStorage.setItem("mixtube-tokenname", res.data.username);
+      localStorage.setItem("mixtube-type", res.data.type);
+      localStorage.setItem("mixtube-Djname", res.data.Djname);
      router.push("/")
      }
     } catch (error) {

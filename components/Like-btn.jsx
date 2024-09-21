@@ -1,40 +1,34 @@
 "use client";
-
+import { handleLIkeAndUnlike } from "@/actions/handlers";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { FaHeart, FaSpinner } from "react-icons/fa";
 
-const Likebtn = ({ id,likedparam }) => {
-  const [loading, setLoading] = useState(true);
+const Likebtn = ({ id, likedparam }) => {
   const [liked, setLiked] = useState(null);
   const [isLiking, setIsLiking] = useState(false);
   const [token, setToken] = useState(null);
-  const [isMounted, setIsMounted] = useState(false); // New state to track mounting
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
     if (typeof window !== "undefined") {
+      setLiked(likedparam);
       setToken(localStorage.getItem("mixtube-token"));
     }
-  }, []);
-
+  }, [likedparam]);
 
   const handleLikeToggle = async () => {
     setIsLiking(true);
     const endpoint = liked ? "unlike" : "like";
 
     try {
-      const res = await fetch(
-        `https://server-nezz.vercel.app/api/${endpoint}?post=${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      try {
+    await handleLIkeAndUnlike({action: endpoint, id: id})
 
-      if (!res.ok)
-        throw new Error(`Failed to ${liked ? "unlike" : "like"} mixtape`);
+      } catch (error) {
+        console.log(error)
+      }
 
       setLiked((prevLiked) => !prevLiked);
     } catch (error) {
@@ -47,15 +41,6 @@ const Likebtn = ({ id,likedparam }) => {
 
   if (!isMounted || !token) {
     return null;
-  }
-
-  if (loading) {
-    return (
-      <div className=" w-full">
-             <FaSpinner className="dark:text-slate-50 animate-spin" />
-
-      </div>
-    );
   }
 
   return (

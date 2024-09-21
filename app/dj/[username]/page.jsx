@@ -56,9 +56,35 @@ export async function generateMetadata({ params: { username } }) {
   };
 }
 
+
+  const checkFollowing = async (token) => {
+    try {
+      const res = await fetch(
+        `https://server-nezz.vercel.app/api/user/check_follow?username=${username}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to check following status");
+      }
+
+      const results = await res.json();
+      return results.is_followed;
+    } catch (error) {
+      console.error("Error checking following status:", error);
+    } finally {
+      setIsFollowingLoading(false);
+    }
+  };
+
 const DjProfile = async ({ params: { username } }) => {
   const cookie = cookies().get("mixtube-token")?.value;
   const profile = await fetchProfile(username, "no-cache");
+  const following = await checkFollowing(cookie);
 
   if (!profile) {
     return (
@@ -107,7 +133,7 @@ const DjProfile = async ({ params: { username } }) => {
               </div>
             </div>
            {
-             cookie && <Follow username={username} />
+             cookie && <Follow username={username} following={following}/>
            }
           </div>
         </div>

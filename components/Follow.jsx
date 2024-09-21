@@ -2,59 +2,16 @@
 import { useState, useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
 
-const Follow = ({ username }) => {
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [isFollowingLoading, setIsFollowingLoading] = useState(true);
+const Follow = ({ username,following }) => {
+  const [isFollowing, setIsFollowing] = useState(following);
+  const [isFollowingLoading, setIsFollowingLoading] = useState(false);
 
-  useEffect(() => {
-    const checkFollowing = async () => {
-      try {
-        const res = await fetch(
-          `https://server-nezz.vercel.app/api/user/check_follow?username=${username}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("mixtube-token")}`,
-            },
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Failed to check following status");
-        }
-
-        const results = await res.json();
-        setIsFollowing(results.is_followed);
-      } catch (error) {
-        console.error("Error checking following status:", error);
-      } finally {
-        setIsFollowingLoading(false);
-      }
-    };
-
-    if (typeof window !== "undefined" && localStorage.getItem("mixtube-token")) {
-      checkFollowing();
-    }
-  }, [username]);
 
   const handleFollowToggle = async () => {
     setIsFollowingLoading(true);
     const endpoint = isFollowing ? "unfollow" : "follow";
-
     try {
-      const response = await fetch(
-        `https://server-nezz.vercel.app/api/user/engage/${endpoint}?username=${username}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("mixtube-token")}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to ${endpoint} user`);
-      }
+      await handleFollowToggle({ action: endpoint, username: username });
 
       setIsFollowing((prev) => !prev);
     } catch (error) {
