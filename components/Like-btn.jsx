@@ -1,22 +1,12 @@
 "use client";
 import { handleLIkeAndUnlike } from "@/actions/handlers";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { FaHeart, FaSpinner } from "react-icons/fa";
 
 const Likebtn = ({ id, likedparam }) => {
-  const [liked, setLiked] = useState(null);
+  console.log(likedparam)
+  const [liked, setLiked] = useState(likedparam);
   const [isLiking, setIsLiking] = useState(false);
-  const [token, setToken] = useState(null);
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-    if (typeof window !== "undefined") {
-      setLiked(likedparam);
-      setToken(localStorage.getItem("mixtube-token"));
-    }
-  }, [likedparam]);
 
   const handleLikeToggle = async () => {
     setIsLiking(true);
@@ -44,8 +34,6 @@ const Likebtn = ({ id, likedparam }) => {
   }
 
   return (
-    <div>
-      {token ? (
         <button
           onClick={handleLikeToggle}
           className={`flex items-center px-4 py-2 rounded-full transition-colors duration-300 ${
@@ -64,16 +52,7 @@ const Likebtn = ({ id, likedparam }) => {
             className={`ml-2 ${liked ? "text-white" : "text-red-500"}`}
           />
         </button>
-      ) : (
-        <h4 className="mt-4 text-gray-600 dark:text-gray-400">
-          <Link href="/login" className="text-blue-500 underline">
-            Login
-          </Link>{" "}
-          to like and comment
-        </h4>
-      )}
-    </div>
-  );
+      )
 };
 
 export default Likebtn;
