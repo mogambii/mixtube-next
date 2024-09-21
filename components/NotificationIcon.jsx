@@ -63,7 +63,7 @@ export default async function NotificationIcon() {
           className="relative flex items-center text-lg text-gray-800 dark:text-slate-100"
         >
           <FaBell className="flex items-center justify-center" size={20} />
-          {notifications > 0 && !notificationPage && (
+          {notifications > 0 && (
             <span className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
               {notifications}
             </span>
