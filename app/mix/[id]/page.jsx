@@ -8,8 +8,6 @@ import Download_btn from "@/components/Download_btn";
 import Share from "@/components/Share";
 import Likebtn from "@/components/Like-btn";
 import { cookies } from "next/headers";
-let liked;
-
 
 async function fetchMixData(id) {
   if (!id) return null;
@@ -75,13 +73,13 @@ export async function generateMetadata({ params: { id } }) {
 }
 
 export default async function MixTape({ params: { id } }) {
+  let liked;
   const token = cookies().get("mixtube-token")?.value
   const username = cookies().get("mixtube-tokenname")?.value
 
   const mix = await fetchMixData(id);
   async function checkLiked() {
     try {
-      setLoading(true);
       const results = await fetch(
         `https://server-nezz.vercel.app/api/checkliked?post=${id}`,
         {
