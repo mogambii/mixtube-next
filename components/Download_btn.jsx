@@ -1,34 +1,18 @@
 "use client";
+import { handleUpdateDownloads } from "@/actions/handlers";
 import React from "react";
 
 const Download_btn = ({ url, id }) => {
   // Function to handle the download
   const handleDownload = async () => {
     try {
-      // Fetch the file from the provided URL
-      const response = await fetch(url);
+      // Open the URL in a new tab to initiate the download
+      window.open(url, "_blank");
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch the file");
-      }
-
-      const blob = await response.blob();
-
-      // Create a Blob URL and trigger the download
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.setAttribute("download", `${id}.mp3`); // Set a default filename or custom one
-
-      // Programmatically trigger the download
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      // Clean up the blob URL after download
-      window.URL.revokeObjectURL(blobUrl);
+      // Update the downloads count after initiating the download
+      await handleUpdateDownloads(id);
     } catch (error) {
-      console.error("Error downloading the file:", error);
+      console.error("Error initiating the download:", error);
       alert("An error occurred while downloading the file.");
     }
   };

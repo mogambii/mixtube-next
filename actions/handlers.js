@@ -132,3 +132,22 @@ export async function handleFollowToggle(data) {
     console.log(error)
   }
 }
+
+export async function handleUpdateDownloads(id) {
+  try {
+    const response = await fetch(
+      `https://fuzzy-garbanzo-xx6vp7q96x63vwr-5050.app.github.dev/api/download/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const res = await response.json();
+    return res;
+  }
+  catch (error) {
+    console.log(error)
+  }
+}
