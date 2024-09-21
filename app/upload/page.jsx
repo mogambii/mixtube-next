@@ -63,7 +63,7 @@ export default function Create() {
     });
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", "https://fuzzy-garbanzo-xx6vp7q96x63vwr-5050.app.github.dev/api/upload", true);
+    xhr.open("POST", "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/upload", true);
     xhr.setRequestHeader(
       "Authorization",
       `Bearer ${localStorage.getItem("mixtube-token")}`
