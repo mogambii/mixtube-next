@@ -103,7 +103,7 @@ const Profile = () => {
         }
       );
 
-      if (!response.ok || !response.status(404))
+      if (!response.ok )
         throw new Error(`Error: ${response.statusText}`);
 
       setMixes(mixes.filter((mix) => mix.unique !== mixToDelete));
