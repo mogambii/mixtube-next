@@ -131,7 +131,7 @@ const DjProfile = async ({ params: { username } }) => {
               </div>
             </div>
            {
-             cookie && <Follow username={username} following={following}/>
+             cookie && <Follow username={username} following={following} token={cookie}/>
            }
           </div>
         </div>

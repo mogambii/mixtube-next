@@ -153,7 +153,7 @@ export default async function MixTape({ params: { id } }) {
         <div className="flex items-center mt-4 gap-x-4">
           <Share id={id} />
          {
-          token &&  <Likebtn likedparam={liked} id={id} />
+          token &&  <Likebtn likedparam={liked.liked} id={id}  />
          }
         </div>
 

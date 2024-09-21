@@ -2,10 +2,34 @@
 import { useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 
-const Follow = ({ username, following }) => {
+const Follow = ({ username, following,token }) => {
   const [isFollowing, setIsFollowing] = useState(following);
   const [isFollowingLoading, setIsFollowingLoading] = useState(false);
 
+  // Function to handle follow/unfollow API calls
+  const handleFollowUnfollow = async (action, username) => {
+    try {
+      const response = await fetch(
+        `https://server-nezz.vercel.app/api/user/engage/${action}?username=${username}`,
+        {
+          method: "POST", 
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to ${action}`);
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error("Error during follow/unfollow:", error);
+      throw error;
+    }
+  };
 
   const handleFollowToggle = async () => {
     setIsFollowingLoading(true);
@@ -13,7 +37,7 @@ const Follow = ({ username, following }) => {
 
     try {
       // Call the API to toggle follow/unfollow
-      await handleFollowToggle(endpoint, username);
+      await handleFollowUnfollow(endpoint, username);
 
       // Toggle the local state
       setIsFollowing((prev) => !prev);
