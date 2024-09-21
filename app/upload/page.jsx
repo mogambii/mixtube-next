@@ -78,7 +78,7 @@ export default function Create() {
 
     xhr.onload = () => {
       setSubmitting(false);
-      if (xhr.status === 201) {
+      if (xhr.ok) {
         enqueueSnackbar("Mixtape added", {
           autoHideDuration: 1000,
           anchorOrigin: { horizontal: "center", vertical: "top" },
