@@ -77,7 +77,7 @@ export default function Create() {
     });
 
     xhr.onload = () => {
-      setSubmitting(false);
+      console.log(xhr)
       if (xhr.ok) {
         enqueueSnackbar("Mixtape added", {
           autoHideDuration: 1000,
@@ -93,6 +93,7 @@ export default function Create() {
           variant: "error",
         });
       }
+      setSubmitting(false);
     };
 
     xhr.onerror = () => {

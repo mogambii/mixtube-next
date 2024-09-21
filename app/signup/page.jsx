@@ -62,9 +62,8 @@ const Signup = () => {
       );
 
       const result = await response.json();
-      console.log(result)
 
-      if (response.ok) {
+      if (result === "User added") {
         enqueueSnackbar("Sign up successful", {
           autoHideDuration: 1000,
           anchorOrigin: { horizontal: "center", vertical: "top" },
