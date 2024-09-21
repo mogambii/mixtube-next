@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { Blocks } from "react-loader-spinner";
-import { enqueueSnackbar } from "notistack";
 import { FaSpinner } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import { CiMenuFries } from "react-icons/ci";
@@ -12,6 +11,7 @@ import ContactsDisplay from "@/components/Contacts";
 import MixCard from "../(components)/MixCard";
 import Share from "@/components/Share";
 import { LogOut } from "@/actions/handlers";
+import toast from "react-hot-toast";
 
 const Profile = () => {
   var username;
@@ -74,7 +74,7 @@ const Profile = () => {
       setPageCount(Math.ceil(mixData.totalmixtapes / itemsPerPage));
     } catch (error) {
       console.error(error);
-      enqueueSnackbar("Failed to load mixes", { variant: "error" });
+      toast.error("Error fetching mixes");
     } finally {
       setLoadingMixes(false);
     }
@@ -107,14 +107,10 @@ const Profile = () => {
         throw new Error(`Error: ${response.statusText}`);
 
       setMixes(mixes.filter((mix) => mix.unique !== mixToDelete));
-      enqueueSnackbar("Mixtape deleted successfully!", {
-        variant: "success",
-      });
+      toast.success("Mixtape deleted successfully");
     } catch (error) {
       console.error("Failed to delete mixtape:", error);
-      enqueueSnackbar("Failed to delete mixtape", {
-        variant: "error",
-      });
+      toast.error("Failed to delete mixtape");
     } finally {
       setDeleting(false);
       setShowModal(false);

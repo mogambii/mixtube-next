@@ -2,10 +2,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaEdit } from "react-icons/fa";
 import { Blocks } from "react-loader-spinner";
-import { enqueueSnackbar } from "notistack";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const ProfileEdit = () => {
   var token;
@@ -62,7 +62,7 @@ const ProfileEdit = () => {
       });
     } catch (error) {
       console.error("Error loading profile:", error);
-      enqueueSnackbar("Failed to load profile.", { variant: "error" });
+      toast.error("Error loading profile", { autoClose: 3000 });
     } finally {
       setLoadingProfile(false);
     }
@@ -119,16 +119,29 @@ const ProfileEdit = () => {
 
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
-      enqueueSnackbar("Changes saved successfully", {
-        autoHideDuration: 1000,
-        anchorOrigin: { horizontal: "center", vertical: "top" },
-        variant: "success",
+      toast.success("Profile updated successfully!", { autoClose: 3000 });
+
+      // Reset the form
+      setForm({
+        profilep: "",
+        username: "",
+        Djname: "",
+        Bio: "",
+        facebook: "",
+        instagram: "",
+        x: "",
+        phone: "",
+        canCall: false,
+        canSMS: false,
+        canWhatsApp: false,
       });
 
       router.push("/profile");
     } catch (error) {
       console.error("An error occurred while updating the profile:", error);
-      enqueueSnackbar("Failed to update profile.", { variant: "error" });
+      toast.error("An error occurred while updating the profile", {
+        autoClose: 3000,
+      });
     }
   };
 

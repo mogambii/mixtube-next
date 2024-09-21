@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { enqueueSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
 import { AiOutlineMail } from "react-icons/ai";
 
@@ -50,11 +49,7 @@ const Recovery = () => {
         throw new Error(errorResponse.error || "Failed to reset password");
       }
 
-      //   enqueueSnackbar("Reset link sent to email", {
-      //     autoHideDuration: 3000,
-      //     anchorOrigin: { horizontal: "center", vertical: "top" },
-      //     variant: "success",
-      //   });
+      toast.success("An email with a magic link to reset your password has been sent to you. Please check your email.");
       setDone(true);
     } catch (error) {
       console.log(error);

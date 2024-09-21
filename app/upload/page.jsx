@@ -1,9 +1,9 @@
 "use client";
 import { useState, useRef } from "react";
-import { enqueueSnackbar } from "notistack";
 import { FiUpload, FiXCircle } from "react-icons/fi";
 import { Tooltip } from "@mui/material";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Create() {
   const router = useRouter();
@@ -77,21 +77,14 @@ export default function Create() {
     });
 
     xhr.onload = () => {
-      console.log(xhr)
-      if (xhr.ok) {
-        enqueueSnackbar("Mixtape added", {
-          autoHideDuration: 1000,
-          anchorOrigin: { horizontal: "center", vertical: "top" },
-          variant: "success",
-        });
+      if (xhr.status === 200) {
+      toast.success("Mixtape uploaded successfully");
         router.push("/profile");
       } else {
         setError(
           "An error occurred while submitting the form. Please try again."
         );
-        enqueueSnackbar("An error occurred while submitting the form.", {
-          variant: "error",
-        });
+        toast.error("An error occurred while submitting the form. Please try again.");
       }
       setSubmitting(false);
     };
@@ -101,11 +94,15 @@ export default function Create() {
       setError(
         "An error occurred while submitting the form. Please check your network."
       );
-      enqueueSnackbar("An error occurred while submitting the form.", {
-        variant: "error",
-      });
+      toast.error("An error occurred while submitting the form. Please check your network.");
     };
 
+    xhr.ontimeout = () => {
+      setSubmitting(false);
+      setError("Request timed out. Please try again.");
+      toast.error("Request timed out. Please try again.");
+    };
+    
     xhr.send(data);
   };
 

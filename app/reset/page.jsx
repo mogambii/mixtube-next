@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { enqueueSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const Reset = ({ params: { token } }) => {
   useEffect(() => {
@@ -55,19 +55,12 @@ const Reset = ({ params: { token } }) => {
         throw new Error(result.error || "Failed to reset password");
       }
 
-      enqueueSnackbar("Password reset successfully", {
-        autoHideDuration: 3000,
-        anchorOrigin: { horizontal: "center", vertical: "top" },
-        variant: "success",
-      });
+      toast.success("Password reset successfully");
 
       router.push("/login");
     } catch (error) {
-      enqueueSnackbar(error.message, {
-        autoHideDuration: 3000,
-        anchorOrigin: { horizontal: "center", vertical: "top" },
-        variant: "error",
-      });
+      console.log(error);
+      toast.error("Failed to reset password");
     } finally {
       setSubmitting(false);
     }

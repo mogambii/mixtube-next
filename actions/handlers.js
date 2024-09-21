@@ -1,7 +1,6 @@
 "use server"
 import { cookies } from "next/headers";
 export async function handleLogin(data) {
-  console.log(data);
   try {
     const response = await fetch(
       "https://server-nezz.vercel.app/api/user/login",

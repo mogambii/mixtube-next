@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { enqueueSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+// Validation schema with Yup
 const schema = yup
   .object({
     username: yup
@@ -33,12 +33,15 @@ const schema = yup
   .required();
 
 const Signup = () => {
+  // Set document title in client-side
   if (typeof window !== "undefined") {
     document.title = "Sign Up - MixTube";
   }
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -47,6 +50,7 @@ const Signup = () => {
     resolver: yupResolver(schema),
   });
 
+  // Handle form submission
   const onSubmit = async (data) => {
     setSubmitting(true);
     try {
@@ -63,21 +67,15 @@ const Signup = () => {
 
       const result = await response.json();
 
-      if (result === "User added") {
-        enqueueSnackbar("Sign up successful", {
-          autoHideDuration: 1000,
-          anchorOrigin: { horizontal: "center", vertical: "top" },
-          variant: "success",
-        });
+      if (response.ok && result.message === "User added") {
+        toast.success("Account created successfully.");  
         router.push("/login");
       } else {
-        setError(
-          result.error || "An unexpected error occurred. Please try again."
-        );
+        setError(result.error || "An unexpected error occurred. Please try again.");
       }
     } catch (err) {
       console.error(err);
-      setError("An unexpected error occurred. Please try again.");
+      setError("Network error, please try again later.");
     } finally {
       setSubmitting(false);
     }
@@ -99,6 +97,7 @@ const Signup = () => {
               Username
             </label>
             <input
+              aria-label="Username"
               {...register("username")}
               id="username"
               type="text"
@@ -116,6 +115,7 @@ const Signup = () => {
               Email
             </label>
             <input
+              aria-label="Email"
               {...register("email")}
               id="email"
               type="email"
@@ -131,6 +131,7 @@ const Signup = () => {
               Account Type
             </label>
             <select
+              aria-label="Account Type"
               {...register("type")}
               id="type"
               className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -148,6 +149,7 @@ const Signup = () => {
               Password
             </label>
             <input
+              aria-label="Password"
               {...register("password")}
               id="password"
               type="password"
@@ -165,6 +167,7 @@ const Signup = () => {
               Confirm Password
             </label>
             <input
+              aria-label="Confirm Password"
               {...register("password2")}
               id="password2"
               type="password"

@@ -1,10 +1,10 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { enqueueSnackbar } from "notistack";
 import { FiUpload, FiXCircle } from "react-icons/fi";
 import { Tooltip } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 export default function Edit({ params: { id } }) {
   useEffect(() => {
     document.title = "Edit Mixtape | MixTube";
@@ -23,7 +23,6 @@ export default function Edit({ params: { id } }) {
   useEffect(() => {
     const fetchMixtape = async () => {
       try {
-        console.log(`Fetching mixtape data for ID: ${id}`);
         const response = await fetch(
           `https://server-nezz.vercel.app/api/my/mixtape/${id}`,
           {
@@ -37,7 +36,6 @@ export default function Edit({ params: { id } }) {
         if (!response.ok) throw new Error("Failed to fetch mixtape data");
 
         const data = await response.json();
-        console.log("Fetched mixtape data:", data);
 
         setMixtapeData({
           title: data.title,
@@ -46,7 +44,7 @@ export default function Edit({ params: { id } }) {
           imgthumb: data.imgthumb,
         });
       } catch (err) {
-        enqueueSnackbar(err.message, { variant: "error" });
+        toast.error("Error fetching mixtape", { autoClose: 3000 });
         console.error("Error fetching mixtape:", err);
       }
     };
@@ -77,12 +75,10 @@ export default function Edit({ params: { id } }) {
     } else {
       formData.append("imgthumb", mixtapeData.imgthumb);
     }
-    console.log(formData);
 
     try {
-      console.log("Submitting form data:", formData);
       const response = await fetch(
-        `https://server-0g0d.onrender.com/api/mixtape/${id}`,
+        `https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/mixtape/${id}`,
         {
           method: "PUT",
           headers: {
@@ -93,16 +89,11 @@ export default function Edit({ params: { id } }) {
       );
 
       if (!response.ok) throw new Error("Failed to update mixtape");
+        toast.success("Mixtape updated successfully!", { autoClose: 3000 });
 
-      enqueueSnackbar("Mixtape updated successfully!", {
-        autoHideDuration: 1000,
-        anchorOrigin: { horizontal: "center", vertical: "top" },
-        variant: "success",
-      });
-
-      navigate("/profile"); // Redirect to the profile or mixtape list
+      navigate("/profile");
     } catch (err) {
-      enqueueSnackbar(err.message, { variant: "error" });
+      toast.error("Error updating mixtape", { autoClose: 3000 });
       console.error("Error updating mixtape:", err);
     } finally {
       setSubmitting(false);

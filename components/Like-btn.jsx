@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { FaHeart, FaSpinner } from "react-icons/fa";
 
 const Likebtn = ({ id, likedparam }) => {
-  console.log(likedparam)
   const [liked, setLiked] = useState(likedparam);
   const [isLiking, setIsLiking] = useState(false);
 
