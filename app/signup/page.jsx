@@ -62,6 +62,7 @@ const Signup = () => {
       );
 
       const result = await response.json();
+      console.log(result)
 
       if (response.ok) {
         enqueueSnackbar("Sign up successful", {
