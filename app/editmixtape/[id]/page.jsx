@@ -91,7 +91,8 @@ export default function Edit({ params: { id } }) {
       if (!response.ok) throw new Error("Failed to update mixtape");
         toast.success("Mixtape updated successfully!", { autoClose: 3000 });
 
-      navigate("/profile");
+
+      router.push("/profile");
     } catch (err) {
       toast.error("Error updating mixtape", { autoClose: 3000 });
       console.error("Error updating mixtape:", err);
