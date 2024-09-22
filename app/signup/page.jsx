@@ -35,9 +35,9 @@ const schema = yup
 
 const Signup = () => {
   // Set document title in client-side
-  if (typeof window !== "undefined") {
+  useEffect(() => {
     document.title = "Sign Up - MixTube";
-  }
+  }, []);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -69,7 +69,7 @@ const Signup = () => {
       const result = await response.json();
 
       if (result === "User added") {
-        toast.success("Account created successfully.");  
+        toast.success("Account created successfully.");
         router.push("/login");
       } else {
         setError(result.error || "An unexpected error occurred. Please try again.");
