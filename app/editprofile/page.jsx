@@ -8,22 +8,25 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 
 const ProfileEdit = () => {
-  var token;
-  var username
+  let token;
+  let username;
   const router = useRouter();
-  if (typeof window !== "undefined"){
-      var token = localStorage.getItem("mixtube-token")
-      var username =  localStorage.getItem("mixtube-tokenname")
+
+  if (typeof window !== "undefined") {
+    token = localStorage.getItem("mixtube-token");
+    username = localStorage.getItem("mixtube-tokenname");
   }
+
   useEffect(() => {
     document.title = "Edit Profile | MixTube";
   }, []);
+
   const fileInputRef = useRef(null);
 
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [form, setForm] = useState({
     profilep: "",
-    username:username,
+    username: username || "",
     Bio: "",
     Djname: "",
     facebook: "",
@@ -47,8 +50,8 @@ const ProfileEdit = () => {
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
       const profileData = await response.json();
-      setForm({
-        ...form,
+      setForm((prevForm) => ({
+        ...prevForm,
         Bio: profileData.Bio || "",
         Djname: profileData.Djname || "",
         profilep: profileData.profilep || "",
@@ -59,7 +62,7 @@ const ProfileEdit = () => {
         canCall: profileData.contacts?.canCall || false,
         canSMS: profileData.contacts?.canSMS || false,
         canWhatsApp: profileData.contacts?.canWP || false,
-      });
+      }));
     } catch (error) {
       console.error("Error loading profile:", error);
       toast.error("Error loading profile", { autoClose: 3000 });
@@ -67,8 +70,9 @@ const ProfileEdit = () => {
       setLoadingProfile(false);
     }
   };
+
   useEffect(() => {
-    if (window) {
+    if (form.username) {
       getProfile();
     }
   }, [form.username]);
@@ -84,8 +88,32 @@ const ProfileEdit = () => {
     }
   };
 
+  const validateSocialMediaLinks = () => {
+    const facebookRegex = /^(https?:\/\/)?(www\.)?facebook\.com\/[a-zA-Z0-9(\.\?)?]/;
+    const instagramRegex = /^(https?:\/\/)?(www\.)?instagram\.com\/[a-zA-Z0-9(_)?]+\/?$/;
+    const xRegex = /^(https?:\/\/)?(www\.)?x\.com\/[a-zA-Z0-9(_)?]+\/?$/;
+
+    if (form.facebook && !facebookRegex.test(form.facebook)) {
+      toast.error("Invalid Facebook profile link", { autoClose: 3000 });
+      return false;
+    }
+    if (form.instagram && !instagramRegex.test(form.instagram)) {
+      toast.error("Invalid Instagram profile link", { autoClose: 3000 });
+      return false;
+    }
+    if (form.x && !xRegex.test(form.x)) {
+      toast.error("Invalid X (Twitter) profile link", { autoClose: 3000 });
+      return false;
+    }
+    return true;
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateSocialMediaLinks()) {
+      return;
+    }
 
     const formData = new FormData();
     formData.append("username", form.username);
@@ -96,10 +124,9 @@ const ProfileEdit = () => {
     formData.append("X", form.x);
     formData.append("phoneNumber", form.phone);
 
-    // Ensure booleans are passed correctly
-    formData.append("canCall", form.canCall === true);
-    formData.append("canSMS", form.canSMS === true);
-    formData.append("canWP", form.canWhatsApp === true);
+    formData.append("canCall", form.canCall);
+    formData.append("canSMS", form.canSMS);
+    formData.append("canWP", form.canWhatsApp);
 
     if (selectedFile) {
       formData.append("profilep", selectedFile);
@@ -107,7 +134,7 @@ const ProfileEdit = () => {
 
     try {
       const response = await fetch(
-       "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/user/profile",
+        "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/user/profile",
         {
           method: "PATCH",
           headers: {
@@ -198,13 +225,21 @@ const ProfileEdit = () => {
 
         <div className="flex justify-center items-center mb-6">
           <div className="relative">
-            <Image
-              className="rounded-full border-4 border-gray-300 dark:border-gray-700 h-40 w-40 object-cover"
-              src={form.profilep}
-              alt="Profile"
-              height={300}
-              width={300}
-            />
+            {form.profilep ? (
+              <Image
+                className="rounded-full border-4 border-gray-300 dark:border-gray-700 h-40 w-40 object-cover"
+                src={form.profilep}
+                alt="Profile"
+                height={300}
+                width={300}
+              />
+            ) : (
+              <div className="rounded-full border-4 border-gray-300 dark:border-gray-700 h-40 w-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <span className="text-gray-500 dark:text-gray-300">
+                  No Image
+                </span>
+              </div>
+            )}
             <FaEdit
               className="absolute bottom-2 right-2 h-8 w-8 text-gray-500 dark:text-gray-300 cursor-pointer"
               onClick={() => fileInputRef.current.click()}
@@ -238,7 +273,7 @@ const ProfileEdit = () => {
             "Your bio"
           )}
           {renderInputField(
-            "Facebook",
+            "Facebook Profile Link",
             "facebook",
             form.facebook,
             (e) => setForm((prev) => ({ ...prev, facebook: e.target.value })),
@@ -246,60 +281,75 @@ const ProfileEdit = () => {
             "Your Facebook profile link"
           )}
           {renderInputField(
-            "Instagram",
+            "Instagram Profile Link",
             "instagram",
             form.instagram,
             (e) => setForm((prev) => ({ ...prev, instagram: e.target.value })),
             "text",
-            "Your Instagram handle"
+            "Your Instagram profile link"
           )}
           {renderInputField(
-            "X (formerly Twitter)",
+            "X (Twitter) Profile Link",
             "x",
             form.x,
             (e) => setForm((prev) => ({ ...prev, x: e.target.value })),
             "text",
-            "Your X handle"
+            "Your X (Twitter) profile link"
+          )}
+          {renderInputField(
+            "Phone Number",
+            "phone",
+            form.phone,
+            (e) => setForm((prev) => ({ ...prev, phone: e.target.value })),
+            "text",
+            "Your phone number"
           )}
 
-          <div className="flex flex-col ring-1 rounded-md dark:ring-slate-50 p-4">
-            {renderInputField(
-              "Phone",
-              "phone",
-              form.phone,
-              (e) => setForm((prev) => ({ ...prev, phone: e.target.value })),
-              "text",
-              "Your phone number"
-            )}
+          <div className="flex items-center gap-4 mt-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={form.canCall}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, canCall: e.target.checked }))
+                }
+                className="form-checkbox h-5 w-5 text-blue-600"
+              />
+              <span className="ml-2 text-gray-700 dark:text-gray-50">
+                Can Call
+              </span>
+            </label>
 
-            <div className="mt-2 grid xx:flex items-center justify-between mx-3">
-              {["Calls", "SMS", "WhatsApp"].map((label, index) => {
-                const checkboxName = ["canCall", "canSMS", "canWhatsApp"][
-                  index
-                ];
-                return (
-                  <label
-                    key={checkboxName}
-                    className="inline-flex items-center"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={form[checkboxName]}
-                      onChange={() =>
-                        setForm((prev) => ({
-                          ...prev,
-                          [checkboxName]: !prev[checkboxName],
-                        }))
-                      }
-                      className="form-checkbox"
-                    />
-                    <span className="ml-2 text-sm text-gray-900 dark:text-gray-50">
-                      {label}
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={form.canSMS}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, canSMS: e.target.checked }))
+                }
+                className="form-checkbox h-5 w-5 text-blue-600"
+              />
+              <span className="ml-2 text-gray-700 dark:text-gray-50">
+                Can SMS
+              </span>
+            </label>
+
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={form.canWhatsApp}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    canWhatsApp: e.target.checked,
+                  }))
+                }
+                className="form-checkbox h-5 w-5 text-blue-600"
+              />
+              <span className="ml-2 text-gray-700 dark:text-gray-50">
+                Can WhatsApp
+              </span>
+            </label>
           </div>
         </div>
 
@@ -314,9 +364,9 @@ const ProfileEdit = () => {
           </Link>
           <button
             type="submit"
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
           >
-            Submit
+            Update Profile
           </button>
         </div>
       </form>
