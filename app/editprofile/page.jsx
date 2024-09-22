@@ -107,7 +107,7 @@ const ProfileEdit = () => {
 
     try {
       const response = await fetch(
-        "https://server-0g0d.onrender.com/api/user/profile",
+       "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/user/profile",
         {
           method: "PATCH",
           headers: {
