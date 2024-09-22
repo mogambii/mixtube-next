@@ -83,7 +83,7 @@ const Profile = () => {
   useEffect(() => {
     fetchProfile();
     fetchMixes();
-  }, [fetchProfile, fetchMixes]);
+  }, [fetchProfile,mixes.length, fetchMixes]);
 
   const handleLogout = async  () => {
     await LogOut();
