@@ -12,8 +12,8 @@ const MixCard = ({ name, title, img, downloads, Djname, likes, link }) => {
             src={img ? img : "https://placehold.co/210x210"}
             className="rounded-xl h-32 w-32 object-cover"
             alt={title}
-            height={100}
-            width={100}
+            height={150}
+            width={150}
           />
           <div className="flex flex-col justify-between ">
             <div>
