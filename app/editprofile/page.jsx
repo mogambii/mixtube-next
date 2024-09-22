@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { FaSpinner } from "react-icons/fa6";
 
 const ProfileEdit = () => {
   let token;
@@ -22,7 +23,7 @@ const ProfileEdit = () => {
   }, []);
 
   const fileInputRef = useRef(null);
-
+  const [submitting, setSubmitting] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [form, setForm] = useState({
     profilep: "",
@@ -90,7 +91,8 @@ const ProfileEdit = () => {
 
   const validateSocialMediaLinks = () => {
     const facebookRegex = /^(https?:\/\/)?(www\.)?facebook\.com\/[a-zA-Z0-9(\.\?)?]/;
-    const instagramRegex = /^(https?:\/\/)?(www\.)?instagram\.com\/[a-zA-Z0-9(_)?]+\/?$/;
+    const instagramRegex = /^(https?:\/\/)?(www\.)?instagram\.com\/[a-zA-Z0-9._]+(\/profilecard\/?.*)?$/;
+
     const xRegex = /^(https?:\/\/)?(www\.)?x\.com\/[a-zA-Z0-9(_)?]+\/?$/;
 
     if (form.facebook && !facebookRegex.test(form.facebook)) {
@@ -133,6 +135,7 @@ const ProfileEdit = () => {
     }
 
     try {
+      setSubmitting(true);
       const response = await fetch(
         "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/user/profile",
         {
@@ -169,6 +172,8 @@ const ProfileEdit = () => {
       toast.error("An error occurred while updating the profile", {
         autoClose: 3000,
       });
+    }finally {
+      setSubmitting(false);
     }
   };
 
@@ -363,10 +368,19 @@ const ProfileEdit = () => {
             </button>
           </Link>
           <button
+            disabled={submitting}
             type="submit"
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none disabled:bg-slate-600 disabled:cursor-not-allowed "
           >
-            Update Profile
+            {
+              submitting ? (
+                <div className="flex items-center justify-center">
+                  <FaSpinner className="animate-spin h-5 w-5 transition-transform duration-300" />
+                </div>
+              ) : (
+                "Save"
+              )
+            }
           </button>
         </div>
       </form>
