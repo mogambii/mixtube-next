@@ -59,14 +59,14 @@ export default function Create() {
       const file = files[0];
       // File size validation
       if (name === "imgthumb") {
-        if (file.size > 2 * 1024 * 1024) { // 2MB limit
-          toast.error("Image size should not exceed 2MB");
+        if (file.size > 4 * 1024 * 1024) { // 2MB limit
+          toast.error("Image size should not exceed 4MB");
           return;
         }
         setImgPreview(URL.createObjectURL(file));
       } else if (name === "audio") {
-        if (file.size > 10 * 1024 * 1024) { // 10MB limit
-          toast.error("Audio size should not exceed 10MB");
+        if (file.size > 150 * 1024 * 1024) { // 10MB limit
+          toast.error("Audio size should not exceed 150MB");
           return;
         }
         setAudioTitle(file.name);
