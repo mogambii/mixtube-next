@@ -5,6 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 // Validation schema with Yup
 const schema = yup
@@ -67,7 +68,7 @@ const Signup = () => {
 
       const result = await response.json();
 
-      if (response.ok && result.message === "User added") {
+      if (result === "User added") {
         toast.success("Account created successfully.");  
         router.push("/login");
       } else {

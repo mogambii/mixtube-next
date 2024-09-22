@@ -1,19 +1,26 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FiUpload, FiXCircle } from "react-icons/fi";
 import { Tooltip } from "@mui/material";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 export default function Create() {
   const router = useRouter();
-  var username;
-  var Djname;
-  if (typeof window !== "undefined") {
-    var username = localStorage.getItem("mixtube-tokenname");
-    var Djname = localStorage.getItem("mixtube-Djname");
-    document.title = "Create Mixtape | MixTube";
-  }
+
+  // Initialize username and Djname using useState
+  const [username, setUsername] = useState("");
+  const [Djname, setDjname] = useState("");
+
+  // Update username and Djname from localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setUsername(localStorage.getItem("mixtube-tokenname") || "");
+      setDjname(localStorage.getItem("mixtube-Djname") || "");
+      document.title = "Create Mixtape | MixTube";
+    }
+  }, []);
 
   const genres = ["POP", "RAP", "TRAP", "BONGO", "DRILL", "DANCEHALL"];
 
@@ -37,17 +44,40 @@ export default function Create() {
   const imgThumbRef = useRef();
   const audioRef = useRef();
 
+  // Update formData when username and Djname change
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      username,
+      Djname,
+    }));
+  }, [username, Djname]);
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
+      const file = files[0];
+      // File size validation
       if (name === "imgthumb") {
-        setImgPreview(URL.createObjectURL(files[0]));
+        if (file.size > 2 * 1024 * 1024) { // 2MB limit
+          toast.error("Image size should not exceed 2MB");
+          return;
+        }
+        setImgPreview(URL.createObjectURL(file));
       } else if (name === "audio") {
-        setAudioTitle(files[0].name);
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+          toast.error("Audio size should not exceed 10MB");
+          return;
+        }
+        setAudioTitle(file.name);
       }
-      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+      setFormData((prev) => ({ ...prev, [name]: file }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      if (name === "genre" && value === "OTHER") {
+        setFormData((prev) => ({ ...prev, [name]: "" }));
+      } else {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+      }
     }
   };
 
@@ -63,7 +93,11 @@ export default function Create() {
     });
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/upload", true);
+    xhr.open(
+      "POST",
+      "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/upload",
+      true
+    );
     xhr.setRequestHeader(
       "Authorization",
       `Bearer ${localStorage.getItem("mixtube-token")}`
@@ -77,16 +111,23 @@ export default function Create() {
     });
 
     xhr.onload = () => {
-      if (xhr.status === 200) {
-      toast.success("Mixtape uploaded successfully");
-        router.push("/profile");
-      } else {
-        setError(
-          "An error occurred while submitting the form. Please try again."
-        );
-        toast.error("An error occurred while submitting the form. Please try again.");
-      }
       setSubmitting(false);
+      if (xhr.status === 200) {
+        toast.success("Mixtape uploaded successfully");
+        router.push("/profile");
+      } else if (xhr.status === 400) {
+        setError("Bad request. Please check your input and try again.");
+        toast.error("Bad request. Please check your input and try again.");
+      } else if (xhr.status === 401) {
+        setError("Unauthorized. Please log in again.");
+        toast.error("Unauthorized. Please log in again.");
+      } else if (xhr.status === 500) {
+        setError("Server error. Please try again later.");
+        toast.error("Server error. Please try again later.");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     };
 
     xhr.onerror = () => {
@@ -94,7 +135,9 @@ export default function Create() {
       setError(
         "An error occurred while submitting the form. Please check your network."
       );
-      toast.error("An error occurred while submitting the form. Please check your network.");
+      toast.error(
+        "An error occurred while submitting the form. Please check your network."
+      );
     };
 
     xhr.ontimeout = () => {
@@ -102,7 +145,7 @@ export default function Create() {
       setError("Request timed out. Please try again.");
       toast.error("Request timed out. Please try again.");
     };
-    
+
     xhr.send(data);
   };
 
@@ -119,7 +162,20 @@ export default function Create() {
     });
     setImgPreview(null);
     setAudioTitle("");
+    setUploadProgress(0);
+    setError("");
+    if (imgThumbRef.current) imgThumbRef.current.value = null;
+    if (audioRef.current) audioRef.current.value = null;
   };
+
+  const isFormIncomplete =
+    !formData.title ||
+    !formData.genre ||
+    !formData.date ||
+    !formData.desc ||
+    !formData.imgthumb ||
+    !formData.audio ||
+    submitting;
 
   return (
     <>
@@ -133,6 +189,7 @@ export default function Create() {
             Mixtape Information
           </h2>
 
+          {/* Title Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-3 gap-x-3">
             <label
               htmlFor="title"
@@ -152,6 +209,7 @@ export default function Create() {
             />
           </div>
 
+          {/* Release Year Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
             <label
               htmlFor="date"
@@ -171,6 +229,7 @@ export default function Create() {
             />
           </div>
 
+          {/* Genre Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
             <label
               htmlFor="genre"
@@ -181,33 +240,33 @@ export default function Create() {
             <select
               name="genre"
               id="genre"
-              value={formData.genre}
+              value={genres.includes(formData.genre) ? formData.genre : "OTHER"}
               onChange={handleChange}
               className="block dark border border-gray-300 rounded-md py-1 px-2 text-slate-900 focus:border-indigo-500 focus:ring-0 sm:text-sm sm:leading-6"
               required
             >
-              <option value={null}>choose or type an option</option>
+              <option value="">Choose a genre</option>
               {genres.map((genre) => (
                 <option key={genre} value={genre}>
                   {genre}
                 </option>
               ))}
-              <option value="OTHER">Other (Type below)</option>
+              <option value="OTHER">Other</option>
             </select>
             {!genres.includes(formData.genre) && (
               <input
                 type="text"
-                name="customGenre"
+                name="genre"
                 value={formData.genre}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, genre: e.target.value }))
-                }
+                onChange={handleChange}
                 placeholder="Type your genre"
                 className="mt-2 block border border-gray-300 rounded-md py-1 px-2 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-0 sm:text-sm sm:leading-6"
+                required
               />
             )}
           </div>
 
+          {/* Description Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
             <label
               htmlFor="desc"
@@ -227,6 +286,7 @@ export default function Create() {
             />
           </div>
 
+          {/* Thumb Image Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
             <label
               htmlFor="imgthumb"
@@ -258,7 +318,9 @@ export default function Create() {
               </Tooltip>
               {imgPreview && (
                 <div className="mt-2 relative">
-                  <img
+                  <Image
+                    width={200}
+                    height={200}
                     src={imgPreview}
                     alt="Preview"
                     className="max-w-full rounded-md max-h-48 object-cover"
@@ -268,7 +330,7 @@ export default function Create() {
                     onClick={() => {
                       setImgPreview(null);
                       setFormData((prev) => ({ ...prev, imgthumb: null }));
-                      imgThumbRef.current.value = null;
+                      if (imgThumbRef.current) imgThumbRef.current.value = null;
                     }}
                   />
                 </div>
@@ -276,6 +338,7 @@ export default function Create() {
             </div>
           </div>
 
+          {/* Audio Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
             <label
               htmlFor="audio"
@@ -314,6 +377,7 @@ export default function Create() {
           </div>
         </div>
 
+        {/* Form Actions */}
         <div className="mt-6 flex items-center justify-end gap-x-6">
           <button
             type="button"
@@ -324,14 +388,19 @@ export default function Create() {
           </button>
           <button
             type="submit"
-            disabled={submitting}
-            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            disabled={isFormIncomplete}
+            className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm ${
+              isFormIncomplete
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-500"
+            } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
           >
             {submitting ? "Submitting..." : "Save"}
           </button>
         </div>
 
-        {uploadProgress > 0 && (
+        {/* Upload Progress */}
+        {uploadProgress > 0 && uploadProgress < 100 && (
           <div className="mt-4 w-full bg-gray-200 rounded-full dark:bg-gray-700">
             <div
               className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
@@ -342,6 +411,7 @@ export default function Create() {
           </div>
         )}
 
+        {/* Error Message */}
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
       </form>
     </>
