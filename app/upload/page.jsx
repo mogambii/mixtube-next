@@ -22,7 +22,7 @@ export default function Create() {
     }
   }, []);
 
-  const genres = ["POP", "RAP", "TRAP", "BONGO", "DRILL", "DANCEHALL"];
+  const genres = ["POP", "RAP", "TRAP", "BONGO", "DRILL", "DANCEHALL","GENGETONE","REGGAE","CRUNK","HIPHOP"];
 
   const [formData, setFormData] = useState({
     title: "",
@@ -43,15 +43,6 @@ export default function Create() {
 
   const imgThumbRef = useRef();
   const audioRef = useRef();
-
-  // Update formData when username and Djname change
-  useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      username,
-      Djname,
-    }));
-  }, [username, Djname]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
