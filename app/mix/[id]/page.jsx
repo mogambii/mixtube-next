@@ -114,8 +114,8 @@ export default async function MixTape({ params: { id } }) {
           <div className="w-full md:w-[200px]">
             <Image
               src={mix.imgthumb}
-              height={300}
-              width={300}
+              height={400}
+              width={400}
               alt={mix.title}
               className="w-full h-auto rounded-lg shadow-md object-cover"
             />

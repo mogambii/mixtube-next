@@ -15,7 +15,7 @@ export async function handleLogin(data) {
 
     const result = await response.json();
     if (response.ok) {
-      // Set token in cookies
+
       cookies().set("mixtube-token", result.token);
 
       // Fetch user profile after login
@@ -29,8 +29,6 @@ export async function handleLogin(data) {
       );
 
       const profile = await profileResponse.json();
-
-      // Set profile-related cookies
       cookies().set("mixtube-tokenname", profile.username);
       if (profile.Djname) {
         cookies().set("mixtube-Djname", profile.Djname);

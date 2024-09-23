@@ -17,7 +17,7 @@ const Share = ({ id }) => {
         <ShareModal
           show={show}
           onClose={() => setShow(false)}
-          url={`https://kenyanmix.vercel.app/mixtape/${id}`}
+          url={`https://mixtube.xyz/mix/${id}`}
         />
       )}
     </div>
