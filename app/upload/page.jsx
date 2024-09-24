@@ -48,14 +48,15 @@ export default function Create() {
     const { name, value, files } = e.target;
     if (files) {
       const file = files[0];
+      // File size validation
       if (name === "imgthumb") {
-        if (file.size > 4 * 1024 * 1024) { 
+        if (file.size > 4 * 1024 * 1024) { // 2MB limit
           toast.error("Image size should not exceed 4MB");
           return;
         }
         setImgPreview(URL.createObjectURL(file));
       } else if (name === "audio") {
-        if (file.size > 150 * 1024 * 1024) { 
+        if (file.size > 150 * 1024 * 1024) { // 10MB limit
           toast.error("Audio size should not exceed 150MB");
           return;
         }
@@ -90,7 +91,7 @@ export default function Create() {
     );
     xhr.setRequestHeader(
       "Authorization",
-      Bearer ${localStorage.getItem("mixtube-token")}
+      `Bearer ${localStorage.getItem("mixtube-token")}`
     );
 
     xhr.upload.addEventListener("progress", (event) => {
@@ -379,11 +380,11 @@ export default function Create() {
           <button
             type="submit"
             disabled={isFormIncomplete}
-            className={rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm ${
+            className={`rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm ${
               isFormIncomplete
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-indigo-600 hover:bg-indigo-500"
-            } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600}
+            } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
           >
             {submitting ? "Submitting..." : "Save"}
           </button>
@@ -394,7 +395,7 @@ export default function Create() {
           <div className="mt-4 w-full bg-gray-200 rounded-full dark:bg-gray-700">
             <div
               className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
-              style={{ width: ${uploadProgress}% }}
+              style={{ width: `${uploadProgress}%` }}
             >
               {uploadProgress}%
             </div>
@@ -402,7 +403,7 @@ export default function Create() {
         )}
 
         {/* Error Message */}
-        {error && <p className="mt-4 text-sm text-red-600 text-center">{error}</p>}
+        {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
       </form>
     </>
   );
