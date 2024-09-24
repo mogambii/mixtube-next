@@ -16,7 +16,7 @@ const Discovermixxes = () => {
   const [open, setOpen] = useState(false);
   const [mixes, setMixes] = useState([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(12);
   const [totalRecords, setTotalRecords] = useState(0);
 
   useEffect(() => {
