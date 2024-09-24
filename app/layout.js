@@ -3,6 +3,7 @@ import "./globals.css";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/navbar";
 import { Toaster } from "react-hot-toast";
+import { Analytics } from "@vercel/analytics/react"
 export const orbitron = Orbitron({
   subsets : ["latin"],
   weight:"400",
@@ -18,12 +19,14 @@ const righteous = Righteous({
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+
       <body className={`${righteous.variable} ${orbitron.variable}`}>
         <div className="dark:bg-gray-900 min-h-screen">
         <Toaster position="top-center" />
           <header className="p-3">
             <Navbar />
           </header>
+          <Analytics />
           <main className="mx-5">
             {children}
           </main>
