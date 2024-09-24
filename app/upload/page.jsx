@@ -48,15 +48,14 @@ export default function Create() {
     const { name, value, files } = e.target;
     if (files) {
       const file = files[0];
-      // File size validation
       if (name === "imgthumb") {
-        if (file.size > 4 * 1024 * 1024) { // 2MB limit
+        if (file.size > 4 * 1024 * 1024) { 
           toast.error("Image size should not exceed 4MB");
           return;
         }
         setImgPreview(URL.createObjectURL(file));
       } else if (name === "audio") {
-        if (file.size > 150 * 1024 * 1024) { // 10MB limit
+        if (file.size > 150 * 1024 * 1024) { 
           toast.error("Audio size should not exceed 150MB");
           return;
         }
@@ -71,73 +70,85 @@ export default function Create() {
       }
     }
   };
-
+  const MAX_RETRIES = 3;
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     setUploadProgress(0);
     setError("");
-
+  
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       data.append(key, value);
     });
-
-    const xhr = new XMLHttpRequest();
-    xhr.open(
-      "POST",
-      "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/upload",
-      true
-    );
-    xhr.setRequestHeader(
-      "Authorization",
-      `Bearer ${localStorage.getItem("mixtube-token")}`
-    );
-
-    xhr.upload.addEventListener("progress", (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = (event.loaded / event.total) * 100;
-        setUploadProgress(Math.round(percentComplete));
+  
+    let retries = 0;
+  
+    const uploadMixtape = () => {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open(
+          "POST",
+          "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/upload",
+          true
+        );
+        xhr.setRequestHeader(
+          "Authorization",
+          `Bearer ${localStorage.getItem("mixtube-token")}`
+        );
+  
+        xhr.upload.addEventListener("progress", (event) => {
+          if (event.lengthComputable) {
+            const percentComplete = (event.loaded / event.total) * 100;
+            setUploadProgress(Math.round(percentComplete));
+          }
+        });
+  
+        xhr.onload = () => {
+          if (xhr.status === 201) {
+            resolve();
+          } else {
+            const errorMsg =
+              xhr.status === 400
+                ? "Bad request. Please check your input and try again."
+                : xhr.status === 401
+                ? "Unauthorized. Please log in again."
+                : xhr.status === 500
+                ? "Server error. Please try again later."
+                : "An unexpected error occurred. Please try again.";
+            reject(new Error(errorMsg));
+          }
+        };
+  
+        xhr.onerror = () => reject(new Error("Network error. Please try again."));
+        xhr.ontimeout = () => reject(new Error("Request timed out. Please try again."));
+  
+        xhr.timeout = 10000; 
+        xhr.send(data);
+      });
+    };
+  
+    const attemptUpload = async () => {
+      while (retries < MAX_RETRIES) {
+        try {
+          await uploadMixtape();
+          toast.success("Mixtape uploaded successfully");
+          router.push("/profile");
+          return;
+        } catch (err) {
+          retries += 1;
+          if (retries === MAX_RETRIES) {
+            setError(err.message);
+            toast.error(err.message);
+            break;
+          }
+          toast(`Retrying upload... (${retries}/${MAX_RETRIES})`);
+        }
       }
-    });
-
-    xhr.onload = () => {
       setSubmitting(false);
-      if (xhr.status === 201) {
-        toast.success("Mixtape uploaded successfully");
-        router.push("/profile");
-      } else if (xhr.status === 400) {
-        setError("Bad request. Please check your input and try again.");
-        toast.error("Bad request. Please check your input and try again.");
-      } else if (xhr.status === 401) {
-        setError("Unauthorized. Please log in again.");
-        toast.error("Unauthorized. Please log in again.");
-      } else if (xhr.status === 500) {
-        setError("Server error. Please try again later.");
-        toast.error("Server error. Please try again later.");
-      } else {
-        setError("An unexpected error occurred. Please try again.");
-        toast.error("An unexpected error occurred. Please try again.");
-      }
     };
-
-    xhr.onerror = () => {
-      setSubmitting(false);
-      setError(
-        "An error occurred while submitting the form. Please check your network."
-      );
-      toast.error(
-        "An error occurred while submitting the form. Please check your network."
-      );
-    };
-
-    xhr.ontimeout = () => {
-      setSubmitting(false);
-      setError("Request timed out. Please try again.");
-      toast.error("Request timed out. Please try again.");
-    };
-
-    xhr.send(data);
+  
+    attemptUpload();
   };
 
   const handleCancel = () => {
