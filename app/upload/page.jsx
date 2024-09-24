@@ -9,11 +9,9 @@ import Image from "next/image";
 export default function Create() {
   const router = useRouter();
 
-  // Initialize username and Djname using useState
   const [username, setUsername] = useState("");
   const [Djname, setDjname] = useState("");
 
-  // Update username and Djname from localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
       setUsername(localStorage.getItem("mixtube-tokenname") || "");
@@ -42,6 +40,7 @@ export default function Create() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [imgPreview, setImgPreview] = useState(null);
   const [audioTitle, setAudioTitle] = useState("");
+  const [isCustomGenre, setIsCustomGenre] = useState(false); // Track custom genre input
 
   const imgThumbRef = useRef();
   const audioRef = useRef();
@@ -66,15 +65,16 @@ export default function Create() {
       setFormData((prev) => ({ ...prev, [name]: file }));
     } else {
       if (name === "genre" && value === "OTHER") {
-        setFormData((prev) => ({ ...prev, [name]: "" }));
+        setIsCustomGenre(true); // Show custom genre input
+        setFormData((prev) => ({ ...prev, genre: "" }));
       } else {
+        setIsCustomGenre(false);
         setFormData((prev) => ({ ...prev, [name]: value }));
       }
     }
   };
 
   const MAX_RETRIES = 3;
-  const TIMEOUT_DURATION = 30000; // 30 seconds timeout
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -127,10 +127,8 @@ export default function Create() {
 
         xhr.onerror = () =>
           reject(new Error("Network error. Please try again."));
-        xhr.ontimeout = () =>
-          reject(new Error("Request timed out. Please try again."));
 
-        xhr.timeout = TIMEOUT_DURATION; // Increased timeout
+        // No timeout, as long uploads should not fail due to time limits
         xhr.send(data);
       });
     };
@@ -173,6 +171,7 @@ export default function Create() {
     setAudioTitle("");
     setUploadProgress(0);
     setError("");
+    setIsCustomGenre(false);
     if (imgThumbRef.current) imgThumbRef.current.value = null;
     if (audioRef.current) audioRef.current.value = null;
   };
@@ -254,7 +253,7 @@ export default function Create() {
               className="block dark border border-gray-300 rounded-md py-1 px-2 text-slate-900 focus:border-indigo-500 focus:ring-0 sm:text-sm sm:leading-6"
               required
             >
-              <option value="">Choose a genre</option>
+              <option value="">Select a genre</option>
               {genres.map((genre) => (
                 <option key={genre} value={genre}>
                   {genre}
@@ -262,6 +261,17 @@ export default function Create() {
               ))}
               <option value="OTHER">Other</option>
             </select>
+            {isCustomGenre && (
+              <input
+                name="customGenre"
+                value={formData.genre}
+                onChange={handleChange}
+                type="text"
+                className="block w-full mt-2 border border-gray-300 rounded-md py-1 px-2 text-slate-900 focus:border-indigo-500 focus:ring-0 sm:text-sm sm:leading-6"
+                placeholder="Enter your genre"
+                required
+              />
+            )}
           </div>
 
           {/* Description Field */}
