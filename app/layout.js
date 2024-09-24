@@ -4,6 +4,8 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/navbar";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 export const orbitron = Orbitron({
   subsets : ["latin"],
   weight:"400",
@@ -26,6 +28,7 @@ export default function RootLayout({ children }) {
           <header className="p-3">
             <Navbar />
           </header>
+          <SpeedInsights />
           <Analytics />
           <main className="mx-5">
             {children}
