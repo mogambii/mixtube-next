@@ -16,8 +16,7 @@ async function fetchProfile(username, cacheOption = "force-cache") {
     );
     if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
-    const profileData = await response.json();
-    return profileData;
+    return await response.json();
   } catch (error) {
     console.error(error);
     return null;
@@ -34,50 +33,44 @@ export async function generateMetadata({ params: { username } }) {
     };
   }
 
+  const imageUrl = profile.profilep || 'https://default-image-url.com/default.jpg';
+  const name = profile.Djname || username;
+
   return {
-    title: `${profile.Djname || username} | Mixtube`,
-    description: profile.Bio || `Explore ${profile.Djname || username}'s mixtapes on Mixtube.`,
+    title: `${name} | Mixtube`,
+    description: profile.Bio || `Explore ${name}'s mixtapes on Mixtube.`,
     openGraph: {
-      title: `${profile.Djname || username} | Mixtube`,
-      description: profile.Bio || `Explore ${profile.Djname || username}'s mixtapes on Mixtube.`,
-      images: [
-        {
-          url: profile.profilep || 'https://default-image-url.com/default.jpg',
-          alt: `${profile.Djname || username}'s profile picture`,
-        },
-      ],
+      title: `${name} | Mixtube`,
+      description: profile.Bio || `Explore ${name}'s mixtapes on Mixtube.`,
+      images: [{ url: imageUrl, alt: `${name}'s profile picture` }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${profile.Djname || username} | Mixtube`,
-      description: profile.Bio || `Explore ${profile.Djname || username}'s mixtapes on Mixtube.`,
-      images: [profile.profilep || 'https://default-image-url.com/default.jpg'],
+      title: `${name} | Mixtube`,
+      description: profile.Bio || `Explore ${name}'s mixtapes on Mixtube.`,
+      images: [imageUrl],
     },
   };
 }
 
-
-  const checkFollowing = async (token, username) => {
-    try {
-      const res = await fetch(
-        `https://server-nezz.vercel.app/api/user/check_follow?username=${username}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to check following status");
+const checkFollowing = async (token, username) => {
+  try {
+    const res = await fetch(
+      `https://server-nezz.vercel.app/api/user/check_follow?username=${username}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
       }
+    );
 
-      const results = await res.json();
-      return results.is_followed;
-    } catch (error) {
-      console.error("Error checking following status:", error);
-    } 
-  };
+    if (!res.ok) throw new Error("Failed to check following status");
+    
+    const results = await res.json();
+    return results.is_followed;
+  } catch (error) {
+    console.error("Error checking following status:", error);
+    return false; // Default to not followed if an error occurs
+  }
+};
 
 const DjProfile = async ({ params: { username } }) => {
   const cookie = cookies().get("mixtube-token")?.value;
@@ -86,8 +79,8 @@ const DjProfile = async ({ params: { username } }) => {
 
   if (!profile) {
     return (
-      <div className="min-h-screen px-4">
-        <h4>An error occurred</h4>
+      <div className="min-h-screen px-4 text-center">
+        <h4>An error occurred while fetching the DJ profile.</h4>
       </div>
     );
   }
@@ -99,12 +92,12 @@ const DjProfile = async ({ params: { username } }) => {
           <Image
             className="rounded-full border-4 border-gray-300 h-44 w-44 object-cover"
             src={profile.profilep}
-            alt={`${profile.username}'s profile`}
+            alt={`${profile.Djname || username}'s profile`}
             width={200}
             height={200}
           />
           <h6 className="font-righteous dark:text-slate-50 text-center mt-2">
-            {profile.Djname && profile.Djname}
+            {profile.Djname}
           </h6>
           <h6 className="font-righteous dark:text-slate-50 text-center">
             @{profile.username}
@@ -127,12 +120,10 @@ const DjProfile = async ({ params: { username } }) => {
               </div>
               <div className="text-center">
                 <h3 className="font-bold">Followers</h3>
-                <h3>{profile.totalFollowers ? profile.totalFollowers : 0}</h3>
+                <h3>{profile.totalFollowers || 0}</h3>
               </div>
             </div>
-           {
-             cookie && <Follow username={username} following={following} token={cookie}/>
-           }
+            {cookie && <Follow username={username} following={following} token={cookie} />}
           </div>
         </div>
       </div>
@@ -143,9 +134,7 @@ const DjProfile = async ({ params: { username } }) => {
         </h3>
       </div>
       <div className="py-3">
-        <h5 className="dark:text-slate-50 text-center py-2 font-righteous">
-          Mixtapes
-        </h5>
+        <h5 className="dark:text-slate-50 text-center py-2 font-righteous">Mixtapes</h5>
         <div className="items-center justify-center border rounded-lg p-2 gap-4">
           <MyMixxes username={profile.username} />
         </div>

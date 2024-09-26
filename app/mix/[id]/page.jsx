@@ -11,7 +11,7 @@ import { cookies } from "next/headers";
 
 async function fetchMixData(id) {
   if (!id) return null;
-  
+
   try {
     const response = await fetch(
       `https://server-nezz.vercel.app/api/mixtape/${id}`,
@@ -23,12 +23,11 @@ async function fetchMixData(id) {
         cache: "no-store",
       }
     );
-    
+
     if (!response.ok)
       throw new Error(`Failed to fetch mixtape: ${response.statusText}`);
 
-    const record = await response.json();
-    return record;
+    return await response.json();
   } catch (error) {
     console.error(error.message);
     return null;
@@ -37,14 +36,14 @@ async function fetchMixData(id) {
 
 export async function generateMetadata({ params: { id } }) {
   const mix = await fetchMixData(id);
-  
+
   if (!mix) {
     return {
       title: "Mixtape Not Found",
       description: "The mixtape you are looking for does not exist.",
     };
   }
-  
+
   const imageUrl = mix.imgthumb || 'https://default-image-url.com/default.jpg';
 
   return {
@@ -64,7 +63,7 @@ export async function generateMetadata({ params: { id } }) {
       type: 'music.song',
     },
     twitter: {
-      card: 'summary_large_image', // Enables the large image preview
+      card: 'summary_large_image',
       title: `${mix.title} | Mixtube`,
       description: mix.desc || `Explore ${mix.Djname || mix.name}'s mixtape on Mixtube.`,
       images: [imageUrl],
@@ -73,12 +72,14 @@ export async function generateMetadata({ params: { id } }) {
 }
 
 export default async function MixTape({ params: { id } }) {
-  let liked;
-  const token = cookies().get("mixtube-token")?.value
-  const username = cookies().get("mixtube-tokenname")?.value
-
+  const token = cookies().get("mixtube-token")?.value;
+  const username = cookies().get("mixtube-tokenname")?.value;
+  
   const mix = await fetchMixData(id);
-  async function checkLiked() {
+  let liked;
+
+  const checkLiked = async () => {
+    if (!token) return null;
     try {
       const results = await fetch(
         `https://server-nezz.vercel.app/api/checkliked?post=${id}`,
@@ -88,14 +89,14 @@ export default async function MixTape({ params: { id } }) {
           },
         }
       );
-      const res = await results.json();
-      return res;
+      return await results.json();
     } catch (error) {
       console.log(error);
+      return null;
     }
-  }
-  
-  if(token){
+  };
+
+  if (token) {
     liked = await checkLiked();
   }
 
@@ -116,7 +117,7 @@ export default async function MixTape({ params: { id } }) {
               src={mix.imgthumb}
               height={400}
               width={400}
-              alt={mix.title}
+              alt={`Cover image of ${mix.title}`}
               className="w-full h-auto rounded-lg shadow-md object-cover"
             />
           </div>
@@ -128,7 +129,7 @@ export default async function MixTape({ params: { id } }) {
               href={`/dj/${mix.name}`}
               className="text-sm md:text-lg font-semibold text-blue-500 hover:underline"
             >
-              {mix.Djname ? mix.Djname : mix.name}
+              {mix.Djname || mix.name}
             </Link>
             <div className="flex flex-col items-center md:items-start justify-between gap-2 md:gap-4 mt-2 md:mt-4">
               <p className="text-gray-600 dark:text-gray-400">Year: {mix.date}</p>
@@ -149,9 +150,7 @@ export default async function MixTape({ params: { id } }) {
 
         <div className="flex items-center mt-4 gap-x-4">
           <Share id={id} />
-         {
-          token &&  <Likebtn likedparam={liked.liked} id={id}  />
-         }
+          {token && <Likebtn likedparam={liked?.liked} id={id} />}
         </div>
 
         <div className="border-t border-gray-200 dark:border-gray-700 mt-6 pt-4">
@@ -164,7 +163,7 @@ export default async function MixTape({ params: { id } }) {
           <Download_btn url={mix.audio} id={id} />
         </div>
 
-      <CommentsPage comment={mix.comments} id={id} token={token}  username={username}/>
+        <CommentsPage comment={mix.comments} id={id} token={token} username={username} />
       </div>
     </div>
   );

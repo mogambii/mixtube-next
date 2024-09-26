@@ -3,30 +3,6 @@ import TopMixtapes from "./(components)/TopMixtapes";
 import NewMixtapes from "./(components)/NewMixtapes";
 import Link from "next/link";
 import NavMenu from "@/components/NavMenu";
-
-export const metadata = {
-  title: "MixTube",
-  description: "Explore, play and download your favourite mixtapes",
-  openGraph: {
-    title: "MixTube",
-    description: "Explore, play and download your favourite mixtapes",
-    images: [
-      {
-        url: "https://i.ibb.co/17dxyfD/a5282d7a00d9ec58056a5.png",
-        width: 800,
-        height: 600,
-        alt: "MixTube",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "MixTube",
-    description: "Explore, play and download your favourite mixtapes",
-    images: ["https://i.ibb.co/17dxyfD/a5282d7a00d9ec58056a5.png"],
-  },
-};
-
 export default function Mainpage() {
   return (
     <div className="min-h-screen">
