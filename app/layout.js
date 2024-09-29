@@ -5,6 +5,7 @@ import Navbar from "@/components/navbar";
 import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 export const orbitron = Orbitron({
   subsets: ["latin"],
@@ -31,6 +32,7 @@ export default function RootLayout({ children }) {
           </header>
           <SpeedInsights />
           <Analytics />
+          <GoogleAnalytics gaId="G-C87ETLJK5C"/>
           <main className="mx-5">{children}</main>
           <footer>
             <Footer />
