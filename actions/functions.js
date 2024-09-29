@@ -1,26 +1,30 @@
 "use server"
-async function fetchData(url) {
-  console.debug(`Fetching data from: ${url}`);
+
+import getDb from "@/util/db";
+
+// export async function Delete(){
+//   const db = await getDb()
+//   const res = await db.collection("users").deleteOne({username : "Frank "})
+// }
+
+export async function GetMixtapes() {
   try {
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-    const data = await res.json();
-    console.debug(`Data fetched successfully from: ${url}`, data);
-    return data;
+    const db = await getDb()
+    const collection = db.collection("mixtapes")
+    const results = await collection.find({}).project({_id: 0, time:1, unique: 1}).toArray()
+    return results;
   } catch (error) {
-    console.error("Error fetching data:", error);
-    return [];
+    console.log(error)
   }
 }
 
-export async function GetMixtapes() {
-  console.debug("Getting mixtapes...");
-  return fetchData("https://server-nezz.vercel.app/allmx");
-}
-
 export async function GetDjs() {
-  console.debug("Getting DJs...");
-  return fetchData("https://server-nezz.vercel.app/alldjs");
+  try {
+    const db = await getDb()
+    const collection = db.collection("users")
+    const result = await collection.find({type: "DJ"}).project({_id: 0, username: 1}).toArray()
+    return result
+  } catch (error) {
+    console.log(error)
+  }
 }

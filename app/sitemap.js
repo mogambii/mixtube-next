@@ -2,28 +2,26 @@ import { GetDjs, GetMixtapes } from "@/actions/functions";
 
 const baseUrl = "https://mixtube.xyz";
 
+function sanitizeUrl(str) {
+  return str.replace(/[^\w-]+/g, '-') 
+            .replace(/--+/g, '-')  
+            .replace(/^-|-$/g, ''); 
+}
 
 export default async function sitemap() {
-  console.debug("Generating sitemap...");
   const [Djs, Mixxes] = await Promise.all([GetDjs(), GetMixtapes()]);
-
-  console.debug("DJs fetched:", Djs);
-  console.debug("Mixtapes fetched:", Mixxes);
 
   const Mixobj =
     Mixxes?.map((mix) => ({
-      url: `${baseUrl}/mix/${mix.unique}`,
-      lastModified: mix.time,
+      url: `${baseUrl}/mix/${sanitizeUrl(mix.unique)}`,
+      lastModified: new Date(mix.time),
     })) || [];
 
   const Djobj =
     Djs?.map((dj) => ({
-      url: `${baseUrl}/dj/${dj.username}`,
+      url: `${baseUrl}/dj/${sanitizeUrl(dj.username)}`,
       lastModified: new Date(),
     })) || [];
-
-  console.debug("Mix object created:", Mixobj);
-  console.debug("DJ object created:", Djobj);
 
   const sitemapArray = [
     {
@@ -34,7 +32,5 @@ export default async function sitemap() {
     ...Mixobj,
     ...Djobj,
   ];
-
-  console.debug("Sitemap generated:", sitemapArray);
   return sitemapArray;
 }
