@@ -6,14 +6,19 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Image from "next/image";
 
+const genres = [
+  "POP", "RAP", "TRAP", "BONGO", "DRILL", 
+  "DANCEHALL", "GENGETONE", "REGGAE", "CRUNK", "HIPHOP"
+];
+
+const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB
+
 export default function Create() {
   const router = useRouter();
-
-  // Initialize username and Djname using useState
+  
   const [username, setUsername] = useState("");
   const [Djname, setDjname] = useState("");
-
-  // Update username and Djname from localStorage
+  
   useEffect(() => {
     if (typeof window !== "undefined") {
       setUsername(localStorage.getItem("mixtube-tokenname") || "");
@@ -21,8 +26,6 @@ export default function Create() {
       document.title = "Create Mixtape | MixTube";
     }
   }, []);
-
-  const genres = ["POP", "RAP", "TRAP", "BONGO", "DRILL", "DANCEHALL","GENGETONE","REGGAE","CRUNK","HIPHOP"];
 
   const [formData, setFormData] = useState({
     title: "",
@@ -48,15 +51,14 @@ export default function Create() {
     const { name, value, files } = e.target;
     if (files) {
       const file = files[0];
-      // File size validation
       if (name === "imgthumb") {
-        if (file.size > 4 * 1024 * 1024) { // 2MB limit
+        if (file.size > 4 * 1024 * 1024) { // 4MB limit
           toast.error("Image size should not exceed 4MB");
           return;
         }
         setImgPreview(URL.createObjectURL(file));
       } else if (name === "audio") {
-        if (file.size > 150 * 1024 * 1024) { // 10MB limit
+        if (file.size > 150 * 1024 * 1024) { // 150MB limit
           toast.error("Audio size should not exceed 150MB");
           return;
         }
@@ -72,72 +74,71 @@ export default function Create() {
     }
   };
 
+  const uploadChunk = (chunk, totalChunks, chunkIndex, filename, onProgress) => {
+    return new Promise((resolve, reject) => {
+      const data = new FormData();
+      data.append("chunk", chunk);
+      data.append("filename", filename);
+      data.append("chunkIndex", chunkIndex);
+      data.append("totalChunks", totalChunks);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/upload", true);
+      xhr.setRequestHeader("Authorization", `Bearer ${localStorage.getItem("mixtube-token")}`);
+
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = (event.loaded / event.total) * 100;
+          onProgress(chunkIndex, totalChunks, percentComplete);
+        }
+      });
+
+      xhr.onload = () => {
+        if (xhr.status === 201) {
+          resolve();
+        } else {
+          reject(new Error(`Failed to upload chunk ${chunkIndex}: ${xhr.statusText}`));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error("Network error occurred"));
+      xhr.ontimeout = () => reject(new Error("Request timed out"));
+
+      xhr.send(data);
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     setUploadProgress(0);
     setError("");
 
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      data.append(key, value);
-    });
+    const audioFile = formData.audio; 
+    const totalChunks = Math.ceil(audioFile.size / CHUNK_SIZE);
+    let uploadPromises = [];
 
-    const xhr = new XMLHttpRequest();
-    xhr.open(
-      "POST",
-      "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/upload",
-      true
-    );
-    xhr.setRequestHeader(
-      "Authorization",
-      `Bearer ${localStorage.getItem("mixtube-token")}`
-    );
+    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+      const start = chunkIndex * CHUNK_SIZE;
+      const end = Math.min(start + CHUNK_SIZE, audioFile.size);
+      const chunk = audioFile.slice(start, end);
 
-    xhr.upload.addEventListener("progress", (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = (event.loaded / event.total) * 100;
-        setUploadProgress(Math.round(percentComplete));
-      }
-    });
+      uploadPromises.push(uploadChunk(chunk, totalChunks, chunkIndex, audioFile.name, (currentIndex, total, percent) => {
+        const overallProgress = ((currentIndex + 1) / total) * 100;
+        setUploadProgress(Math.round(overallProgress));
+      }));
+    }
 
-    xhr.onload = () => {
+    try {
+      await Promise.all(uploadPromises);
       setSubmitting(false);
-      if (xhr.status === 201) {
-        toast.success("Mixtape uploaded successfully");
-        router.push("/profile");
-      } else if (xhr.status === 400) {
-        setError("Bad request. Please check your input and try again.");
-        toast.error("Bad request. Please check your input and try again.");
-      } else if (xhr.status === 401) {
-        setError("Unauthorized. Please log in again.");
-        toast.error("Unauthorized. Please log in again.");
-      } else if (xhr.status === 500) {
-        setError("Server error. Please try again later.");
-        toast.error("Server error. Please try again later.");
-      } else {
-        setError("An unexpected error occurred. Please try again.");
-        toast.error("An unexpected error occurred. Please try again.");
-      }
-    };
-
-    xhr.onerror = () => {
+      toast.success("Mixtape uploaded successfully");
+      router.push("/profile");
+    } catch (error) {
       setSubmitting(false);
-      setError(
-        "An error occurred while submitting the form. Please check your network."
-      );
-      toast.error(
-        "An error occurred while submitting the form. Please check your network."
-      );
-    };
-
-    xhr.ontimeout = () => {
-      setSubmitting(false);
-      setError("Request timed out. Please try again.");
-      toast.error("Request timed out. Please try again.");
-    };
-
-    xhr.send(data);
+      setError(error.message);
+      toast.error(error.message);
+    }
   };
 
   const handleCancel = () => {
@@ -157,6 +158,11 @@ export default function Create() {
     setError("");
     if (imgThumbRef.current) imgThumbRef.current.value = null;
     if (audioRef.current) audioRef.current.value = null;
+    // Revoke object URLs to free memory
+    if (imgPreview) {
+      URL.revokeObjectURL(imgPreview);
+      setImgPreview(null);
+    }
   };
 
   const isFormIncomplete =
@@ -171,10 +177,7 @@ export default function Create() {
   return (
     <>
       <h3 className="text-lg font-semibold p-4 dark:text-slate-50">Mixtube</h3>
-      <form
-        onSubmit={handleSubmit}
-        className="border rounded-lg overflow-hidden p-4 bg-white dark:bg-gray-800"
-      >
+      <form onSubmit={handleSubmit} className="border rounded-lg overflow-hidden p-4 bg-white dark:bg-gray-800">
         <div className="grid grid-cols-1 gap-x-5 gap-y-8 border-b border-slate-900/10 pb-12 md:grid-cols-2">
           <h2 className="text-base p-1 gap-y-2 font-semibold leading-7 text-slate-900 dark:text-slate-50">
             Mixtape Information
@@ -182,10 +185,7 @@ export default function Create() {
 
           {/* Title Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-3 gap-x-3">
-            <label
-              htmlFor="title"
-              className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900"
-            >
+            <label htmlFor="title" className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900">
               Title
             </label>
             <input
@@ -202,10 +202,7 @@ export default function Create() {
 
           {/* Release Year Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
-            <label
-              htmlFor="date"
-              className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900"
-            >
+            <label htmlFor="date" className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900">
               Release Year
             </label>
             <input
@@ -222,10 +219,7 @@ export default function Create() {
 
           {/* Genre Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
-            <label
-              htmlFor="genre"
-              className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900"
-            >
+            <label htmlFor="genre" className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900">
               Genre
             </label>
             <select
@@ -259,10 +253,7 @@ export default function Create() {
 
           {/* Description Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
-            <label
-              htmlFor="desc"
-              className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900"
-            >
+            <label htmlFor="desc" className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900">
               Description
             </label>
             <textarea
@@ -279,10 +270,7 @@ export default function Create() {
 
           {/* Thumb Image Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
-            <label
-              htmlFor="imgthumb"
-              className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900"
-            >
+            <label htmlFor="imgthumb" className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900">
               Thumb Image
             </label>
             <div className="relative">
@@ -322,6 +310,7 @@ export default function Create() {
                       setImgPreview(null);
                       setFormData((prev) => ({ ...prev, imgthumb: null }));
                       if (imgThumbRef.current) imgThumbRef.current.value = null;
+                      URL.revokeObjectURL(imgPreview); // Revoke the object URL
                     }}
                   />
                 </div>
@@ -331,10 +320,7 @@ export default function Create() {
 
           {/* Audio Field */}
           <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
-            <label
-              htmlFor="audio"
-              className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900"
-            >
+            <label htmlFor="audio" className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900">
               Audio
             </label>
             <div className="relative">
