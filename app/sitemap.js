@@ -1,25 +1,14 @@
+import { GetDjs, GetMixtapes } from "@/actions/functions";
+
 const baseUrl = "https://mixtube.xyz";
 
-async function fetchData(url) {
-  try {
-    const res = await fetch(url);
-    return await res.json();
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return [];
-  }
-}
-
-async function GetMixtapes() {
-  return fetchData("https://server-nezz.vercel.app/allmx");
-}
-
-async function GetDjs() {
-  return fetchData("https://server-nezz.vercel.app/alldjs");
-}
 
 export default async function sitemap() {
+  console.debug("Generating sitemap...");
   const [Djs, Mixxes] = await Promise.all([GetDjs(), GetMixtapes()]);
+
+  console.debug("DJs fetched:", Djs);
+  console.debug("Mixtapes fetched:", Mixxes);
 
   const Mixobj =
     Mixxes?.map((mix) => ({
@@ -33,7 +22,10 @@ export default async function sitemap() {
       lastModified: new Date(),
     })) || [];
 
-  return [
+  console.debug("Mix object created:", Mixobj);
+  console.debug("DJ object created:", Djobj);
+
+  const sitemapArray = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -42,4 +34,7 @@ export default async function sitemap() {
     ...Mixobj,
     ...Djobj,
   ];
+
+  console.debug("Sitemap generated:", sitemapArray);
+  return sitemapArray;
 }
