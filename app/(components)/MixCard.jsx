@@ -21,7 +21,7 @@ const MixCard = ({ name, title, img, downloads, Djname, likes, link }) => {
                 {title ? title : "Title"}
               </h3>
               <h6 className="font-righteous uppercase dark:text-white text-[11px] mt-1">
-                BY : {Djname ? Djname : name}
+                BY : {Djname !== "null" ? Djname : name}
               </h6>
             </div>
             <div className="flex items-center gap-4 mt-2 mb-3">

@@ -129,7 +129,7 @@ export default async function MixTape({ params: { id } }) {
               href={`/dj/${mix.name}`}
               className="text-sm md:text-lg font-semibold text-blue-500 hover:underline"
             >
-              {mix.Djname || mix.name}
+              {mix.Djname? mix.Djname:  mix.name}
             </Link>
             <div className="flex flex-col items-center md:items-start justify-between gap-2 md:gap-4 mt-2 md:mt-4">
               <p className="text-gray-600 dark:text-gray-400">Year: {mix.date}</p>
