@@ -86,7 +86,7 @@ export default function Create() {
     const xhr = new XMLHttpRequest();
     xhr.open(
       "POST",
-      "https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/upload",
+      "https://server-0g0d.onrender.com/api/upload",
       true
     );
     xhr.setRequestHeader(
