@@ -86,7 +86,7 @@ export default function Create() {
     const xhr = new XMLHttpRequest();
     xhr.open(
       "POST",
-      "https://fuzzy-garbanzo-xx6vp7q96x63vwr-5050.app.github.dev/api/upload",
+      "https://server-0g0d.onrender.com/api/upload",
       true
     );
     xhr.setRequestHeader(
