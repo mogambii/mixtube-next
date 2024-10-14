@@ -167,17 +167,8 @@ export default async function MixTape({ params: { id } }) {
           <AudioPlayer audio={mix.audio} />
         </div>
 
-        {/* Download button or login prompt */}
         <div>
-          {token ? (
             <DownloadBtn url={mix.audio} id={id} />
-          ) : (
-            <button
-              className="mt-4 w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300"
-            >
-              Login to download
-            </button>
-          )}
         </div>
 
         {/* Comments section */}
