@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from '@next/third-parties/google'
+import AudioPlayer from "./(components)/audioplayer";
 
 export const orbitron = Orbitron({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({ children }) {
           <Analytics />
           <GoogleAnalytics gaId="G-C87ETLJK5C"/>
           <main className="mx-5">{children}</main>
+          <AudioPlayer/>
           <footer>
             <Footer />
           </footer>

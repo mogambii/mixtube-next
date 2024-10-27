@@ -4,7 +4,6 @@ import MyMixxes from "@/components/MyMixxes";
 import { cookies } from "next/headers";
 import Image from "next/image";
 
-// Shared function to fetch the DJ profile data
 async function fetchProfile(username, cacheOption = "force-cache") {
   try {
     const response = await fetch(
@@ -15,7 +14,6 @@ async function fetchProfile(username, cacheOption = "force-cache") {
       }
     );
     if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-
     return await response.json();
   } catch (error) {
     console.error(error);
@@ -28,8 +26,8 @@ export async function generateMetadata({ params: { username } }) {
 
   if (!profile) {
     return {
-      title: "DJ Profile Not Found",
-      description: "The DJ profile you are looking for does not exist.",
+      title: "DJ Profile Not Found | Mixtube",
+      description: "The DJ profile you are looking for does not exist on Mixtube.",
     };
   }
 
@@ -37,17 +35,17 @@ export async function generateMetadata({ params: { username } }) {
   const name = profile.Djname || username;
 
   return {
-    title: `${name} | Mixtube`,
-    description: profile.Bio || `Explore ${name}'s mixtapes on Mixtube.`,
+    title: `${name} | DJ Profile on Mixtube`,
+    description: profile.Bio || `Discover ${name}'s mixtapes, biography, and social contacts on Mixtube.`,
     openGraph: {
-      title: `${name} | Mixtube`,
-      description: profile.Bio || `Explore ${name}'s mixtapes on Mixtube.`,
+      title: `${name} | DJ Profile on Mixtube`,
+      description: profile.Bio || `Explore mixtapes and more from ${name} on Mixtube.`,
       images: [{ url: imageUrl, alt: `${name}'s profile picture` }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${name} | Mixtube`,
-      description: profile.Bio || `Explore ${name}'s mixtapes on Mixtube.`,
+      title: `${name} | DJ Profile on Mixtube`,
+      description: profile.Bio || `Discover ${name}'s music journey on Mixtube.`,
       images: [imageUrl],
     },
   };
@@ -63,7 +61,7 @@ const checkFollowing = async (token, username) => {
     );
 
     if (!res.ok) throw new Error("Failed to check following status");
-    
+
     const results = await res.json();
     return results.is_followed;
   } catch (error) {
@@ -80,28 +78,28 @@ const DjProfile = async ({ params: { username } }) => {
   if (!profile) {
     return (
       <div className="min-h-screen px-4 text-center">
-        <h4>An error occurred while fetching the DJ profile.</h4>
+        <h1 className="text-xl font-bold">DJ Profile Not Found</h1>
+        <p>The DJ profile you are looking for does not exist.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen px-4">
+    <main className="min-h-screen px-4" itemScope itemType="http://schema.org/Person">
       <div className="grid items-center justify-center grid-cols-1 md:grid-cols-2 mb-6">
         <div className="flex flex-col items-center mb-4">
           <Image
             className="rounded-full border-4 border-gray-300 h-44 w-44 object-cover"
             src={profile.profilep}
-            alt={`${profile.Djname || username}'s profile`}
+            alt={`Profile picture of DJ ${profile.Djname || username}`}
             width={200}
             height={200}
+            itemProp="image"
           />
-          <h6 className="font-righteous dark:text-slate-50 text-center mt-2">
+          <h2 className="text-2xl font-righteous dark:text-slate-50 text-center mt-2" itemProp="name">
             {profile.Djname}
-          </h6>
-          <h6 className="font-righteous dark:text-slate-50 text-center">
-            @{profile.username}
-          </h6>
+          </h2>
+          <h3 className="font-righteous dark:text-slate-50 text-center">@{profile.username}</h3>
           <ContactsDisplay
             contacts={profile.contacts}
             socialMediaHandles={profile.socialMediaHandles}
@@ -110,36 +108,39 @@ const DjProfile = async ({ params: { username } }) => {
         <div className="flex flex-col items-center dark:text-slate-100">
           <div className="flex flex-col items-center mb-4">
             <div className="flex gap-6 mb-4">
-              <div className="text-center">
+              <div className="text-center" itemProp="interactionStatistic" itemScope itemType="http://schema.org/InteractionCounter">
+                <meta itemProp="interactionType" content="http://schema.org/DownloadAction" />
                 <h3 className="font-bold">Downloads</h3>
-                <h3>{profile.totalDownloads}</h3>
+                <h3 itemProp="userInteractionCount">{profile.totalDownloads}</h3>
               </div>
-              <div className="text-center">
+              <div className="text-center" itemProp="interactionStatistic" itemScope itemType="http://schema.org/InteractionCounter">
+                <meta itemProp="interactionType" content="http://schema.org/LikeAction" />
                 <h3 className="font-bold">Likes</h3>
-                <h3>{profile.totalLikes}</h3>
+                <h3 itemProp="userInteractionCount">{profile.totalLikes}</h3>
               </div>
-              <div className="text-center">
+              <div className="text-center" itemProp="interactionStatistic" itemScope itemType="http://schema.org/InteractionCounter">
+                <meta itemProp="interactionType" content="http://schema.org/FollowAction" />
                 <h3 className="font-bold">Followers</h3>
-                <h3>{profile.totalFollowers || 0}</h3>
+                <h3 itemProp="userInteractionCount">{profile.totalFollowers || 0}</h3>
               </div>
             </div>
             {cookie && <Follow username={username} following={following} token={cookie} />}
           </div>
         </div>
       </div>
-      <div className="p-3 border rounded-sm mb-6">
+      <section className="p-3 border rounded-sm mb-6">
         <h4 className="dark:text-slate-50 text-center font-righteous">Bio</h4>
-        <h3 className="dark:text-slate-50 text-center p-2">
-          {profile.Bio || "not added"}
-        </h3>
-      </div>
-      <div className="py-3">
+        <p className="dark:text-slate-50 text-center p-2" itemProp="description">
+          {profile.Bio || "Bio not added"}
+        </p>
+      </section>
+      <section className="py-3">
         <h5 className="dark:text-slate-50 text-center py-2 font-righteous">Mixtapes</h5>
         <div className="items-center justify-center border rounded-lg p-2 gap-4">
           <MyMixxes username={profile.username} />
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

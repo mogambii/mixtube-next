@@ -29,6 +29,55 @@ export default async function sitemap() {
       lastModified: new Date(),
       priority: 1,
     },
+    {
+      url: baseUrl + "/",
+      lastModified: new Date(),
+      priority: 1,
+    },
+    {
+      url: baseUrl + "/login",
+      lastModified: new Date(),
+    },
+    {
+      url: baseUrl + "/editprofile",
+      lastModified: new Date(),
+    },
+    {
+      url: baseUrl + "/upload",
+      lastModified: new Date(),
+    },
+    {
+      url: baseUrl + "/editmixtape",
+      lastModified: new Date(),
+    },
+    {
+      url: baseUrl + "/profile",
+      lastModified: new Date(),
+    },
+    {
+      url: baseUrl + "/discover",
+      lastModified: new Date(),
+    },
+    {
+      url: baseUrl + "/mix",
+      lastModified: new Date(),
+    },
+    {
+      url: baseUrl + "/dj",
+      lastModified: new Date(),
+    },
+    {
+      url: baseUrl + "/search",
+      lastModified: new Date(),
+    },
+    {
+      url: baseUrl + "/discoverdjs",
+      lastModified: new Date(),
+    },
+    {
+      url: baseUrl + "/discovermixtapes",
+      lastModified: new Date(),
+    },
     ...Mixobj,
     ...Djobj,
   ];
