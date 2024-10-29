@@ -49,19 +49,31 @@ function AudioPlayer() {
     const idFromStorage = localStorage.getItem("mixtape-id");
     setId(idFromStorage);
     if (idFromStorage) loadAudio(idFromStorage);
-
+  
     const handleStorageChange = () => {
       const newId = localStorage.getItem("mixtape-id");
-      if (newId !== id) setId(newId);
+      if (newId !== id) {
+        setId(newId);
+        loadAudio(newId); // Load audio when id changes in localStorage
+      }
     };
-
+  
+    // Check every second for ID updates
+    const checkIdChange = setInterval(() => {
+      const newId = localStorage.getItem("mixtape-id");
+      if (newId !== id) {
+        setId(newId);
+        loadAudio(newId); // Load audio when id changes due to interval check
+      }
+    }, 1000);
+  
     window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
-  useEffect(() => {
-    if (id) loadAudio(id);
+    return () => {
+      clearInterval(checkIdChange);
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, [id]);
+  
 
   useEffect(() => {
     if (audioPlayer.current) {
