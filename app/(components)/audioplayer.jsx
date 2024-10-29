@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useRef, useEffect } from "react";
@@ -48,16 +48,11 @@ function AudioPlayer() {
   useEffect(() => {
     const idFromStorage = localStorage.getItem("mixtape-id");
     setId(idFromStorage);
-    // Initial load
-    if (idFromStorage) {
-      loadAudio(idFromStorage);
-    }
+    if (idFromStorage) loadAudio(idFromStorage);
 
     const handleStorageChange = () => {
       const newId = localStorage.getItem("mixtape-id");
-      if (newId !== id) {
-        setId(newId);
-      }
+      if (newId !== id) setId(newId);
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -65,25 +60,20 @@ function AudioPlayer() {
   }, []);
 
   useEffect(() => {
-    if (id) {
-      loadAudio(id); // Load audio when id changes
-    }
+    if (id) loadAudio(id);
   }, [id]);
 
   useEffect(() => {
     if (audioPlayer.current) {
-      audioPlayer.current.src = audio; // Set the new audio source
-      audioPlayer.current.load(); // Load the new audio
-      setIsPlaying(false); // Reset play state
+      audioPlayer.current.src = audio;
+      audioPlayer.current.load();
+      setIsPlaying(false);
     }
   }, [audio]);
 
   const togglePlay = () => {
-    if (isPlaying) {
-      audioPlayer.current.pause();
-    } else {
-      audioPlayer.current.play();
-    }
+    if (isPlaying) audioPlayer.current.pause();
+    else audioPlayer.current.play();
     setIsPlaying((prev) => !prev);
   };
 
@@ -98,10 +88,7 @@ function AudioPlayer() {
 
   const handleRewind = () => {
     if (audioPlayer.current) {
-      audioPlayer.current.currentTime = Math.max(
-        audioPlayer.current.currentTime - 10,
-        0
-      );
+      audioPlayer.current.currentTime = Math.max(audioPlayer.current.currentTime - 10, 0);
     }
   };
 
@@ -159,94 +146,43 @@ function AudioPlayer() {
     }
   };
 
-  // Check for ID changes every second
-  useEffect(() => {
-    const checkIdChange = setInterval(() => {
-      const newId = localStorage.getItem("mixtape-id");
-      if (newId !== id) {
-        setId(newId);
-      }
-    }, 1000);
-
-    return () => clearInterval(checkIdChange);
-  }, [id]);
-
   if (!id) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-slate-100 dark:bg-gray-900 text-gray-200 p-4 shadow-lg z-50 rounded-t-lg">
-      <div className="audio-player flex items-center space-x-4 mx-6 gap-x-2 rounded-md">
-        {thumbnail && (
-          <div className="thumbnail w-24 h-24 mb-4">
-            <Link href={`/mix/${id}`}>
-              <Image
-                src={thumbnail}
-                alt="Album Thumbnail"
-                className="w-full h-full rounded-md object-cover shadow-md"
-                width={200}
-                height={200}
-              />
-            </Link>
-          </div>
-        )}
+    <div className="fixed bottom-0 left-0 w-full bg-slate-100 dark:bg-gray-900 text-gray-200 p-2 shadow-lg z-50 rounded-t-lg flex items-center justify-between">
+      {thumbnail && (
+        <Link href={`/mix/${id}`} className="w-16 h-16">
+          <Image src={thumbnail} alt="Album Thumbnail" className="w-full h-full rounded-md object-cover" width={64} height={64} />
+        </Link>
+      )}
 
-        <audio
-          ref={audioPlayer}
-          onTimeUpdate={updateProgress}
-          onEnded={() => setIsPlaying(false)}
-        />
+      <audio ref={audioPlayer} onTimeUpdate={updateProgress} onEnded={() => setIsPlaying(false)} />
 
-        <div className="flex-grow pb-3">
-          <div
-            ref={progressRef}
-            className="relative w-full h-1 bg-gray-600 rounded cursor-pointer mt-2"
-            onClick={handleSeek}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={() => setTooltipTime(null)}
-          >
-            <div
-              className="absolute top-0 left-0 h-full bg-blue-500 rounded"
-              style={{ width: `${progress}%` }}
-            />
-            <div
-              ref={dotRef}
-              className="absolute h-4 w-4 bg-blue-500 rounded-full"
-              style={{ left: `${progress}%`, top: "50%", transform: "translate(-50%, -50%)" }}
-            />
-            {tooltipTime && (
-              <div className="absolute top-0 left-0 mt-1 text-xs bg-gray-900 text-white rounded px-1 py-0.5">
-                {tooltipTime}
-              </div>
-            )}
-          </div>
-
-          <div className="controls flex justify-between items-center mt-3">
-            <button onClick={handleRewind} aria-label="Rewind 10 seconds" className="transition-transform hover:scale-110">
-              <LiaStepBackwardSolid className="h-6 w-6 text-blue-500" />
-            </button>
-            <button
-              onClick={togglePlay}
-              aria-label={isPlaying ? "Pause" : "Play"}
-              className="h-12 w-12 rounded-full bg-blue-500 text-white flex items-center justify-center transition-transform hover:scale-110"
-            >
-              {isBuffering ? (
-                <Bars height="24" width="24" color="#ffffff" ariaLabel="loading" />
-              ) : isPlaying ? (
-                <RiPauseLine className="h-7 w-7" />
-              ) : (
-                <RiPlayFill className="h-7 w-7" />
-              )}
-            </button>
-            <button onClick={handleForward} aria-label="Forward 10 seconds" className="transition-transform hover:scale-110">
-              <LiaStepForwardSolid className="h-6 w-6 text-blue-500" />
-            </button>
-          </div>
-
-          <div className="time-display text-center text-blue-500 mt-2 flex justify-between w-full">
-            <div>{currentTimeDisplay}</div>
-            <div>{durationDisplay}</div>
-          </div>
+      <div className="flex-1 mx-2">
+        <div ref={progressRef} className="relative w-full h-1 bg-gray-600 rounded cursor-pointer" onClick={handleSeek} onMouseMove={handleMouseMove} onMouseLeave={() => setTooltipTime(null)}>
+          <div className="absolute top-0 left-0 h-full bg-blue-500" style={{ width: `${progress}%` }} />
+          <div ref={dotRef} className="absolute h-3 w-3 bg-blue-500 rounded-full" style={{ left: `${progress}%`, top: "50%", transform: "translate(-50%, -50%)" }} />
+          {tooltipTime && (
+            <div className="absolute top-0 left-0 mt-1 text-xs bg-gray-900 text-white rounded px-1 py-0.5">{tooltipTime}</div>
+          )}
         </div>
+
+        <div className="flex justify-between text-xs text-blue-500 mt-1">
+          <div>{currentTimeDisplay}</div>
+          <div>{durationDisplay}</div>
+        </div>
+      </div>
+
+      <div className="flex space-x-2">
+        <button onClick={handleRewind} aria-label="Rewind 10 seconds" className="hover:text-blue-500">
+          <LiaStepBackwardSolid className="h-5 w-5" />
+        </button>
+        <button onClick={togglePlay} aria-label={isPlaying ? "Pause" : "Play"} className="h-10 w-10 bg-blue-500 text-white rounded-full flex items-center justify-center">
+          {isBuffering ? <Bars height="20" width="20" color="#ffffff" /> : isPlaying ? <RiPauseLine className="h-6 w-6" /> : <RiPlayFill className="h-6 w-6" />}
+        </button>
+        <button onClick={handleForward} aria-label="Forward 10 seconds" className="hover:text-blue-500">
+          <LiaStepForwardSolid className="h-5 w-5" />
+        </button>
       </div>
     </div>
   );
