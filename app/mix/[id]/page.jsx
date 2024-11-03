@@ -42,7 +42,7 @@ export async function generateMetadata({ params: { id } }) {
 
   return {
     title: mix ? `${mix.title} | Mixtube` : "Mixtape Not Found",
-    description: mix?.desc || `Explore ${mix?.Djname || mix?.name}'s mixtape on Mixtube.`,
+    description: `${mix?.desc} mix on mixtube | stream, play and download| by  ${mix?.Djname || mix?.name}`  || `Explore ${mix?.Djname || mix?.name}'s mixtape on Mixtube.`,
     keywords: [
       "mixtape",
       "music",

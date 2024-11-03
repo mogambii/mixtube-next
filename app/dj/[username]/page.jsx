@@ -36,7 +36,7 @@ export async function generateMetadata({ params: { username } }) {
 
   const imageUrl = profile.profilep || 'https://default-image-url.com/default.jpg';
   const name = profile.Djname || username;
-  const description = profile.Bio || `Discover ${name}'s mixtapes, biography, and social contacts on Mixtube.`;
+  const description = ` Discover ${name}'s mixtapes, biography, and social contacts on Mixtube. \n ${profile.Bio && profile.Bio} `;
 
   return {
     title: `${name} | DJ Profile on Mixtube`,
