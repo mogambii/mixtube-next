@@ -4,6 +4,6 @@ export default function robots() {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://mixtube.xyz/sitemap.xml",
+    sitemap: "https://mixtube.xyz/sitemap.xml/",
   };
 }
