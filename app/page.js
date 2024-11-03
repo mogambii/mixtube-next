@@ -13,7 +13,7 @@ export const metadata = {
   keywords: "latest mixtapes, free music, download mixtapes, mixtube music, playlists, trending music, mixtape downloads, music streaming",
   openGraph: {
     type: "website",
-    url: "https://mixtube.com/",
+    url: "https://mixtube.xyz/",
     title: "Discover & Download Mixtapes | MixTube",
     description: "Stream and download the best mixtapes from your favorite artists on MixTube. Share playlists and stay updated with new releases.",
     images: [
@@ -32,7 +32,7 @@ export const metadata = {
     images: ["https://i.ibb.co/17dxyfD/a5282d7a00d9ec58056a5.png"],
   },
   alternates: {
-    canonical: "https://mixtube.com/",
+    canonical: "https://mixtube.xyz/",
   },
 };
 
