@@ -28,25 +28,43 @@ export async function generateMetadata({ params: { username } }) {
     return {
       title: "DJ Profile Not Found | Mixtube",
       description: "The DJ profile you are looking for does not exist on Mixtube.",
+      alternates: {
+        canonical: `/dj/${username}`,
+      },
     };
   }
 
   const imageUrl = profile.profilep || 'https://default-image-url.com/default.jpg';
   const name = profile.Djname || username;
+  const description = profile.Bio || `Discover ${name}'s mixtapes, biography, and social contacts on Mixtube.`;
 
   return {
     title: `${name} | DJ Profile on Mixtube`,
-    description: profile.Bio || `Discover ${name}'s mixtapes, biography, and social contacts on Mixtube.`,
+    description,
+    keywords: [
+      "DJ", 
+      `${name}`, 
+      "Mixtube", 
+      "DJ Profile", 
+      "Mixtape", 
+      `${profile.genre}`, 
+      "Music", 
+      "Mixes", 
+      `${name}'s Mixtube Profile`
+    ],
     openGraph: {
       title: `${name} | DJ Profile on Mixtube`,
-      description: profile.Bio || `Explore mixtapes and more from ${name} on Mixtube.`,
+      description,
       images: [{ url: imageUrl, alt: `${name}'s profile picture` }],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${name} | DJ Profile on Mixtube`,
-      description: profile.Bio || `Discover ${name}'s music journey on Mixtube.`,
+      description,
       images: [imageUrl],
+    },
+    alternates: {
+      canonical: `/dj/${username}`,
     },
   };
 }
@@ -66,7 +84,7 @@ const checkFollowing = async (token, username) => {
     return results.is_followed;
   } catch (error) {
     console.error("Error checking following status:", error);
-    return false; // Default to not followed if an error occurs
+    return false;
   }
 };
 
@@ -86,6 +104,7 @@ const DjProfile = async ({ params: { username } }) => {
 
   return (
     <main className="min-h-screen px-4" itemScope itemType="http://schema.org/Person">
+      <link rel="canonical" href={`/dj/${username}`} />
       <div className="grid items-center justify-center grid-cols-1 md:grid-cols-2 mb-6">
         <div className="flex flex-col items-center mb-4">
           <Image

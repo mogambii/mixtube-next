@@ -5,7 +5,7 @@ import { FaWhatsapp } from "react-icons/fa";
 const Footer = () => {
   return (
     <div className=" w-full rounded-lg">
-      <footer className="pt-10 pb-6">
+      <footer className="pt-10 pb-16">
         <div className="flex justify-center pt-1 gap-2">
           <a href="https://t.me/kenyanmix">
             <FaTelegram

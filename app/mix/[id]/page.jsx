@@ -43,6 +43,15 @@ export async function generateMetadata({ params: { id } }) {
   return {
     title: mix ? `${mix.title} | Mixtube` : "Mixtape Not Found",
     description: mix?.desc || `Explore ${mix?.Djname || mix?.name}'s mixtape on Mixtube.`,
+    keywords: [
+      "mixtape",
+      "music",
+      "dj mix",
+      mix?.genre || "genre",
+      mix?.title || "mixtape",
+      "Mixtube",
+      mix?.Djname || mix?.name,
+    ],
     openGraph: {
       title: `${mix?.title || "Mixtape"} | Mixtube`,
       description: mix?.desc || `Explore ${mix?.Djname || mix?.name}'s mixtape on Mixtube.`,
@@ -61,6 +70,9 @@ export async function generateMetadata({ params: { id } }) {
       title: `${mix?.title || "Mixtape"} | Mixtube`,
       description: mix?.desc || `Explore ${mix?.Djname || mix?.name}'s mixtape on Mixtube.`,
       images: [imageUrl],
+    },
+    alternates: {
+      canonical: `https://mixtube.com/mixtape/${id}`,
     },
   };
 }
@@ -96,13 +108,35 @@ export default async function MixTape({ params: { id } }) {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 md:p-6">
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "MusicAlbum",
+          "@id": `https://mixtube.com/mixtape/${id}`,
+          name: mix.title || "Mixtape",
+          description: mix.desc || `Explore ${mix.Djname || mix.name}'s mixtape on Mixtube.`,
+          byArtist: {
+            "@type": "Person",
+            name: mix.Djname || mix.name || "Unknown Artist",
+          },
+          genre: mix.genre || "N/A",
+          image: mix.imgthumb || defaultImageUrl,
+          datePublished: mix.date,
+          track: {
+            "@type": "MusicRecording",
+            name: mix.title || "Track",
+            duration: mix.duration || "N/A",
+            inAlbum: mix.title || "Album",
+          },
+        })}
+      </script>
       <div className="dark:bg-gray-800 rounded-lg shadow-lg p-4 md:p-6 space-y-6">
         
         {/* Mixtape Information */}
         <div className="flex flex-col md:flex-row pb-4 border-b border-gray-200 dark:border-gray-700 gap-4">
           <div className="w-full md:w-[200px]">
             <Image
-              src={mix.imgthumb || "https://i.ibb.co/17dxyfD/a5282d7a00d9ec58056a5.png"}
+              src={mix.imgthumb || defaultImageUrl}
               height={400}
               width={400}
               alt={`Cover image of ${mix.title || "Mixtape"}`}
@@ -141,9 +175,8 @@ export default async function MixTape({ params: { id } }) {
         <div className="flex items-center mt-4 gap-x-4">
           <Share id={id} />
           {token && <LikeBtn likedparam={liked?.liked} id={id} />}
-        <AudioAdd id={id} />
+          <AudioAdd id={id} />
         </div>
-
 
         {/* Download Button */}
         <div>
