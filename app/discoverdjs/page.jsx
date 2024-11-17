@@ -56,11 +56,6 @@ const DiscoverDjs = () => {
   const Menu = () => (
     <div className="w-auto">
       <div className="hidden md:flex gap-x-5">
-        <Link href="/discoverdjs">
-          <button className="rounded-3xl px-3 py-1 font-righteous dark:text-slate-50 border-2 text-xs h-10">
-            Discover DJs
-          </button>
-        </Link>
         <Link href="/discover">
           <button className="rounded-3xl px-3 py-1 font-righteous dark:text-slate-50 border-2 text-xs h-10">
             Discover Mixxes
