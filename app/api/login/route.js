@@ -5,7 +5,7 @@ export async function POST(request) {
   try {
     const { username, password } = await request.json();
     const response = await fetch(
-      `https://cautious-funicular-wr9g54x9jw4jf5r4p-3000.app.github.dev/api/user/login`,
+      `https://server-nezz.vercel.app/api/user/login`,
       {
         method: "POST",
         headers: {
