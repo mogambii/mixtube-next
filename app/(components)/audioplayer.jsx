@@ -37,7 +37,7 @@ function AudioPlayer() {
       audioPlayer.current.pause();
     } else {
       audioPlayer.current.play();
-      // Update play count when starting to play
+      // Update play count when starting to pla
       if (currentMix.id) {
         updatePlays(currentMix.id);
       }
