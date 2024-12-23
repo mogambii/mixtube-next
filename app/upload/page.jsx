@@ -9,28 +9,19 @@ import Image from "next/image";
 export default function Create() {
   const router = useRouter();
 
-  // Initialize username and Djname using useState
-  const [username, setUsername] = useState("");
-  const [Djname, setDjname] = useState("");
-
-  // Update username and Djname from localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setUsername(localStorage.getItem("mixtube-tokenname") || "");
-      setDjname(localStorage.getItem("mixtube-Djname") || "");
       document.title = "Create Mixtape | MixTube";
     }
   }, []);
 
-  const genres = ["POP", "RAP", "TRAP", "BONGO", "DRILL", "DANCEHALL","GENGETONE","REGGAE","CRUNK","HIPHOP"];
+  const genres = ["POP", "RAP", "TRAP", "BONGO", "DRILL", "DANCEHALL", "GENGETONE", "REGGAE", "CRUNK", "HIPHOP"];
 
   const [formData, setFormData] = useState({
     title: "",
     genre: "",
     date: "",
     desc: "",
-    username,
-    Djname,
     imgthumb: null,
     audio: null,
   });
@@ -48,15 +39,14 @@ export default function Create() {
     const { name, value, files } = e.target;
     if (files) {
       const file = files[0];
-      // File size validation
       if (name === "imgthumb") {
-        if (file.size > 4 * 1024 * 1024) { // 2MB limit
+        if (file.size > 4 * 1024 * 1024) { // 4MB limit
           toast.error("Image size should not exceed 4MB");
           return;
         }
         setImgPreview(URL.createObjectURL(file));
       } else if (name === "audio") {
-        if (file.size > 150 * 1024 * 1024) { // 10MB limit
+        if (file.size > 150 * 1024 * 1024) { // 150MB limit
           toast.error("Audio size should not exceed 150MB");
           return;
         }
@@ -84,16 +74,9 @@ export default function Create() {
     });
 
     const xhr = new XMLHttpRequest();
-    xhr.open(
-      "POST",
-      "https://server-0g0d.onrender.com/api/upload",
-      true
-    );
-    xhr.setRequestHeader(
-      "Authorization",
-      `Bearer ${localStorage.getItem("mixtube-token")}`
-    );
+    xhr.open("POST", "/api/upload",true);
 
+    xhr.withCredentials = true;
     xhr.upload.addEventListener("progress", (event) => {
       if (event.lengthComputable) {
         const percentComplete = (event.loaded / event.total) * 100;
@@ -106,29 +89,23 @@ export default function Create() {
       if (xhr.status === 201) {
         toast.success("Mixtape uploaded successfully");
         router.push("/profile");
-      } else if (xhr.status === 400) {
-        setError("Bad request. Please check your input and try again.");
-        toast.error("Bad request. Please check your input and try again.");
-      } else if (xhr.status === 401) {
-        setError("Unauthorized. Please log in again.");
-        toast.error("Unauthorized. Please log in again.");
-      } else if (xhr.status === 500) {
-        setError("Server error. Please try again later.");
-        toast.error("Server error. Please try again later.");
       } else {
-        setError("An unexpected error occurred. Please try again.");
-        toast.error("An unexpected error occurred. Please try again.");
+        const message = xhr.status === 400
+          ? "Bad request. Please check your input and try again."
+          : xhr.status === 401
+          ? "Unauthorized. Please log in again."
+          : xhr.status === 500
+          ? "Server error. Please try again later."
+          : "An unexpected error occurred. Please try again.";
+        setError(message);
+        toast.error(message);
       }
     };
 
     xhr.onerror = () => {
       setSubmitting(false);
-      setError(
-        "An error occurred while submitting the form. Please check your network."
-      );
-      toast.error(
-        "An error occurred while submitting the form. Please check your network."
-      );
+      setError("An error occurred while submitting the form. Please check your network.");
+      toast.error("An error occurred while submitting the form. Please check your network.");
     };
 
     xhr.ontimeout = () => {
@@ -146,8 +123,6 @@ export default function Create() {
       genre: "",
       date: "",
       desc: "",
-      username,
-      Djname,
       imgthumb: null,
       audio: null,
     });

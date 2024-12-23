@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { FaBell } from "react-icons/fa6";
 import { cookies } from "next/headers";
-import { LogOutbtn } from "./LogOut-btn";
 
 async function verifyToken(token) {
   try {
@@ -19,8 +18,7 @@ async function verifyToken(token) {
   }
 }
 
-async function fetchNotificationsCount(token, type) {
-  if (!type) return 0;
+async function fetchNotificationsCount(token) {
   try {
     const response = await fetch(
       "https://server-nezz.vercel.app/api/user/total-notifications",
@@ -48,13 +46,11 @@ export default async function NotificationIcon() {
   const cookieStore = await  cookies();
   // Retrieve cookies on the server side
   const mixtubeToken = cookieStore.get("mixtube-token");
-  const mixtubeType = cookieStore.get("mixtube-type");
 
   const token = mixtubeToken ? mixtubeToken.value : null;
-  const type = mixtubeType ? mixtubeType.value : null;
 
   const isTokenValid = token ? await verifyToken(token) : false;
-  const notifications = isTokenValid ? await fetchNotificationsCount(token, type) : 0;
+  const notifications = isTokenValid ? await fetchNotificationsCount(token) : 0;
 
   return (
     <div className="flex items-center gap-4">
@@ -73,15 +69,13 @@ export default async function NotificationIcon() {
       )}
         <div className="flex items-center gap-4 dark:text-slate-50">
           <div className="flex items-center gap-x-2 text-lg font-semibold">
-            {type === "DJ" ? (
+            {token ? (
               <Link
                 href="/profile"
                 className="px-2 py-1 rounded-full ring-1 ring-slate-900 dark:ring-slate-50 hover:bg-gray-200 dark:hover:bg-gray-700"
               >
                 Profile
               </Link>
-            ) : type ? (
-              <LogOutbtn />
             ) : (
               <Link
                 href="/login"
@@ -95,3 +89,4 @@ export default async function NotificationIcon() {
     </div>
   );
 }
+

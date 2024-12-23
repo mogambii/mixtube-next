@@ -1,33 +1,21 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaSpinner } from "react-icons/fa";
 import { Blocks } from "react-loader-spinner";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { FaSpinner } from "react-icons/fa6";
 
 const ProfileEdit = () => {
-  let token;
-  let username;
   const router = useRouter();
-
-  if (typeof window !== "undefined") {
-    token = localStorage.getItem("mixtube-token");
-    username = localStorage.getItem("mixtube-tokenname");
-  }
-
-  useEffect(() => {
-    document.title = "Edit Profile | MixTube";
-  }, []);
-
   const fileInputRef = useRef(null);
+
   const [submitting, setSubmitting] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [form, setForm] = useState({
     profilep: "",
-    username: username || "",
+    username: "",
     Bio: "",
     Djname: "",
     facebook: "",
@@ -41,18 +29,20 @@ const ProfileEdit = () => {
 
   const [selectedFile, setSelectedFile] = useState(null);
 
+  useEffect(() => {
+    document.title = "Edit Profile | MixTube";
+    getProfile();
+  }, []);
+
   const getProfile = async () => {
     setLoadingProfile(true);
     try {
-      const response = await fetch(
-        `https://server-nezz.vercel.app/api/user/dj/profile/?username=${form.username}`
-      );
-
+      const response = await fetch(`/api/myprofiledetails`);
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
       const profileData = await response.json();
-      setForm((prevForm) => ({
-        ...prevForm,
+      setForm({
+        username: profileData.username || "",
         Bio: profileData.Bio || "",
         Djname: profileData.Djname || "",
         profilep: profileData.profilep || "",
@@ -63,20 +53,14 @@ const ProfileEdit = () => {
         canCall: profileData.contacts?.canCall || false,
         canSMS: profileData.contacts?.canSMS || false,
         canWhatsApp: profileData.contacts?.canWP || false,
-      }));
+      });
     } catch (error) {
       console.error("Error loading profile:", error);
-      toast.error("Error loading profile", { autoClose: 3000 });
+      toast.error("Error loading profile");
     } finally {
       setLoadingProfile(false);
     }
   };
-
-  useEffect(() => {
-    if (form.username) {
-      getProfile();
-    }
-  }, [form.username]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -92,19 +76,18 @@ const ProfileEdit = () => {
   const validateSocialMediaLinks = () => {
     const facebookRegex = /^(https?:\/\/)?(www\.)?facebook\.com\/[a-zA-Z0-9(\.\?)?]/;
     const instagramRegex = /^(https?:\/\/)?(www\.)?instagram\.com\/[a-zA-Z0-9._]+(\/profilecard\/?.*)?$/;
-
     const xRegex = /^(https?:\/\/)?(www\.)?x\.com\/[a-zA-Z0-9(_)?]+\/?$/;
 
     if (form.facebook && !facebookRegex.test(form.facebook)) {
-      toast.error("Invalid Facebook profile link", { autoClose: 3000 });
+      toast.error("Invalid Facebook profile link");
       return false;
     }
     if (form.instagram && !instagramRegex.test(form.instagram)) {
-      toast.error("Invalid Instagram profile link", { autoClose: 3000 });
+      toast.error("Invalid Instagram profile link");
       return false;
     }
     if (form.x && !xRegex.test(form.x)) {
-      toast.error("Invalid X (Twitter) profile link", { autoClose: 3000 });
+      toast.error("Invalid X (Twitter) profile link");
       return false;
     }
     return true;
@@ -113,9 +96,7 @@ const ProfileEdit = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateSocialMediaLinks()) {
-      return;
-    }
+    if (!validateSocialMediaLinks()) return;
 
     const formData = new FormData();
     formData.append("username", form.username);
@@ -125,7 +106,6 @@ const ProfileEdit = () => {
     formData.append("Instagram", form.instagram);
     formData.append("X", form.x);
     formData.append("phoneNumber", form.phone);
-
     formData.append("canCall", form.canCall);
     formData.append("canSMS", form.canSMS);
     formData.append("canWP", form.canWhatsApp);
@@ -137,73 +117,28 @@ const ProfileEdit = () => {
     try {
       setSubmitting(true);
       const response = await fetch(
-        "https://server-0g0d.onrender.com/api/user/profile",
+        "/api/myprofiledetails",
         {
           method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
           body: formData,
         }
       );
 
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
-      toast.success("Profile updated successfully!", { autoClose: 3000 });
-
-      // Reset the form
-      setForm({
-        profilep: "",
-        username: "",
-        Djname: "",
-        Bio: "",
-        facebook: "",
-        instagram: "",
-        x: "",
-        phone: "",
-        canCall: false,
-        canSMS: false,
-        canWhatsApp: false,
-      });
-
+      toast.success("Profile updated successfully!");
       router.push("/profile");
     } catch (error) {
       console.error("An error occurred while updating the profile:", error);
-      toast.error("An error occurred while updating the profile", {
-        autoClose: 3000,
-      });
-    }finally {
+      toast.error("An error occurred while updating the profile");
+    } finally {
       setSubmitting(false);
     }
   };
 
-  if (loadingProfile) {
-    return (
-      <div className="min-h-screen grid justify-center items-center gap-3 m-1/2">
-        <Blocks
-          height="100"
-          width="100"
-          color="#4fa94d"
-          ariaLabel="blocks-loading"
-          visible={true}
-        />
-      </div>
-    );
-  }
-
-  const renderInputField = (
-    label,
-    name,
-    value,
-    onChange,
-    type = "text",
-    placeholder = ""
-  ) => (
+  const renderInputField = (label, name, value, onChange, type = "text", placeholder = "") => (
     <div className="flex flex-col">
-      <label
-        htmlFor={name}
-        className="text-sm font-medium text-gray-900 dark:text-gray-50"
-      >
+      <label htmlFor={name} className="text-sm font-medium text-gray-900 dark:text-gray-50">
         {label}
       </label>
       <input
@@ -217,6 +152,14 @@ const ProfileEdit = () => {
       />
     </div>
   );
+
+  if (loadingProfile) {
+    return (
+      <div className="min-h-screen grid justify-center items-center gap-3">
+        <Blocks height="100" width="100" color="#4fa94d" ariaLabel="blocks-loading" visible={true} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-800 p-6 rounded-md">
@@ -240,9 +183,7 @@ const ProfileEdit = () => {
               />
             ) : (
               <div className="rounded-full border-4 border-gray-300 dark:border-gray-700 h-40 w-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                <span className="text-gray-500 dark:text-gray-300">
-                  No Image
-                </span>
+                <span className="text-gray-500 dark:text-gray-300">No Image</span>
               </div>
             )}
             <FaEdit
@@ -252,62 +193,24 @@ const ProfileEdit = () => {
           </div>
         </div>
 
-        <input
-          type="file"
-          ref={fileInputRef}
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileChange}
-        />
+        <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={handleFileChange} />
 
         <div className="grid grid-cols-1 gap-6">
-          {renderInputField(
-            "DJ Name",
-            "Djname",
-            form.Djname,
-            (e) => setForm((prev) => ({ ...prev, Djname: e.target.value })),
-            "text",
-            "Your DJ name"
+          {renderInputField("DJ Name", "Djname", form.Djname, (e) =>
+            setForm((prev) => ({ ...prev, Djname: e.target.value }))
           )}
-          {renderInputField(
-            "Bio",
-            "Bio",
-            form.Bio,
-            (e) => setForm((prev) => ({ ...prev, Bio: e.target.value })),
-            "text",
-            "Your bio"
+          {renderInputField("Bio", "Bio", form.Bio, (e) => setForm((prev) => ({ ...prev, Bio: e.target.value })))}
+          {renderInputField("Facebook Profile Link", "facebook", form.facebook, (e) =>
+            setForm((prev) => ({ ...prev, facebook: e.target.value }))
           )}
-          {renderInputField(
-            "Facebook Profile Link",
-            "facebook",
-            form.facebook,
-            (e) => setForm((prev) => ({ ...prev, facebook: e.target.value })),
-            "text",
-            "Your Facebook profile link"
+          {renderInputField("Instagram Profile Link", "instagram", form.instagram, (e) =>
+            setForm((prev) => ({ ...prev, instagram: e.target.value }))
           )}
-          {renderInputField(
-            "Instagram Profile Link",
-            "instagram",
-            form.instagram,
-            (e) => setForm((prev) => ({ ...prev, instagram: e.target.value })),
-            "text",
-            "Your Instagram profile link"
+          {renderInputField("X (Twitter) Profile Link", "x", form.x, (e) =>
+            setForm((prev) => ({ ...prev, x: e.target.value }))
           )}
-          {renderInputField(
-            "X (Twitter) Profile Link",
-            "x",
-            form.x,
-            (e) => setForm((prev) => ({ ...prev, x: e.target.value })),
-            "text",
-            "Your X (Twitter) profile link"
-          )}
-          {renderInputField(
-            "Phone Number",
-            "phone",
-            form.phone,
-            (e) => setForm((prev) => ({ ...prev, phone: e.target.value })),
-            "text",
-            "Your phone number"
+          {renderInputField("Phone Number", "phone", form.phone, (e) =>
+            setForm((prev) => ({ ...prev, phone: e.target.value }))
           )}
 
           <div className="flex items-center gap-4 mt-4">
@@ -315,45 +218,30 @@ const ProfileEdit = () => {
               <input
                 type="checkbox"
                 checked={form.canCall}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, canCall: e.target.checked }))
-                }
+                onChange={(e) => setForm((prev) => ({ ...prev, canCall: e.target.checked }))}
                 className="form-checkbox h-5 w-5 text-blue-600"
               />
-              <span className="ml-2 text-gray-700 dark:text-gray-50">
-                Can Call
-              </span>
+              <span className="ml-2 text-gray-700 dark:text-gray-50">Can Call</span>
             </label>
 
             <label className="flex items-center">
               <input
                 type="checkbox"
                 checked={form.canSMS}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, canSMS: e.target.checked }))
-                }
+                onChange={(e) => setForm((prev) => ({ ...prev, canSMS: e.target.checked }))}
                 className="form-checkbox h-5 w-5 text-blue-600"
               />
-              <span className="ml-2 text-gray-700 dark:text-gray-50">
-                Can SMS
-              </span>
+              <span className="ml-2 text-gray-700 dark:text-gray-50">Can SMS</span>
             </label>
 
             <label className="flex items-center">
               <input
                 type="checkbox"
                 checked={form.canWhatsApp}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    canWhatsApp: e.target.checked,
-                  }))
-                }
+                onChange={(e) => setForm((prev) => ({ ...prev, canWhatsApp: e.target.checked }))}
                 className="form-checkbox h-5 w-5 text-blue-600"
               />
-              <span className="ml-2 text-gray-700 dark:text-gray-50">
-                Can WhatsApp
-              </span>
+              <span className="ml-2 text-gray-700 dark:text-gray-50">Can WhatsApp</span>
             </label>
           </div>
         </div>
@@ -370,17 +258,9 @@ const ProfileEdit = () => {
           <button
             disabled={submitting}
             type="submit"
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none disabled:bg-slate-600 disabled:cursor-not-allowed "
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none disabled:bg-slate-600 disabled:cursor-not-allowed"
           >
-            {
-              submitting ? (
-                <div className="flex items-center justify-center">
-                  <FaSpinner className="animate-spin h-5 w-5 transition-transform duration-300" />
-                </div>
-              ) : (
-                "Save"
-              )
-            }
+            {submitting ? <FaSpinner className="animate-spin h-5 w-5" /> : "Save"}
           </button>
         </div>
       </form>

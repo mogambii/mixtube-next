@@ -5,7 +5,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { handleLogin } from "@/actions/handlers";
 import Head from "next/head";
 
 const schema = yup.object({
@@ -38,14 +37,17 @@ const Login = () => {
   const onSubmit = async (data) => {
     setError("");
     try {
-      const res = await handleLogin(data);
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });   
       if (res.status !== 200) {
         setError(res.message);
       } else {
-        localStorage.setItem("mixtube-token", res.data.token);
-        localStorage.setItem("mixtube-tokenname", res.data.username);
-        localStorage.setItem("mixtube-type", res.data.type);
-        localStorage.setItem("mixtube-Djname", res.data.Djname);
+        setError("");
         router.push("/");
       }
     } catch (error) {

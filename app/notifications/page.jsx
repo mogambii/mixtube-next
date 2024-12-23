@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaTrashAlt, FaEnvelopeOpen, FaEnvelope } from "react-icons/fa";
 import Spinner from "../(components)/Spinner";
+import toast from "react-hot-toast";
 
 function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
@@ -16,11 +17,10 @@ function NotificationsPage() {
     async function fetchNotifications() {
       try {
         const response = await fetch(
-          `https://server-nezz.vercel.app/api/user/notifications?page=${page}`,
+          `/api/notifications?page=${page}`,
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("mixtube-token")}`,
             },
           }
         );
@@ -53,18 +53,19 @@ function NotificationsPage() {
     setActionLoading(true);
     try {
       const response = await fetch(
-        `https://server-nezz.vercel.app/api/user/notification?notificationId=${notificationId}`,
+        `/api/notifications?id=${notificationId}`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("mixtube-token")}`,
+            "Content-Type": "application/json",
           },
-        }
+        } 
       );
       if (response.ok) {
         setNotifications((prev) =>
           prev.filter((notification) => notification.id !== notificationId)
         );
+      toast.success("Notification deleted successfully");
       } else {
         alert("Failed to delete notification");
       }

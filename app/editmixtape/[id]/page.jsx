@@ -24,9 +24,8 @@ export default function Edit({ params: { id } }) {
   useEffect(() => {
     const fetchMixtape = async () => {
       try {
-        const response = await fetch(`/api/my/mixtape/${id}`, {
+        const response = await fetch(`/api/mymix?id=${id}`, {
           method: "GET",
-          credentials: 'include',
           headers: {
             "Content-Type": "application/json",
           },
@@ -81,9 +80,8 @@ export default function Edit({ params: { id } }) {
     }
 
     try {
-      const response = await fetch(`/api/mixtape/${id}`, {
-        method: "PUT",
-        credentials: 'include',
+      const response = await fetch(`/api/mymix?id=${id}`, {
+        method: "PATCH",
         body: formData,
       });
 
@@ -136,7 +134,7 @@ export default function Edit({ params: { id } }) {
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2">Date</label>
           <input
-            type="date"
+            type="text"
             value={mixtapeData.date}
             onChange={(e) =>
               setMixtapeData({ ...mixtapeData, date: e.target.value })
@@ -214,3 +212,4 @@ export default function Edit({ params: { id } }) {
     </div>
   );
 }
+

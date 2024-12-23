@@ -5,15 +5,10 @@ export default async function middleware(req) {
   const { pathname } = req.nextUrl;
   const cookieStore = await  cookies();
 
-  const mixtubeType = cookieStore.get('mixtube-type');
-  const mixtubeUsername = cookieStore.get('mixtube-tokenname');
+  const mixtubeUsername = cookieStore.get('mixtube-username');
+  const token = cookieStore.get('mixtube-token')?.value;
 
-  // Protect the /login route if the user is already logged in
-  if (pathname === '/login' && mixtubeType) {
-    return NextResponse.redirect(new URL('/profile', req.url));
-  }
 
-  // Protect /dj/[name] route and redirect if the username matches the cookie value
   if (pathname.startsWith('/dj/')) {
     const name = pathname.split('/')[2];
     if (mixtubeUsername && name === mixtubeUsername?.value) {
@@ -22,9 +17,9 @@ export default async function middleware(req) {
   }
 
   // Protect certain routes if the user is not logged in
-  const protectedRoutes = ['/create', '/editprofile', '/editmixtape'];
+  const protectedRoutes = ['/create', '/editprofile', '/editmixtape','/profile']
   if (protectedRoutes.some(route => pathname.startsWith(route))) {
-    if (!mixtubeType) {
+    if (!token) {
       return NextResponse.redirect(new URL('/login', req.url));
     }
   }

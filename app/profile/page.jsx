@@ -14,11 +14,6 @@ import { LogOut } from "@/actions/handlers";
 import toast from "react-hot-toast";
 
 const Profile = () => {
-  var username;
-  if (typeof window !== "undefined") {
-    document.title = "My Profile | MixTube";
-    var username = localStorage.getItem("mixtube-tokenname");
-  }
   const router = useRouter();
   const [likes, setLikes] = useState(0);
   const [downloads, setDownloads] = useState(0);
@@ -38,7 +33,7 @@ const Profile = () => {
   const fetchProfile = useCallback(async () => {
     try {
       const response = await fetch(
-        `https://server-nezz.vercel.app/api/user/dj/profile/?username=${username}`
+        `/api/myprofiledetails`
       );
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
       const profileData = await response.json();
@@ -48,13 +43,13 @@ const Profile = () => {
       console.error(error);
       setLoadingProfile(false);
     }
-  }, [username]);
+  }, []);
 
   const fetchMixes = useCallback(async () => {
     setLoadingMixes(true);
     try {
       const mixResponse = await fetch(
-        `https://server-nezz.vercel.app/api/search/mixtapes?search=${username}&page=${currentPage}&limit=${itemsPerPage}`
+        `/api/profile/mymixxes?page=${currentPage}&limit=${itemsPerPage}`
       );
       if (mixResponse.status === 404) {
         setMixes([]);
@@ -78,7 +73,7 @@ const Profile = () => {
     } finally {
       setLoadingMixes(false);
     }
-  }, [username, currentPage, itemsPerPage]);
+  }, [ currentPage, itemsPerPage]);
 
   useEffect(() => {
     fetchProfile();
@@ -94,11 +89,11 @@ const Profile = () => {
     setDeleting(true);
     try {
       const response = await fetch(
-        `https://server-nezz.vercel.app/api/mixtape/${mixToDelete}`,
+        `/api/mymix?id=${mixToDelete}`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("mixtube-token")}`,
+            "Content-Type": "application/json",
           },
         }
       );
