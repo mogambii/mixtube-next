@@ -35,14 +35,14 @@ export function PlayerProvider({ children }) {
 
   const updatePlays = async (id) => {
     try {
-      // const response = await fetch(`https://server-nezz.vercel.app/api/mixtape/${id}/plays`, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      // });
+      const response = await fetch(`https://server-nezz.vercel.app/api/updateplays?id=${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
       
-      // if (!response.ok) {
-      //   throw new Error(`Failed to update plays: ${response.statusText}`);
-      // }
+      if (!response.ok) {
+        throw new Error(`Failed to update plays: ${response.statusText}`);
+      }
     } catch (error) {
       console.error("Error updating plays:", error);
     }

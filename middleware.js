@@ -17,7 +17,7 @@ export default async function middleware(req) {
   }
 
   // Protect certain routes if the user is not logged in
-  const protectedRoutes = ['/create', '/editprofile', '/editmixtape','/profile']
+  const protectedRoutes = ['/create', '/editprofile', '/editmixtape','/profile','/upload'];
   if (protectedRoutes.some(route => pathname.startsWith(route))) {
     if (!token) {
       return NextResponse.redirect(new URL('/login', req.url));
@@ -28,5 +28,5 @@ export default async function middleware(req) {
 }
 
 export const config = {
-  matcher: ['/login', '/dj/:name*', '/create', '/editprofile', '/editmixtape'],
+  matcher: ['/login', '/dj/:name*', '/create', '/editprofile', '/editmixtape',"/upload","/profile"],
 };

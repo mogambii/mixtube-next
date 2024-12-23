@@ -86,7 +86,7 @@ export default function Create() {
 
     xhr.onload = () => {
       setSubmitting(false);
-      if (xhr.status === 201) {
+      if (xhr.status === 200) {
         toast.success("Mixtape uploaded successfully");
         router.push("/profile");
       } else {

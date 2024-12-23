@@ -24,13 +24,11 @@ export async function POST(request) {
         formData.append('username', username);
         formData.append('Djname', Djname);
 
-        // Send the form data to the target API with the authorization token
         const response = await fetch("https://server-0g0d.onrender.com/api/upload", {
             method: "POST",
-            body: formData,  // Directly pass the FormData object
+            body: formData,  
             headers: {
                 Authorization: `Bearer ${token}`,
-                // No need to set "Content-Type", the browser will handle it
             }
         });
 
@@ -40,12 +38,12 @@ export async function POST(request) {
         // Parse the JSON response from the upload API
         const data = await response.json();
         
+        console.log(data)
         // Return the data as a Next.js response
         return new NextResponse(JSON.stringify(data), { status: 200 });
 
     } catch (error) {
         console.log(error);
-        // Return an error response if anything fails
         return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
     }
 }

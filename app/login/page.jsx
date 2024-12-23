@@ -49,6 +49,9 @@ const Login = () => {
       } else {
         setError("");
         router.push("/");
+        if(typeof window !== "undefined") {
+          router.refresh();
+        }
       }
     } catch (error) {
       console.error(error);
