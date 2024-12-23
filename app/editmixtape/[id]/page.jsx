@@ -5,6 +5,7 @@ import { Tooltip } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+
 export default function Edit({ params: { id } }) {
   useEffect(() => {
     document.title = "Edit Mixtape | MixTube";
@@ -115,49 +116,49 @@ export default function Edit({ params: { id } }) {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Edit Mixtape</h1>
-      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Title</label>
+    <div className="container mx-auto px-4 py-8 max-w-4xl dark:bg-gray-900 dark:text-white">
+      <h1 className="text-3xl font-semibold text-center mb-8">Edit Mixtape</h1>
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg dark:border dark:border-gray-700">
+        <div className="mb-6">
+          <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Title</label>
           <input
             type="text"
             value={mixtapeData.title}
             onChange={(e) =>
               setMixtapeData({ ...mixtapeData, title: e.target.value })
             }
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Date</label>
+        <div className="mb-6">
+          <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Date</label>
           <input
             type="text"
             value={mixtapeData.date}
             onChange={(e) =>
               setMixtapeData({ ...mixtapeData, date: e.target.value })
             }
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Description</label>
-          <textarea
-            value={mixtapeData.desc}
-            onChange={(e) =>
-              setMixtapeData({ ...mixtapeData, desc: e.target.value })
-            }
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             required
           />
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium mb-2">Thumbnail</label>
+          <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+          <textarea
+            value={mixtapeData.desc}
+            onChange={(e) =>
+              setMixtapeData({ ...mixtapeData, desc: e.target.value })
+            }
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white h-32"
+            required
+          />
+        </div>
+
+        <div className="mb-8">
+          <label className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Thumbnail</label>
           <div className="flex items-center space-x-4">
             <input
               type="file"
@@ -169,9 +170,9 @@ export default function Edit({ params: { id } }) {
             />
             <label
               htmlFor="thumbnail-upload"
-              className="cursor-pointer flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+              className="cursor-pointer flex items-center space-x-2 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
             >
-              <FiUpload />
+              <FiUpload size={18} />
               <span>Upload Image</span>
             </label>
             {mixtapeData.imgthumb && (
@@ -179,9 +180,9 @@ export default function Edit({ params: { id } }) {
                 <Image
                   src={mixtapeData.imgthumb}
                   alt="Thumbnail preview"
-                  width={100}
-                  height={100}
-                  className="rounded"
+                  width={120}
+                  height={120}
+                  className="rounded-lg"
                 />
                 <Tooltip title="Remove Image">
                   <button
@@ -189,7 +190,7 @@ export default function Edit({ params: { id } }) {
                     onClick={handleRemoveImage}
                     className="absolute -top-2 -right-2 text-red-500 hover:text-red-600"
                   >
-                    <FiXCircle size={20} />
+                    <FiXCircle size={24} />
                   </button>
                 </Tooltip>
               </div>
@@ -201,7 +202,7 @@ export default function Edit({ params: { id } }) {
           <button
             type="submit"
             disabled={submitting}
-            className={`bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors ${
+            className={`bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600 ${
               submitting ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
@@ -212,4 +213,3 @@ export default function Edit({ params: { id } }) {
     </div>
   );
 }
-
