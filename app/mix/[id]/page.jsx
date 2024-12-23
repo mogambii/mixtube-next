@@ -34,7 +34,8 @@ async function fetchMixData(id) {
 }
 
 // Metadata generation for SEO
-export async function generateMetadata({ params: { id } }) {
+export async function generateMetadata({ params }) {
+  const {id} = await params
   const mix = await fetchMixData(id);
 
   const defaultImageUrl = "https://i.ibb.co/17dxyfD/a5282d7a00d9ec58056a5.png";
@@ -77,9 +78,11 @@ export async function generateMetadata({ params: { id } }) {
   };
 }
 
-export default async function MixTape({ params: { id } }) {
-  const token = cookies().get("mixtube-token")?.value;
-  const username = cookies().get("mixtube-tokenname")?.value;
+export default async function MixTape({ params}) {
+  const {id} = await params
+  const cookieStore = await cookies();
+  const token = cookieStore.get("mixtube-token")?.value;
+  const username = cookieStore.get("mixtube-tokenname")?.value;
 
   const mix = await fetchMixData(id);
   let liked = null;
@@ -130,10 +133,9 @@ export default async function MixTape({ params: { id } }) {
           },
         })}
       </script>
-      <div className="dark:bg-gray-800 rounded-lg shadow-lg p-4 md:p-6 space-y-6">
-        
+      <div className="dark:bg-gray-800 rounded-lg shadow-lg p-4 md:p-6 space-y-8">
         {/* Mixtape Information */}
-        <div className="flex flex-col md:flex-row pb-4 border-b border-gray-200 dark:border-gray-700 gap-4">
+        <div className="flex flex-col md:flex-row pb-4 border-b border-gray-200 dark:border-gray-700 gap-6">
           <div className="w-full md:w-[200px]">
             <Image
               src={mix.imgthumb || defaultImageUrl}
@@ -157,7 +159,6 @@ export default async function MixTape({ params: { id } }) {
               <p className="text-gray-600 dark:text-gray-400">Year: {mix.date || "N/A"}</p>
               <p className="text-gray-600 dark:text-gray-400">Genre: {mix.genre || "N/A"}</p>
             </div>
-            {/* Download and Like Stats */}
             <div className="flex items-center justify-center md:justify-start gap-4 mt-4 md:mt-6">
               <span className="flex items-center text-gray-600 dark:text-gray-400">
                 <FaDownload />
@@ -169,6 +170,25 @@ export default async function MixTape({ params: { id } }) {
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Description Section */}
+        <div className="ring-1 ring-gray-200 p-4 md:p-6 rounded-lg shadow-sm">
+          <h3 className="text-sm md:text-lg font-semibold text-gray-800 dark:text-slate-100 mb-2">
+            Description
+          </h3>
+          <p className="text-gray-700 dark:text-gray-300 break-words whitespace-pre-wrap">
+            {mix.desc ? (
+              <span dangerouslySetInnerHTML={{
+                __html: mix.desc.replace(
+                  /(https?:\/\/[^\s]+)/g,
+                  '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>'
+                )
+              }} />
+            ) : (
+              "No description available for this mixtape."
+            )}
+          </p>
         </div>
 
         {/* Share and Like Buttons */}

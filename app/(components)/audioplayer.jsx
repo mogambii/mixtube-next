@@ -5,87 +5,45 @@ import React, { useState, useRef, useEffect } from "react";
 import { LiaStepBackwardSolid, LiaStepForwardSolid } from "react-icons/lia";
 import { RiPauseLine, RiPlayFill } from "react-icons/ri";
 import { Bars } from "react-loader-spinner";
+import { usePlayerContext } from "@/context/PlayerContext";
 
 function AudioPlayer() {
-  const [id, setId] = useState(null);
-  const [audio, setAudio] = useState(null);
-  const [thumbnail, setThumbnail] = useState(null);
+  const { currentMix, playMix, updatePlays } = usePlayerContext();
+
+  if (!currentMix || !currentMix.audio) {
+    return null;
+  }
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTimeDisplay, setCurrentTimeDisplay] = useState("00:00");
   const [durationDisplay, setDurationDisplay] = useState("00:00");
-  const [isBuffering, setIsBuffering] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(true);
   const [tooltipTime, setTooltipTime] = useState(null);
 
   const audioPlayer = useRef(null);
   const progressRef = useRef(null);
   const dotRef = useRef(null);
 
-  const fetchMixData = async (id) => {
-    if (!id) return null;
-    try {
-      const response = await fetch(`https://server-nezz.vercel.app/api/mixtape/${id}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        cache: "no-store",
-      });
-      if (!response.ok) throw new Error(`Failed to fetch mixtape: ${response.statusText}`);
-      return await response.json();
-    } catch (error) {
-      console.error("Fetch mixtape error:", error);
-      return null;
-    }
-  };
-
-  const loadAudio = async (id) => {
-    const mixData = await fetchMixData(id);
-    if (mixData) {
-      setAudio(mixData.audio);
-      setThumbnail(mixData.imgthumb);
-    }
-  };
-
   useEffect(() => {
-    const idFromStorage = localStorage.getItem("mixtape-id");
-    setId(idFromStorage);
-    if (idFromStorage) loadAudio(idFromStorage);
-  
-    const handleStorageChange = () => {
-      const newId = localStorage.getItem("mixtape-id");
-      if (newId !== id) {
-        setId(newId);
-        loadAudio(newId); // Load audio when id changes in localStorage
-      }
-    };
-  
-    // Check every second for ID updates
-    const checkIdChange = setInterval(() => {
-      const newId = localStorage.getItem("mixtape-id");
-      if (newId !== id) {
-        setId(newId);
-        loadAudio(newId); // Load audio when id changes due to interval check
-      }
-    }, 1000);
-  
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      clearInterval(checkIdChange);
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, [id]);
-  
-
-  useEffect(() => {
-    if (audioPlayer.current) {
-      audioPlayer.current.src = audio;
+    if (currentMix && audioPlayer.current) {
+      audioPlayer.current.src = currentMix.audio;
       audioPlayer.current.load();
       setIsPlaying(false);
+      setIsBuffering(true);
     }
-  }, [audio]);
+  }, [currentMix]);
 
   const togglePlay = () => {
-    if (isPlaying) audioPlayer.current.pause();
-    else audioPlayer.current.play();
+    if (isPlaying) {
+      audioPlayer.current.pause();
+    } else {
+      audioPlayer.current.play();
+      // Update play count when starting to play
+      if (currentMix.id) {
+        updatePlays(currentMix.id);
+      }
+    }
     setIsPlaying((prev) => !prev);
   };
 
@@ -114,17 +72,21 @@ function AudioPlayer() {
       const currentTime = audioPlayer.current.currentTime;
       const duration = audioPlayer.current.duration;
 
-      setProgress((currentTime / duration) * 100);
-      setCurrentTimeDisplay(formatTime(currentTime));
-      setDurationDisplay(formatTime(duration));
+      if (!isNaN(duration)) {
+        setProgress((currentTime / duration) * 100);
+        setCurrentTimeDisplay(formatTime(currentTime));
+        setDurationDisplay(formatTime(duration));
 
-      if (dotRef.current) {
-        dotRef.current.style.left = `${(currentTime / duration) * 100}%`;
+        if (dotRef.current) {
+          dotRef.current.style.left = `${(currentTime / duration) * 100}%`;
+        }
+        setIsBuffering(false);
       }
     }
   };
 
   const formatTime = (time) => {
+    if (isNaN(time)) return "00:00";
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
@@ -134,13 +96,19 @@ function AudioPlayer() {
     const audioElement = audioPlayer.current;
     const handleWaiting = () => setIsBuffering(true);
     const handlePlaying = () => setIsBuffering(false);
+    const handleLoadedMetadata = () => {
+      setDurationDisplay(formatTime(audioElement.duration));
+      setIsBuffering(false);
+    };
 
     if (audioElement) {
       audioElement.addEventListener("waiting", handleWaiting);
       audioElement.addEventListener("playing", handlePlaying);
+      audioElement.addEventListener("loadedmetadata", handleLoadedMetadata);
       return () => {
         audioElement.removeEventListener("waiting", handleWaiting);
         audioElement.removeEventListener("playing", handlePlaying);
+        audioElement.removeEventListener("loadedmetadata", handleLoadedMetadata);
       };
     }
   }, []);
@@ -148,7 +116,7 @@ function AudioPlayer() {
   useEffect(() => {
     const interval = setInterval(updateProgress, 1000);
     return () => clearInterval(interval);
-  }, [audio]);
+  }, [currentMix]);
 
   const handleMouseMove = (e) => {
     if (progressRef.current && audioPlayer.current.duration) {
@@ -158,13 +126,11 @@ function AudioPlayer() {
     }
   };
 
-  if (!id) return null;
-
   return (
     <div className="fixed bottom-0 left-0 w-full bg-slate-100 dark:bg-gray-900 text-gray-200 p-2 shadow-lg z-50 rounded-t-lg flex items-center justify-between">
-      {thumbnail && (
-        <Link href={`/mix/${id}`} className="w-16 h-16">
-          <Image src={thumbnail} alt="Album Thumbnail" className="w-full h-full rounded-md object-cover" width={64} height={64} />
+      {currentMix.thumbnail && (
+        <Link href={`/mix/${currentMix.id}`} className="w-16 h-16">
+          <Image src={currentMix.thumbnail} alt="Album Thumbnail" className="w-full h-full rounded-md object-cover" width={64} height={64} />
         </Link>
       )}
 

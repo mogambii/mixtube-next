@@ -5,7 +5,7 @@ export default async function TopMixList() {
   async function getRecords() {
     try {
       const response = await fetch(
-        "https://server-nezz.vercel.app/api/newmixtapes",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/newmixtapes`,
         {
           method: "GET",
           cache :"reload"

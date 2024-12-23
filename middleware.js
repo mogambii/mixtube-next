@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-export default function middleware(req) {
+export default async function middleware(req) {
   const { pathname } = req.nextUrl;
-  const cookieStore = cookies();
+  const cookieStore = await  cookies();
 
   const mixtubeType = cookieStore.get('mixtube-type');
   const mixtubeUsername = cookieStore.get('mixtube-tokenname');

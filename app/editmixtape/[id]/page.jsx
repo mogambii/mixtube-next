@@ -9,6 +9,7 @@ export default function Edit({ params: { id } }) {
   useEffect(() => {
     document.title = "Edit Mixtape | MixTube";
   }, []);
+  
   const [mixtapeData, setMixtapeData] = useState({
     title: "",
     date: "",
@@ -23,20 +24,23 @@ export default function Edit({ params: { id } }) {
   useEffect(() => {
     const fetchMixtape = async () => {
       try {
-        const response = await fetch(
-          `https://server-nezz.vercel.app/api/my/mixtape/${id}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("mixtube-token")}`,
-            },
-          }
-        );
+        const response = await fetch(`/api/my/mixtape/${id}`, {
+          method: "GET",
+          credentials: 'include',
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-        if (!response.ok) throw new Error("Failed to fetch mixtape data");
+        if (!response.ok) {
+          if (response.status === 401) {
+            router.push('/login');
+            return;
+          }
+          throw new Error("Failed to fetch mixtape data");
+        }
 
         const data = await response.json();
-
         setMixtapeData({
           title: data.title,
           date: data.date,
@@ -50,7 +54,7 @@ export default function Edit({ params: { id } }) {
     };
 
     fetchMixtape();
-  }, [id]);
+  }, [id, router]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -77,168 +81,136 @@ export default function Edit({ params: { id } }) {
     }
 
     try {
-      const response = await fetch(
-        `https://web-24h2fqj0usck.up-de-fra1-k8s-1.apps.run-on-seenode.com/api/mixtape/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("mixtube-token")}`,
-          },
-          body: formData,
+      const response = await fetch(`/api/mixtape/${id}`, {
+        method: "PUT",
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/login');
+          return;
         }
-      );
+        throw new Error("Failed to update mixtape");
+      }
 
-      if (!response.ok) throw new Error("Failed to update mixtape");
-        toast.success("Mixtape updated successfully!", { autoClose: 3000 });
-
-
-      router.push("/profile");
-    } catch (err) {
-      toast.error("Error updating mixtape", { autoClose: 3000 });
-      console.error("Error updating mixtape:", err);
+      toast.success("Mixtape updated successfully!");
+      router.push(`/mix/${id}`);
+    } catch (error) {
+      toast.error("Error updating mixtape");
+      console.error("Error updating mixtape:", error);
     } finally {
       setSubmitting(false);
     }
   };
 
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    setMixtapeData((prevData) => ({
+      ...prevData,
+      imgthumb: "",
+    }));
+    if (imgThumbRef.current) {
+      imgThumbRef.current.value = "";
+    }
+  };
+
   return (
-    <>
-      <h3 className="text-lg font-semibold p-4 dark:text-slate-50">
-        Edit Mixtape
-      </h3>
-      <form
-        onSubmit={handleSubmit}
-        className="border rounded-lg overflow-hidden p-4 bg-white dark:bg-gray-800"
-      >
-        <div className="grid grid-cols-1 gap-x-5 gap-y-8 border-b border-slate-900/10 pb-12 md:grid-cols-2">
-          <div className="grid max-w-2xl grid-cols-1 gap-y-3 gap-x-3">
-            <label
-              htmlFor="title"
-              className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900"
-            >
-              Title
-            </label>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Edit Mixtape</h1>
+      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2">Title</label>
+          <input
+            type="text"
+            value={mixtapeData.title}
+            onChange={(e) =>
+              setMixtapeData({ ...mixtapeData, title: e.target.value })
+            }
+            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2">Date</label>
+          <input
+            type="date"
+            value={mixtapeData.date}
+            onChange={(e) =>
+              setMixtapeData({ ...mixtapeData, date: e.target.value })
+            }
+            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2">Description</label>
+          <textarea
+            value={mixtapeData.desc}
+            onChange={(e) =>
+              setMixtapeData({ ...mixtapeData, desc: e.target.value })
+            }
+            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+            required
+          />
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium mb-2">Thumbnail</label>
+          <div className="flex items-center space-x-4">
             <input
-              name="title"
-              id="title"
-              value={mixtapeData.title}
-              onChange={(e) =>
-                setMixtapeData((prev) => ({ ...prev, title: e.target.value }))
-              }
-              type="text"
-              className="block border border-gray-300 rounded-md py-1 px-2 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-0 sm:text-sm sm:leading-6"
-              placeholder="Title"
-              required
+              type="file"
+              ref={imgThumbRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+              id="thumbnail-upload"
             />
-          </div>
-
-          <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
             <label
-              htmlFor="date"
-              className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900"
+              htmlFor="thumbnail-upload"
+              className="cursor-pointer flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
             >
-              Release Year
+              <FiUpload />
+              <span>Upload Image</span>
             </label>
-            <input
-              name="date"
-              id="date"
-              value={mixtapeData.date}
-              onChange={(e) =>
-                setMixtapeData((prev) => ({ ...prev, date: e.target.value }))
-              }
-              className="block border border-gray-300 rounded-md py-1 px-2 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-0 sm:text-sm sm:leading-6"
-              required
-            />
-          </div>
-
-          <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
-            <label
-              htmlFor="desc"
-              className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900"
-            >
-              Description
-            </label>
-            <textarea
-              name="desc"
-              id="desc"
-              value={mixtapeData.desc}
-              onChange={(e) =>
-                setMixtapeData((prev) => ({ ...prev, desc: e.target.value }))
-              }
-              className="block border border-gray-300 rounded-md py-1 px-2 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-0 sm:text-sm sm:leading-6"
-              placeholder="Describe your mixtape"
-              rows={4}
-              required
-            />
-          </div>
-
-          <div className="grid max-w-2xl grid-cols-1 gap-y-6 gap-x-7">
-            <label
-              htmlFor="imgthumb"
-              className="block dark:text-slate-50 text-sm font-small leading-6 text-slate-900"
-            >
-              Thumb Image
-            </label>
-            <div className="relative">
-              <input
-                name="imgthumb"
-                id="imgthumb"
-                onChange={handleFileChange}
-                type="file"
-                accept="image/*"
-                ref={imgThumbRef}
-                className="hidden"
-              />
-              <Tooltip title="Upload an image" placement="right">
-                <button
-                  type="button"
-                  onClick={() => imgThumbRef.current.click()}
-                  className="flex items-center justify-center border-2 border-dashed border-gray-400 p-2 rounded-md dark:text-slate-50 text-slate-900 hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <FiUpload className="mr-2" />
-                  Upload Image
-                </button>
-              </Tooltip>
-              {mixtapeData.imgthumb && (
-                <div className="mt-2 relative">
-                  <Image
-                    src={mixtapeData.imgthumb}
-                    alt="Preview"
-                    className="max-w-full rounded-md max-h-full"
-                    height={300}
-                    width={300}
-                  />
-                  <FiXCircle
-                    className="absolute top-0 right-0 cursor-pointer text-red-600"
-                    onClick={() => {
-                      setSelectedFile(null);
-                      setMixtapeData((prev) => ({ ...prev, imgthumb: "" }));
-                      imgThumbRef.current.value = null;
-                    }}
-                  />
-                </div>
-              )}
-            </div>
+            {mixtapeData.imgthumb && (
+              <div className="relative">
+                <Image
+                  src={mixtapeData.imgthumb}
+                  alt="Thumbnail preview"
+                  width={100}
+                  height={100}
+                  className="rounded"
+                />
+                <Tooltip title="Remove Image">
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="absolute -top-2 -right-2 text-red-500 hover:text-red-600"
+                  >
+                    <FiXCircle size={20} />
+                  </button>
+                </Tooltip>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-x-6">
-          <button
-            type="button"
-            className="text-sm font-semibold leading-6 text-slate-900 dark:text-slate-50"
-            onClick={() => router.push("/profile")}
-          >
-            Cancel
-          </button>
+        <div className="flex justify-end">
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className={`bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors ${
+              submitting ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            {submitting ? "Updating..." : "Save"}
+            {submitting ? "Updating..." : "Update Mixtape"}
           </button>
         </div>
       </form>
-    </>
+    </div>
   );
 }

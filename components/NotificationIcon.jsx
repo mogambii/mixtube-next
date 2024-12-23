@@ -45,9 +45,10 @@ async function fetchNotificationsCount(token, type) {
 }
 
 export default async function NotificationIcon() {
+  const cookieStore = await  cookies();
   // Retrieve cookies on the server side
-  const mixtubeToken = cookies().get("mixtube-token");
-  const mixtubeType = cookies().get("mixtube-type");
+  const mixtubeToken = cookieStore.get("mixtube-token");
+  const mixtubeType = cookieStore.get("mixtube-type");
 
   const token = mixtubeToken ? mixtubeToken.value : null;
   const type = mixtubeType ? mixtubeType.value : null;
