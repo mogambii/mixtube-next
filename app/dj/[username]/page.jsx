@@ -108,6 +108,7 @@ const DjProfile = async ({ params: { username } }) => {
       <div className="grid items-center justify-center grid-cols-1 md:grid-cols-2 mb-6">
         <div className="flex flex-col items-center mb-4">
           <Image
+            priority
             className="rounded-full border-4 border-gray-300 h-44 w-44 object-cover"
             src={profile.profilep}
             alt={`Profile picture of DJ ${profile.Djname || username}`}

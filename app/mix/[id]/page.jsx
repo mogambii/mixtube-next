@@ -138,6 +138,7 @@ export default async function MixTape({ params}) {
         <div className="flex flex-col md:flex-row pb-4 border-b border-gray-200 dark:border-gray-700 gap-6">
           <div className="w-full md:w-[200px]">
             <Image
+              priority
               src={mix.imgthumb || defaultImageUrl}
               height={400}
               width={400}

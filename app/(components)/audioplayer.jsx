@@ -10,10 +10,7 @@ import { usePlayerContext } from "@/context/PlayerContext";
 function AudioPlayer() {
   const { currentMix, playMix, updatePlays } = usePlayerContext();
 
-  if (!currentMix || !currentMix.audio) {
-    return null;
-  }
-
+  // Always call hooks first
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTimeDisplay, setCurrentTimeDisplay] = useState("00:00");
@@ -25,6 +22,7 @@ function AudioPlayer() {
   const progressRef = useRef(null);
   const dotRef = useRef(null);
 
+  // useEffect hooks must be called unconditionally
   useEffect(() => {
     if (currentMix && audioPlayer.current) {
       audioPlayer.current.src = currentMix.audio;
@@ -125,6 +123,10 @@ function AudioPlayer() {
       setTooltipTime(formatTime(time));
     }
   };
+
+  if (!currentMix || !currentMix.audio) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-0 left-0 w-full bg-slate-100 dark:bg-gray-900 text-gray-200 p-2 shadow-lg z-50 rounded-t-lg flex items-center justify-between">
