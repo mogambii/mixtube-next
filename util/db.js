@@ -19,7 +19,7 @@ async function getDb() {
     console.log("connected to MongoDB!");
     return client.db("kenyanmix");
   } catch (err) {
-    console.error("Failed to connect to MongoDB", err);
+    console.error("Failed to connect to MongoDB ", err);
     throw err;
   }
 }
