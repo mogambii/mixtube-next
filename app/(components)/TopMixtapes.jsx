@@ -7,7 +7,7 @@ export default async function TopMixList() {
       const response = await fetch(
         "https://api.mixtube.xyz/api/topmixtapes",
         {
-          cache: "reload",
+          cache: "no-cache",
         }
       );
       if (!response.ok) {

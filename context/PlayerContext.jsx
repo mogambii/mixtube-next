@@ -12,10 +12,10 @@ export function PlayerProvider({ children }) {
 
   const playMix = async (id) => {
     try {
-      const response = await fetch(`hhttps://api.mixtube.xyz/api/mixtape/${id}`, {
+      const response = await fetch(`https://api.mixtube.xyz/api/mixtape/${id}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store",
+        cache: "no-cache",
       });
       
       if (!response.ok) {
@@ -35,7 +35,7 @@ export function PlayerProvider({ children }) {
 
   const updatePlays = async (id) => {
     try {
-      const response = await fetch(`hhttps://api.mixtube.xyz/api/updateplays?id=${id}`, {
+      const response = await fetch(`https://api.mixtube.xyz/api/updateplays?id=${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });

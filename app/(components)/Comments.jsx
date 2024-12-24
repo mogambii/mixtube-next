@@ -15,7 +15,7 @@ const CommentsPage = ({ comment, id, username,token }) => {
   const handleDeleteComment = async (commentId) => {
     try {
       const response = await fetch(
-        `hhttps://api.mixtube.xyz/api/comment/${id}/${commentId}`,
+        `https://api.mixtube.xyz/api/comment/${id}/${commentId}`,
         {
           method: "DELETE",
           headers: {
@@ -47,7 +47,7 @@ const CommentsPage = ({ comment, id, username,token }) => {
     }
     try {
       const response = await fetch(
-        `hhttps://api.mixtube.xyz/api/comment`,
+        `https://api.mixtube.xyz/api/comment`,
         {
           method: "POST",
           headers: {

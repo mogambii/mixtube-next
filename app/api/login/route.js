@@ -5,7 +5,7 @@ export async function POST(request) {
   try {
     const { username, password } = await request.json();
     const response = await fetch(
-      `hhttps://api.mixtube.xyz/api/user/login`,
+      `https://api.mixtube.xyz/api/user/login`,
       {
         method: "POST",
         headers: {
@@ -22,7 +22,7 @@ export async function POST(request) {
 
       // Fetch user profile with the received token
       const userdata = await fetch(
-        `hhttps://api.mixtube.xyz/api/user/profile`,
+        `https://api.mixtube.xyz/api/user/profile`,
         {
           headers: {
             "Content-Type": "application/json",

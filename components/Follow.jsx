@@ -10,7 +10,7 @@ const Follow = ({ username, following,token }) => {
   const handleFollowUnfollow = async (action, username) => {
     try {
       const response = await fetch(
-        `hhttps://api.mixtube.xyz/api/user/engage/${action}?username=${username}`,
+        `https://api.mixtube.xyz/api/user/engage/${action}?username=${username}`,
         {
           method: "POST", 
           headers: {

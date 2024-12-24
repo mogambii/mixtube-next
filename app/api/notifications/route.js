@@ -13,7 +13,7 @@ export async function GET(request) {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-            cache:"reload"
+            cache:"no-cache"
             
         });
         if (!response.ok) throw new Error(`Error: ${response.statusText}`);
@@ -30,7 +30,7 @@ export async function DELETE(request) {
         const cookieStore = await cookies()
         const token = cookieStore.get("mixtube-token")?.value
         const id = request.nextUrl.searchParams.get("id");
-        const response = await fetch(`hhttps://api.mixtube.xyz/api/user/notification?notificationId=${id}`, {
+        const response = await fetch(`https://api.mixtube.xyz/api/user/notification?notificationId=${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

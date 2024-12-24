@@ -34,7 +34,7 @@ const Recovery = () => {
     setIsSubmitting(true);
     try {
       const response = await fetch(
-        "hhttps://api.mixtube.xyz/api/user/reset-pass",
+        "https://api.mixtube.xyz/api/user/reset-pass",
         {
           method: "POST",
           headers: {

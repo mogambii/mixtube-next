@@ -7,7 +7,7 @@ export async function GET(request) {
         const token = cookieStore.get("mixtube-token")?.value;
         const id = request.nextUrl.searchParams.get("id");
 
-        const response = await fetch(`hhttps://api.mixtube.xyz/api/my/mixtape/${id}`, {
+        const response = await fetch(`https://api.mixtube.xyz/api/my/mixtape/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

@@ -39,7 +39,7 @@ const Reset = ({ params: { token } }) => {
     setSubmitting(true);
     try {
       const response = await fetch(
-        "hhttps://api.mixtube.xyz/api/user/change-pass",
+        "https://api.mixtube.xyz/api/user/change-pass",
         {
           method: "POST",
           headers: {

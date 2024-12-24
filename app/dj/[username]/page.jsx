@@ -7,7 +7,7 @@ import Image from "next/image";
 async function fetchProfile(username, cacheOption = "force-cache") {
   try {
     const response = await fetch(
-      `hhttps://api.mixtube.xyz/api/user/dj/profile/?username=${username}`,
+      `https://api.mixtube.xyz/api/user/dj/profile/?username=${username}`,
       {
         method: "GET",
         cache: cacheOption,
@@ -72,7 +72,7 @@ export async function generateMetadata({ params: { username } }) {
 const checkFollowing = async (token, username) => {
   try {
     const res = await fetch(
-      `hhttps://api.mixtube.xyz/api/user/check_follow?username=${username}`,
+      `https://api.mixtube.xyz/api/user/check_follow?username=${username}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }

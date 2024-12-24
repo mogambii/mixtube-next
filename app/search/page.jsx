@@ -24,7 +24,7 @@ const SearchPage = () => {
     setSearching(true);
     try {
       const response = await fetch(
-        `hhttps://api.mixtube.xyz/api/search?search=${query}`
+        `https://api.mixtube.xyz/api/search?search=${query}`
       );
 
       if (!response.ok) throw new Error("Network response was not ok");

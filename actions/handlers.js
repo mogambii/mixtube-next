@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 export async function handleLogin(data) {
   try {
     const response = await fetch(
-      "hhttps://api.mixtube.xyz/api/user/login",
+      "https://api.mixtube.xyz/api/user/login",
       {
         method: "POST",
         headers: {
@@ -20,7 +20,7 @@ export async function handleLogin(data) {
 
       // Fetch user profile after login
       const profileResponse = await fetch(
-        "hhttps://api.mixtube.xyz/api/user/profile",
+        "https://api.mixtube.xyz/api/user/profile",
         {
           headers: {
             Authorization: `Bearer ${result.token}`,
@@ -75,7 +75,7 @@ export async function handleLIkeAndUnlike(data) {
   const token = cookies().get("mixtube-token")?.value
   try { 
     const response = await fetch(
-      `hhttps://api.mixtube.xyz/api/${action}?post=${id}`,
+      `https://api.mixtube.xyz/api/${action}?post=${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ export async function handleCommentSubmit(data) {
   const token = cookies().get("mixtube-token")?.value
   try {
     const response = await fetch(
-      `hhttps://api.mixtube.xyz/api/comment`,
+      `https://api.mixtube.xyz/api/comment`,
       {
         method: "POST",
         headers: {
@@ -114,7 +114,7 @@ export async function handleFollowToggle(data) {
   const token = cookies().get("mixtube-token")?.value
   try {
     const response = await fetch(
-      `hhttps://api.mixtube.xyz/api/user/engage/${data.action}?username=${data.username}`,
+      `https://api.mixtube.xyz/api/user/engage/${data.action}?username=${data.username}`,
       {
         method: "POST",
         headers: {
@@ -133,7 +133,7 @@ export async function handleFollowToggle(data) {
 export async function handleUpdateDownloads(id) {
   try {
     const response = await fetch(
-      `hhttps://api.mixtube.xyz/api/download/${id}`,
+      `https://api.mixtube.xyz/api/download/${id}`,
       {
         method: "PUT",
         headers: {

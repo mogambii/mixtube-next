@@ -11,7 +11,7 @@ export async function POST(request) {
         const token = cookieStore.get("mixtube-token")?.value;
 
         // Fetch the user profile using the token
-        const profile = await fetch("hhttps://api.mixtube.xyz/api/user/profile", {
+        const profile = await fetch("https://api.mixtube.xyz/api/user/profile", {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

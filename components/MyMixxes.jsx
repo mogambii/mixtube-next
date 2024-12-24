@@ -15,7 +15,7 @@ const MyMixxes = ({ username }) => {
       setLoadingMixes(true);
       try {
         const mixResponse = await fetch(
-          `hhttps://api.mixtube.xyz/api/search/mixtapes?search=${username}&page=${currentPage}&limit=${itemsPerPage}`
+          `https://api.mixtube.xyz/api/search/mixtapes?search=${username}&page=${currentPage}&limit=${itemsPerPage}`
         );
         if (!mixResponse.ok)
           throw new Error(`Error: ${mixResponse.statusText}`);

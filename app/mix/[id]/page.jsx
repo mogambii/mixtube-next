@@ -16,11 +16,11 @@ async function fetchMixData(id) {
 
   try {
     const response = await fetch(
-      `hhttps://api.mixtube.xyz/api/mixtape/${id}`,
+      `https://api.mixtube.xyz/api/mixtape/${id}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store",
+        cache: "no-cache",
       }
     );
 
@@ -91,7 +91,7 @@ export default async function MixTape({ params}) {
   if (token) {
     try {
       const results = await fetch(
-        `hhttps://api.mixtube.xyz/api/checkliked?post=${id}`,
+        `https://api.mixtube.xyz/api/checkliked?post=${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

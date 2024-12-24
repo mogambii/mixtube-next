@@ -7,7 +7,7 @@ export async function PATCH(request) {
         const token = cookieStore.get("mixtube-token")?.value;
         const id = request.nextUrl.searchParams.get("id");
 
-        const response = await fetch(`hhttps://api.mixtube.xyz/api/user/profile/${id}`, {
+        const response = await fetch(`https://api.mixtube.xyz/api/user/profile/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

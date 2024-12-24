@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 async function verifyToken(token) {
   try {
     const res = await fetch(
-      `hhttps://api.mixtube.xyz/api/user/check-token?token=${token}`
+      `https://api.mixtube.xyz/api/user/check-token?token=${token}`
     );
     if (!res.ok) {
       console.error("Invalid token");
@@ -21,7 +21,7 @@ async function verifyToken(token) {
 async function fetchNotificationsCount(token) {
   try {
     const response = await fetch(
-      "hhttps://api.mixtube.xyz/api/user/total-notifications",
+      "https://api.mixtube.xyz/api/user/total-notifications",
       {
         headers: {
           "Content-Type": "application/json",
