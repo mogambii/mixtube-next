@@ -8,37 +8,38 @@ const MpNav = dynamic(() => import("./(components)/MpNav"));
 const NavMenu = dynamic(() => import("@/components/NavMenu"));
 
 export const metadata = {
-  title: "Explore Mixtapes | Discover & Download Mixtube Music",
+  title: "Stream & Download the Best DJ Mixtapes | MixTube Music",
   description:
-    "Explore the latest mixtapes, stream, and download your favorite music on MixTube. Share your playlists, and discover new artists every day.",
+    "Discover the top DJ mixtapes on MixTube. Stream, download, and share trending mixtapes. Explore new DJs, exclusive mixes, and your favorite music daily.",
   keywords:
-    "latest mixtapes, free music, download mixtapes, mixtube music, playlists, trending music, mixtape downloads, music streaming",
+    "DJ mixtapes, free mixtape downloads, trending mixtapes, new DJ mixes, mixtape streaming, music downloads, share mixtapes, top mixtapes, MixTube music",
   openGraph: {
     type: "website",
     url: "https://mixtube.xyz/",
-    title: "Discover & Download Mixtapes | MixTube",
+    title: "Stream & Download Trending DJ Mixtapes | MixTube",
     description:
-      "Stream and download the best mixtapes from your favorite artists on MixTube. Share playlists and stay updated with new releases.",
+      "Get the latest DJ mixtapes on MixTube. Stream music, download exclusive mixes, and discover trending DJs. Share and enjoy top mixtapes daily.",
     images: [
       {
         url: "https://mixtube.xyz/og.jpg",
         width: 800,
         height: 600,
-        alt: "MixTube - Stream, download, and share your favorite mixtapes",
+        alt: "MixTube - Discover and stream the best DJ mixtapes",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Stream & Download Your Favorite Mixtapes | MixTube",
+    title: "Stream & Download Top DJ Mixtapes | MixTube",
     description:
-      "Explore the hottest mixtapes on MixTube. Play, download, and share your favorite music anytime.",
+      "Find trending DJ mixtapes on MixTube. Stream, download, and share your favorite mixes anytime. Explore exclusive music and new DJs daily.",
     images: ["https://mixtube.xyz/og.jpg"],
   },
   alternates: {
     canonical: "https://mixtube.xyz/",
   },
 };
+
 
 export default function Mainpage() {
   return (
