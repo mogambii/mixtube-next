@@ -36,8 +36,7 @@ export function PlayerProvider({ children }) {
   const updatePlays = async (id) => {
     try {
       const response = await fetch(`https://api.mixtube.xyz/api/updateplays?id=${id}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "GET",
       });
       
       if (!response.ok) {

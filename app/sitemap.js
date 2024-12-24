@@ -25,11 +25,6 @@ export default async function sitemap() {
 
   const sitemapArray = [
     {
-      url: baseUrl,
-      lastModified: new Date(),
-      priority: 1,
-    },
-    {
       url: baseUrl + "/",
       lastModified: new Date(),
       priority: 1,
