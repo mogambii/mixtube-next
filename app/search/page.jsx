@@ -93,7 +93,8 @@ const SearchPage = () => {
           name={mix.name}
           img={mix.imgthumb}
           downloads={mix.downloads}
-          likes={mix.likes}
+          Djname={mix.Djname}
+          plays={mix.plays}
         />
       ))}
     </div>
