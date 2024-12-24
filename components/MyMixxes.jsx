@@ -80,7 +80,7 @@ const MyMixxes = ({ username }) => {
                 name={mix.name}
                 img={mix.imgthumb}
                 downloads={mix.downloads}
-                plays={mix.plays}
+                plays={mix.plays? mix.plays : 0}
               />
             ))}
           </div>

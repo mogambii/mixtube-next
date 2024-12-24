@@ -9,6 +9,7 @@ const SearchPage = () => {
   useEffect(() => {
     document.title = "MixTube - Search";
   }, []);
+
   const [searching, setSearching] = useState(false);
   const [noResults, setNoResults] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -41,10 +42,10 @@ const SearchPage = () => {
 
   const NoValue = () => (
     <div className="w-full h-screen flex justify-center items-center">
-      <div className="">
-        <MdOutlineSearchOff className="h-24 w-24 md:h-32 md:w-32 lg:h-36 lg:w-36 text-gray-400 dark:text-slate-50  mx-auto" />
-        <h3 className="text-3xl md:text-4xl font-mono text-gray-500 dark:text-slate-50">
-          ENTER KEYWORD
+      <div className="text-center">
+        <MdOutlineSearchOff className="h-24 w-24 md:h-32 md:w-32 lg:h-36 lg:w-36 text-gray-400 dark:text-slate-50 mx-auto" />
+        <h3 className="text-3xl md:text-4xl font-mono text-gray-500 dark:text-slate-50 mt-4">
+          Enter a keyword to search
         </h3>
       </div>
     </div>
@@ -52,21 +53,21 @@ const SearchPage = () => {
 
   const NoResults = () => (
     <div className="w-full h-screen flex justify-center items-center">
-      <div className="grid justify-center items-center gap-3 text-center">
+      <div className="text-center">
         <MdManageSearch className="h-24 w-24 md:h-32 md:w-32 lg:h-36 lg:w-36 text-gray-400 dark:text-slate-50 mx-auto" />
-        <h4 className="text-xl md:text-2xl font-mono text-gray-500 dark:text-slate-50">
-          NO RESULTS FOUND
+        <h4 className="text-xl md:text-2xl font-mono text-gray-500 dark:text-slate-50 mt-4">
+          No results found. Try another search.
         </h4>
       </div>
     </div>
   );
 
   const MpNav = () => (
-    <form onSubmit={(e) => e.preventDefault()} className="p-1">
-      <div className="flex items-center bg-slate-200 p-2 rounded-full dark:bg-gray-800">
+    <form onSubmit={(e) => e.preventDefault()} className="p-4">
+      <div className="flex items-center bg-gray-100 p-3 rounded-full shadow-md dark:bg-gray-800">
         <FaMagnifyingGlass
           onClick={(e) => e.preventDefault()}
-          className="dark:text-slate-50 text-gray-500 ml-2"
+          className="dark:text-slate-50 text-gray-500 ml-2 cursor-pointer"
           aria-label="Search Icon"
         />
         <input
@@ -76,14 +77,14 @@ const SearchPage = () => {
           onChange={handleInputChange}
           name="search"
           placeholder="Search mixtapes"
-          className="bg-transparent outline-none px-4 py-1 w-full dark:text-slate-100"
+          className="bg-transparent outline-none px-4 py-1 w-full text-gray-700 dark:text-slate-100 placeholder-gray-400"
         />
       </div>
     </form>
   );
 
   const Results = () => (
-    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-4">
+    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 px-4 py-6">
       {searchResults.map((mix) => (
         <MixCard
           key={mix.unique}
@@ -94,19 +95,19 @@ const SearchPage = () => {
           img={mix.imgthumb}
           downloads={mix.downloads}
           Djname={mix.Djname}
-          plays={mix.plays}
+          plays={mix.plays ? mix.plays : 0}
         />
       ))}
     </div>
   );
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {MpNav()}
-      <div className="px-4">
+      <div className="px-4 min-h-full">
         {searchValue && (
-          <h2 className="font-bold dark:text-slate-200 py-3 text-2xl">
-            <span className="text-blue-700">Results for: {searchValue}</span>
+          <h2 className="font-bold text-gray-800 dark:text-slate-200 py-3 text-2xl">
+            <span className="text-blue-700 dark:text-blue-400">Results for: {searchValue}</span>
           </h2>
         )}
         {searchValue ? (
@@ -117,7 +118,7 @@ const SearchPage = () => {
               <Results />
             )
           ) : (
-            <div className="flex justify-center py-8">
+            <div className="min-h-[80vh] grid items-center place-content-center">
               <Bars
                 height="80"
                 width="80"
