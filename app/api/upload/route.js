@@ -24,7 +24,7 @@ export async function POST(request) {
         formData.append('username', username);
         formData.append('Djname', Djname);
 
-        const response = await fetch("https://api.mixtube.xyzgit push/api/upload", {
+        const response = await fetch("https://api.mixtube.xyz/api/upload", {
             method: "POST",
             body: formData,  
             headers: {
