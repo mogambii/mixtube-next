@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { FaDownload, FaHeart } from "react-icons/fa6";
+import { FaDownload, FaRegCirclePlay } from "react-icons/fa6";
 
-const MixCard = ({ name, title, img, downloads, Djname, likes, link }) => {
+const MixCard = ({ name, title, img, downloads, Djname, plays, link }) => {
   return (
     <div className="p-2 w-full">
       <Link href={link}>
@@ -30,8 +30,8 @@ const MixCard = ({ name, title, img, downloads, Djname, likes, link }) => {
                 <h5 className="dark:text-slate-50 text-sm">{downloads}</h5>
               </div>
               <div className="flex items-center gap-2">
-                <FaHeart className="dark:text-slate-50 h-5 w-5" />
-                <h5 className="dark:text-slate-50 text-sm">{likes}</h5>
+              <FaRegCirclePlay className="dark:text-slate-50 h-5 w-5"/>
+                <h5 className="dark:text-slate-50 text-sm">{plays}</h5>
               </div>
             </div>
           </div>

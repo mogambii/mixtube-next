@@ -56,7 +56,7 @@ const Signup = () => {
     setSubmitting(true);
     try {
       const response = await fetch(
-        "https://server-nezz.vercel.app/api/user/register",
+        "hhttps://api.mixtube.xyz/api/user/register",
         {
           method: "POST",
           headers: {

@@ -202,6 +202,7 @@ const Profile = () => {
       <div className="flex flex-col items-center md:flex-row justify-evenly p-4">
         <div className="flex flex-col items-center mb-6 md:mb-0">
           <Image
+            priority
             className="rounded-full border-4 h-44 w-44 object-cover border-gray-300 dark:border-gray-700"
             src={profile.profilep}
             alt={`${profile.username}'s profile`}
@@ -282,6 +283,7 @@ const Profile = () => {
                       img={mix.imgthumb}
                       downloads={mix.downloads}
                       likes={mix.likes}
+                      plays={mix.plays ? mix.plays : 0}
                     />
                     <div className="absolute top-2 right-2">
                       <button

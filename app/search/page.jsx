@@ -24,7 +24,7 @@ const SearchPage = () => {
     setSearching(true);
     try {
       const response = await fetch(
-        `https://server-nezz.vercel.app/api/search?search=${query}`
+        `hhttps://api.mixtube.xyz/api/search?search=${query}`
       );
 
       if (!response.ok) throw new Error("Network response was not ok");

@@ -6,12 +6,13 @@ export async function GET(request) {
     const username = cookieStore.get("mixtube-username")?.value
     const currentPage = request.nextUrl.searchParams.get("page");
     const itemsPerPage = request.nextUrl.searchParams.get("limit");
+    const token = cookieStore.get("mixtube-token")?.value
     try {
-        const response = await fetch(`https://server-nezz.vercel.app/api/search/mixtapes?search=${username}&page=${currentPage}&limit=${itemsPerPage}`, {
+        const response = await fetch(`https://api.mixtube.xyz/api/search/mixtapes?search=${username}&page=${currentPage}&limit=${itemsPerPage}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${request.headers.get("Authorization")}`,
+                Authorization: `Bearer ${token}`,
             },
             
         });

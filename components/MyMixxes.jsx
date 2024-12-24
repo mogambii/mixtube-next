@@ -15,7 +15,7 @@ const MyMixxes = ({ username }) => {
       setLoadingMixes(true);
       try {
         const mixResponse = await fetch(
-          `https://server-nezz.vercel.app/api/search/mixtapes?search=${username}&page=${currentPage}&limit=${itemsPerPage}`
+          `hhttps://api.mixtube.xyz/api/search/mixtapes?search=${username}&page=${currentPage}&limit=${itemsPerPage}`
         );
         if (!mixResponse.ok)
           throw new Error(`Error: ${mixResponse.statusText}`);

@@ -7,12 +7,13 @@ export async function GET(request) {
         const cookieStore = await cookies()
         const username = cookieStore.get("mixtube-username")?.value
         const token = cookieStore.get("mixtube-token")?.value
-        const response = await fetch(`https://server-nezz.vercel.app/api/user/notifications?page=${page}`, {
+        const response = await fetch(`https://api.mixtube.xyz/api/user/notifications?page=${page}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
+            cache:"reload"
             
         });
         if (!response.ok) throw new Error(`Error: ${response.statusText}`);
@@ -29,7 +30,7 @@ export async function DELETE(request) {
         const cookieStore = await cookies()
         const token = cookieStore.get("mixtube-token")?.value
         const id = request.nextUrl.searchParams.get("id");
-        const response = await fetch(`https://server-nezz.vercel.app/api/user/notification?notificationId=${id}`, {
+        const response = await fetch(`hhttps://api.mixtube.xyz/api/user/notification?notificationId=${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",

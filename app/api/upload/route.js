@@ -11,7 +11,7 @@ export async function POST(request) {
         const token = cookieStore.get("mixtube-token")?.value;
 
         // Fetch the user profile using the token
-        const profile = await fetch("https://server-nezz.vercel.app/api/user/profile", {
+        const profile = await fetch("hhttps://api.mixtube.xyz/api/user/profile", {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -24,7 +24,7 @@ export async function POST(request) {
         formData.append('username', username);
         formData.append('Djname', Djname);
 
-        const response = await fetch("https://server-0g0d.onrender.com/api/upload", {
+        const response = await fetch("https://api.mixtube.xyzgit push/api/upload", {
             method: "POST",
             body: formData,  
             headers: {

@@ -1,11 +1,10 @@
 "use client";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { CiMenuFries } from "react-icons/ci";
-import { IoClose } from "react-icons/io5";
 import { Blocks } from "react-loader-spinner";
 import MpNav from "../(components)/MpNav";
 import MixCard from "../(components)/MixCard";
+import NavMenu from "@/components/NavMenu";
 
 const Discovermixxes = () => {
   useEffect(() => {
@@ -24,7 +23,7 @@ const Discovermixxes = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `https://server-nezz.vercel.app/api/discover?page=${page}&limit=${limit}`
+          `https://api.mixtube.xyz/api/discover?page=${page}&limit=${limit}`
         );
         const data = await response.json();
         setMixes(data.results);
@@ -51,66 +50,7 @@ const Discovermixxes = () => {
     }
   };
 
-  const renderMenu = () => (
-    <div className="w-auto">
-      <div className="hidden md:flex gap-x-5">
-        <Link href="/discoverdjs">
-          <button
-            className="rounded-3xl px-3 py-1 font-righteous dark:text-slate-50 border-2 text-xs h-10"
-            aria-label="Discover DJs"
-          >
-            Discover DJs
-          </button>
-        </Link>
-        <Link href="/discover">
-          <button
-            className="rounded-3xl px-3 py-1 font-righteous dark:text-slate-50 border-2 text-xs h-10"
-            aria-label="Discover Mixxes"
-          >
-            Discover Mixxes
-          </button>
-        </Link>
-      </div>
-      <div className="md:hidden">
-        <button
-          className="relative"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
-          onBlur={() => setOpen(false)}
-        >
-          <div className="ring-1 rounded-full p-3">
-            {open ? (
-              <IoClose className="h-4 w-4 dark:text-slate-50" />
-            ) : (
-              <CiMenuFries className="h-4 w-4 dark:text-slate-50" />
-            )}
-          </div>
-        </button>
-        {open && (
-          <div className="shadow-1 absolute right-16 top-40 border-4 p-4 rounded-lg dark:border-slate-200 bg-slate-900 text-slate-50">
-            <div className="grid gap-2 w-full">
-              <Link href="/discoverdjs">
-                <button
-                  className="w-full rounded-3xl px-3 py-1 font-righteous dark:text-slate-50 border-2 text-xs h-10"
-                  aria-label="Discover DJs"
-                >
-                  Discover DJs
-                </button>
-              </Link>
-              <Link href="/discover">
-                <button
-                  className="w-full rounded-3xl px-3 py-1 font-righteous dark:text-slate-50 border-2 text-xs h-10"
-                  aria-label="Discover Mixxes"
-                >
-                  Discover Mixxes
-                </button>
-              </Link>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+
 
   return (
     <>
@@ -118,15 +58,15 @@ const Discovermixxes = () => {
         <h5 className="dark:text-slate-50 py-2 pl-3 font-righteous">
           DISCOVER MIXTAPES
         </h5>
-        <div className="flex justify-between gap-x-2">
-          <Link href="/search" className="w-full">
+        <div className="flex gap-4 w-full px-2 items-center justify-between py-3">
+          <Link href="/search" className="w-4/5">
             <MpNav place="search mixtape" />
           </Link>
-          {renderMenu()}
+         <NavMenu/>
         </div>
         <div className="grid items-center justify-center">
           {loading ? (
-            <div className="grid justify-center items-center gap-3 min-h-screen">
+            <div className="grid justify-center items-center gap-3 min-h-[80vh]">
               <Blocks
                 height="100"
                 width="100"
@@ -147,7 +87,7 @@ const Discovermixxes = () => {
                       name={mix.name}
                       img={mix.imgthumb}
                       downloads={mix.downloads}
-                      likes={mix.likes}
+                      plays={mix.plays ? mix.plays : 0}
                     />
                   </div>
                 ))}

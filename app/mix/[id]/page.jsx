@@ -1,5 +1,5 @@
 import React from "react";
-import { FaDownload, FaHeart } from "react-icons/fa";
+import { FaDownload, FaHeart, FaRegCircle } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
 import CommentsPage from "@/app/(components)/Comments";
@@ -8,6 +8,7 @@ import Share from "@/components/Share";
 import LikeBtn from "@/components/Like-btn";
 import { cookies } from "next/headers";
 import AudioAdd from "@/app/(components)/AudioAdd";
+import { FaRegCirclePlay } from "react-icons/fa6";
 
 // Fetch mixtape data by ID
 async function fetchMixData(id) {
@@ -15,7 +16,7 @@ async function fetchMixData(id) {
 
   try {
     const response = await fetch(
-      `https://server-nezz.vercel.app/api/mixtape/${id}`,
+      `hhttps://api.mixtube.xyz/api/mixtape/${id}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -82,7 +83,7 @@ export default async function MixTape({ params}) {
   const {id} = await params
   const cookieStore = await cookies();
   const token = cookieStore.get("mixtube-token")?.value;
-  const username = cookieStore.get("mixtube-tokenname")?.value;
+  const username = cookieStore.get("mixtube-username")?.value;
 
   const mix = await fetchMixData(id);
   let liked = null;
@@ -90,7 +91,7 @@ export default async function MixTape({ params}) {
   if (token) {
     try {
       const results = await fetch(
-        `https://server-nezz.vercel.app/api/checkliked?post=${id}`,
+        `hhttps://api.mixtube.xyz/api/checkliked?post=${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -169,6 +170,10 @@ export default async function MixTape({ params}) {
                 <FaHeart />
                 <span className="ml-1">{mix.likes || 0}</span>
               </span>
+              <span className="flex items-center text-gray-600 dark:text-gray-400">
+                <FaRegCirclePlay className=" dark:text-slate-50 h-5 w-5" />
+                <span className="ml-2 ">{mix.plays || 0}</span>
+                </span>
             </div>
           </div>
         </div>
@@ -195,7 +200,7 @@ export default async function MixTape({ params}) {
         {/* Share and Like Buttons */}
         <div className="flex items-center mt-4 gap-x-4">
           <Share id={id} />
-          {token && <LikeBtn likedparam={liked?.liked} id={id} />}
+          {token && <LikeBtn likedparam={liked?.liked} id={id}  suppressHydrationWarning/>}
           <AudioAdd id={id} />
         </div>
 

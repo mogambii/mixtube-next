@@ -7,7 +7,7 @@ export async function GET(request) {
         const token = cookieStore.get("mixtube-token")?.value;
         const id = request.nextUrl.searchParams.get("id");
 
-        const response = await fetch(`https://server-nezz.vercel.app/api/my/mixtape/${id}`, {
+        const response = await fetch(`hhttps://api.mixtube.xyz/api/my/mixtape/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -33,7 +33,7 @@ export async function DELETE(request) {
         const token = cookieStore.get("mixtube-token")?.value;
         const id = request.nextUrl.searchParams.get("id");
 
-        const response = await fetch(`https://server-0g0d.onrender.com/api/mixtape/${id}`, {
+        const response = await fetch(`https://api.mixtube.xyz/api/mixtape/${id}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -67,7 +67,7 @@ export async function PATCH(request) {
         const id = request.nextUrl.searchParams.get("id");
 
         // Send the form data with the PUT request to the API
-        const response = await fetch(`https://server-0g0d.onrender.com/api/mixtape/${id}`, {
+        const response = await fetch(`https://api.mixtube.xyz/api/mixtape/${id}`, {
             method: "PUT", // Use PUT or PATCH depending on your API
             body: formData, // Send the form data directly
             headers: {

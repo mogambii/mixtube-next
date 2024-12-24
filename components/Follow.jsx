@@ -10,7 +10,7 @@ const Follow = ({ username, following,token }) => {
   const handleFollowUnfollow = async (action, username) => {
     try {
       const response = await fetch(
-        `https://server-nezz.vercel.app/api/user/engage/${action}?username=${username}`,
+        `hhttps://api.mixtube.xyz/api/user/engage/${action}?username=${username}`,
         {
           method: "POST", 
           headers: {

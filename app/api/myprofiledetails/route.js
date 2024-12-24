@@ -5,7 +5,7 @@ export async function GET(request) {
     try {
         const cookieStore = await cookies()
         const username = cookieStore.get("mixtube-username")?.value
-        const response = await fetch(`https://server-nezz.vercel.app/api/user/dj/profile/?username=${username}`, {
+        const response = await fetch(`hhttps://api.mixtube.xyz/api/user/dj/profile/?username=${username}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -25,7 +25,7 @@ export async function DELETE(request) {
     try {
         const cookieStore = await cookies()
         const username = cookieStore.get("mixtube-username")?.value
-        const response = await fetch(`https://server-nezz.vercel.app/api/user/dj/profile/?username=${username}`, {
+        const response = await fetch(`hhttps://api.mixtube.xyz/api/user/dj/profile/?username=${username}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export async function PATCH(request) {
         const cookieStore = await cookies();
         const token = cookieStore.get("mixtube-token")?.value;
 
-        const response = await fetch("https://server-0g0d.onrender.com/api/user/profile", {
+        const response = await fetch("https://api.mixtube.xyz/api/user/profile", {
             method: "PATCH",
             headers: {
                 authorization: `Bearer ${token}`,

@@ -39,7 +39,7 @@ const Reset = ({ params: { token } }) => {
     setSubmitting(true);
     try {
       const response = await fetch(
-        "https://server-nezz.vercel.app/api/user/change-pass",
+        "hhttps://api.mixtube.xyz/api/user/change-pass",
         {
           method: "POST",
           headers: {

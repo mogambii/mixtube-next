@@ -5,11 +5,9 @@ export default async function TopMixList() {
   const getRecords = async () => {
     try {
       const response = await fetch(
-        "https://server-nezz.vercel.app/api/topmixtapes",
+        "https://api.mixtube.xyz/api/topmixtapes",
         {
-          next: {
-            revalidate: 60*30,
-          },
+          cache: "reload",
         }
       );
       if (!response.ok) {
@@ -33,7 +31,7 @@ export default async function TopMixList() {
         name={mix.name}
         img={mix.imgthumb}
         downloads={mix.downloads}
-        likes={mix.likes}
+        plays={mix.plays ? mix.plays : 0}
       />
     </div>
   ));

@@ -5,10 +5,10 @@ export default async function TopMixList() {
   async function getRecords() {
     try {
       const response = await fetch(
-        `https://server-nezz.vercel.app/api/newmixtapes`,
+        `https://api.mixtube.xyz/api/newmixtapes`,
         {
           method: "GET",
-          cache :"reload"
+          cache :"reload",
         }
       );
       if (!response.ok) {
@@ -25,7 +25,7 @@ export default async function TopMixList() {
   const newMix = await getRecords();
   const renderMixCards = () => {
     return newMix.map((mix) => (
-      <div className="w-full" key={mix._id}>
+      <div className="w-full" key={mix.unique}>
         <MixCard
           link={`/mix/${mix.unique}`}
           Djname={mix.Djname}
@@ -34,7 +34,7 @@ export default async function TopMixList() {
           name={mix.name}
           img={mix.imgthumb}
           downloads={mix.downloads}
-          likes={mix.likes}
+          plays={mix.plays ? mix.plays : 0}
         />
       </div>
     ));
