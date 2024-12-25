@@ -20,7 +20,6 @@ export async function POST(request) {
       const token = data.token;
 
 
-      // Fetch user profile with the received token
       const userdata = await fetch(
         `https://api.mixtube.xyz/api/user/profile`,
         {
@@ -32,8 +31,6 @@ export async function POST(request) {
       );
 
       if (!userdata.ok) {
-        // Handle failure in fetching user details
-        console.error('Failed to fetch user profile:', userdata.status);
         return new NextResponse(
           JSON.stringify({ error: "Failed to fetch user profile" }),
           { status: 500 }
@@ -44,9 +41,9 @@ export async function POST(request) {
 
       const cookiesOptions = {
         httpOnly: true,
-        secure: true, // Only use secure cookies in production
-        sameSite: "None", // For cross-origin cookies
-        maxAge: 60 * 60 * 24 * 7, // 7 days
+        secure: true, 
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7,
       };
 
       // Set cookies
@@ -55,18 +52,16 @@ export async function POST(request) {
       await cookies(request).set("mixtube-Djname", details.Djname, cookiesOptions);
       await cookies(request).set("mixtube-type", details.type, cookiesOptions);
       await cookies(request).set("mixtube-token", token, cookiesOptions);
-      return new NextResponse(JSON.stringify(data), { status: 200 });
+      return new NextResponse(JSON.stringify({ message: "Login successful" }), { status: 200 });
     } else {
-      // Log error response details for better debugging
       const errorResponse = await response.json();
-      console.error('Login failed:', errorResponse);
       return new NextResponse(
-        JSON.stringify({ error: "Login failed", details: errorResponse }),
-        { status: 500 }
+        JSON.stringify(errorResponse),
+        { status: 401, statusText: "Login failed, please check your credentials" }
       );
     }
   } catch (error) {
     console.error('Error during login process:', error);
-    return new NextResponse(JSON.stringify({ error: "Login failed" }), { status: 500 });
+    return new NextResponse(JSON.stringify({ error: "server error" }), { status: 500 ,statusText: "server error"});
   }
 }

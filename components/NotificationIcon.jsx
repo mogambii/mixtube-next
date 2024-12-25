@@ -68,7 +68,7 @@ export default async function NotificationIcon() {
         </Link>
       )}
         <div className="flex items-center gap-4 dark:text-slate-50">
-          <div className="flex items-center gap-x-2 text-lg font-semibold">
+          <div className="flex items-center gap-x-2 font-semibold text-base">
             {token ? (
               <Link
                 href="/profile"
