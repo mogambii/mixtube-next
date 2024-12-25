@@ -3,18 +3,19 @@ import Link from "next/link";
 import React from "react";
 import { FaDownload, FaRegCirclePlay } from "react-icons/fa6";
 
-const MixCard = ({ name, title, img, downloads, Djname, plays, link }) => {
+const MixCard = ({ name, title, img, downloads, Djname, plays, link, loading }) => {
   return (
     <div className="p-2 w-full">
       <Link href={link}>
         <div className="dark:bg-slate-800 bg-slate-300 rounded-xl flex gap-4 p-2 w-full">
           <Image
-            priority
+            priority={loading? false : true}
             src={img ? img : "https://placehold.co/210x210"}
             className="rounded-xl h-32 w-32 object-cover"
             alt={title}
             height={100}
             width={100}
+            loading={loading?"lazy":"eager"}
           />
           <div className="flex flex-col justify-between ">
             <div>

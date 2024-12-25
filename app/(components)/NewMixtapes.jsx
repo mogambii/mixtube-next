@@ -57,7 +57,8 @@ export default async function TopMixList() {
               name={mix.name}
               img={mix.imgthumb}
               downloads={mix.downloads}
-              plays={mix.plays || 0} // Default to 0 if plays is undefined
+              plays={mix.plays || 0}
+              loading={false}
             />
           </div>
         ))}
