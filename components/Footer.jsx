@@ -7,21 +7,21 @@ const Footer = () => {
     <div className=" w-full rounded-lg">
       <footer className="pt-10 pb-16">
         <div className="flex justify-center pt-1 gap-2">
-          <a href="https://t.me/kenyanmix">
+          <a href="https://t.me/kenyanmix" aria-label="telegram">
             <FaTelegram
               size={22}
               className=" dark:text-slate-50 hover:scale-125 transition-transform duration-100"
             />
           </a>
           /
-          <a href="https://instagram.com/mogambi.dev">
+          <a href="https://instagram.com/mogambi.dev" aria-label="instagram">
             <FaInstagram
               size={22}
               className="dark:text-slate-50 hover:scale-125 transition-transform duration-100"
             />
           </a>
           /
-          <a href="https://wa.me/254101468231">
+          <a href="https://wa.me/254101468231" aria-label="whatsapp">
             <FaWhatsapp
               size={22}
               className="dark:text-slate-50 hover:scale-125 transition-transform duration-100"
