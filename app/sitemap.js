@@ -25,7 +25,7 @@ export default async function sitemap() {
     // Generate the DJ URLs
     const Djobj = Djs?.map((dj) => ({
       url: `${baseUrl}/dj/${sanitizeUrl(dj.username)}`,
-      lastModified: new Date(dj.updatedAt || dj.createdAt), // Latest timestamp for DJ profiles
+      lastModified: "daily",
       priority: 0.7, // Lower priority for individual DJ pages
     })) || [];
 
