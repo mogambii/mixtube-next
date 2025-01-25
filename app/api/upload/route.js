@@ -1,12 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-export const config = {
-  api: {
-    responseLimit: '250mb',
-  },
-}
-
 export async function POST(request) {
     try {
         // Get the form data from the request
