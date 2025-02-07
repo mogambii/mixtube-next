@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  email              String?   @unique
+  username           String?   @unique
+  password           String?
+  type               String?   @default("DJ")
+  bio                String?
+  djName             String?
+  profilep           String?
+  contacts           Json?
+  socialMediaHandles Json?
+  followers          String[] 
+  createdAt          DateTime? @default(now())
+  updatedAt          DateTime? @updatedAt
+  mixtapes           Mixtape[]
+  comments           Comment[]
+  emailVerified      DateTime?
+  image              String?
+  accounts           Account[]
+  sessions           Session[]
+
+  following         Follower[] @relation("Following")
+  followedBy        Follower[] @relation("FollowedBy")
+
+  likedMixtapes     MixtapeLike[]
+}
+
+model Follower {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  followerId  String   @db.ObjectId
+  followingId String   @db.ObjectId
+  createdAt   DateTime @default(now())
+
+  follower  User @relation(fields: [followerId], references: [id], onDelete: Cascade, name: "Following")
+  following User @relation(fields: [followingId], references: [id], onDelete: Cascade, name: "FollowedBy")
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String?  @db.ObjectId
+  mixtapeId String   @db.ObjectId
+
+  user    User?   @relation(fields: [userId], references: [id])
+  mixtape Mixtape @relation(fields: [mixtapeId], references: [id])
+
+  @@index([mixtapeId])
+  @@index([userId])
+}
+
+model Mixtape {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  desc        String?   @default("")
+  genre       String    @default("Unknown")
+  imgthumb    String?   @default("")
+  audio       String
+  downloadUrl String?   @default("")
+  time        DateTime  @default(now())
+  unique      String    @unique
+  comments    Comment[]
+  djName      String    @default("Unknown DJ")
+  userId      String    @db.ObjectId
+  user        User?     @relation(fields: [userId], references: [id])
+  stats       Stats[]
+
+  mixtapeLikes MixtapeLike[]
+
+  @@index([userId])
+  @@index([genre])
+}
+
+model MixtapeLike {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  mixtapeId String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mixtape Mixtape @relation(fields: [mixtapeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mixtapeId])
+  @@index([userId])
+  @@index([mixtapeId])
+}
+
+model Stats {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  mixtapeId String   @db.ObjectId
+  date      DateTime @default(now())
+  plays     Int      @default(0)
+  likes     Int      @default(0)
+  downloads Int      @default(0)
+
+  mixtape Mixtape @relation(fields: [mixtapeId], references: [id])
+
+  @@unique([mixtapeId, date])
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ResetToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

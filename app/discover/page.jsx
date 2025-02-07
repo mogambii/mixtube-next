@@ -58,12 +58,16 @@ const Discovermixxes = () => {
         <h5 className="dark:text-slate-50 py-2 pl-3 font-righteous">
           DISCOVER MIXTAPES
         </h5>
-        <div className="flex gap-4 w-full px-2 items-center justify-between py-3">
-          <Link href="/search" className="w-4/5">
-            <MpNav place="search mixtape" />
-          </Link>
-         <NavMenu/>
-        </div>
+        <header className="flex justify-between items-center p-0" role="banner">
+        <Link
+          href="/search"
+          className="flex-1 mr-2"
+          aria-label="Search Mixtapes"
+        >
+          <MpNav place="Search Mixtape" />
+        </Link>
+        <NavMenu />
+      </header>
         <div className="grid items-center justify-center">
           {loading ? (
             <div className="grid justify-center items-center gap-3 min-h-[80vh]">

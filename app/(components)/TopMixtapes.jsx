@@ -5,7 +5,7 @@ export default async function TopMixList() {
   const getRecords = async () => {
     try {
       const response = await fetch(
-        "https://api.mixtube.xyz/api/topmixtapes",
+        "http://localhost:3000/api/home/topmixtapes",
         {
           cache: "no-cache",
         }
@@ -16,7 +16,7 @@ export default async function TopMixList() {
         return;
       }
       const records = await response.json();
-      return records;
+      return records.mixtapes;
     } catch (error) {
       console.error("Failed to fetch top mixtapes:", error);
     }
@@ -26,12 +26,11 @@ export default async function TopMixList() {
     <div className="w-full" key={mix.unique}>
       <MixCard
         link={`/mix/${mix.unique}`}
-        Djname={mix.Djname}
+        Djname={mix.djName}
         title={mix.title}
-        name={mix.name}
         img={mix.imgthumb}
-        downloads={mix.downloads}
-        plays={mix.plays ? mix.plays : 0}
+        downloads={mix.engagement.downloads}
+        plays={mix.engagement.plays}
       />
     </div>
   ));

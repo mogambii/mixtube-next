@@ -3,7 +3,7 @@ import MixCard from "./MixCard";
 
 async function getRecords() {
   try {
-    const response = await fetch(`https://api.mixtube.xyz/api/newmixtapes`, {
+    const response = await fetch(`http://localhost:3000/api/home/newmixtapes`, {
       method: "GET",
       cache: "no-cache",
     });
@@ -14,7 +14,7 @@ async function getRecords() {
     }
 
     const records = await response.json();
-    return records;
+    return records.mixtapes;
   } catch (error) {
     console.error("Failed to fetch new mixtapes:", error);
     return [];
@@ -51,13 +51,12 @@ export default async function TopMixList() {
           <div className="w-full" key={mix.unique}>
             <MixCard
               link={`/mix/${mix.unique}`}
-              Djname={mix.Djname}
+              Djname={mix.djName}
               title={mix.title}
               year={new Date(mix.date).getFullYear()}
-              name={mix.name}
               img={mix.imgthumb}
-              downloads={mix.downloads}
-              plays={mix.plays || 0}
+              downloads={mix.engagement.downloads}
+              plays={mix.engagement.plays || 0}
               loading={false}
             />
           </div>

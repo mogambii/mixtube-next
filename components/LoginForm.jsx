@@ -1,16 +1,18 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { FcGoogle } from "react-icons/fc";
 
 const schema = yup.object({
-  username: yup
+  email: yup
     .string()
-    .required("Username is required")
-    .min(3, "Username must be at least 3 characters"),
+    .required("Email is required")
+    .email("Must be a valid email"),
   password: yup
     .string()
     .required("Password is required")
@@ -32,25 +34,17 @@ const Login = () => {
   const onSubmit = async (data) => {
     setError("");
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });   
-      if (res.status !== 200) {
-        if(res.status === 401) {
-          setError("Invalid username or password.");
-        }else{
-          setError("An unexpected error occurred. Please try again later.");
-        }
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Invalid email or password");
       } else {
-        setError("");
         router.push("/");
-        if(typeof window !== "undefined") {
-          router.refresh();
-        }
+        router.refresh();
       }
     } catch (error) {
       console.error(error);
@@ -58,38 +52,60 @@ const Login = () => {
     }
   };
 
+  const handleGoogleSignIn = () => {
+    signIn("google", { callbackUrl: "/" });
+  };
+
   return (
     <>
       <main className="flex justify-center items-center min-h-svh bg-gray-100 dark:bg-gray-950">
-        <section className="w-full max-w-md p-8 space-y-8 bg-white shadow-md rounded" aria-labelledby="login-heading">
+        <section className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-gray-800 shadow-md rounded" aria-labelledby="login-heading">
           <header className="text-center">
-            <h1 id="login-heading" className="text-3xl font-bold text-gray-900">Hello Again</h1>
-            <p className="mt-2 text-sm text-gray-600">Welcome to MixTube</p>
+            <h1 id="login-heading" className="text-3xl font-bold text-gray-900 dark:text-white">Hello Again</h1>
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">Welcome to MixTube</p>
           </header>
+
+          <button
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+          >
+            <FcGoogle className="text-xl" />
+            Continue with Google
+          </button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">Or continue with</span>
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" aria-label="Login Form">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>
               <input
-                {...register("username")}
-                id="username"
-                type="text"
-                className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                aria-invalid={!!errors.username}
-                aria-describedby="username-error"
+                {...register("email")}
+                id="email"
+                type="email"
+                className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+                aria-invalid={!!errors.email}
+                aria-describedby="email-error"
               />
-              {errors.username && (
-                <p id="username-error" className="mt-1 text-xs text-red-600">
-                  {errors.username.message}
+              {errors.email && (
+                <p id="email-error" className="mt-1 text-xs text-red-600">
+                  {errors.email.message}
                 </p>
               )}
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-200">Password</label>
               <input
                 {...register("password")}
                 id="password"
                 type="password"
-                className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
                 aria-invalid={!!errors.password}
                 aria-describedby="password-error"
               />
@@ -99,28 +115,28 @@ const Login = () => {
                 </p>
               )}
             </div>
+
             {error && (
-              <div className="text-center text-sm text-red-600" role="alert">{error}</div>
+              <div className="text-red-500 text-sm text-center" role="alert">
+                {error}
+              </div>
             )}
-            <div className="text-right">
-              <Link href="/recovery" className="text-sm text-indigo-600">
-                Forgotten password?
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            >
+              {isSubmitting ? "Signing in..." : "Sign in"}
+            </button>
+
+            <p className="text-center text-sm text-gray-600 dark:text-gray-300">
+              Don't have an account?{" "}
+              <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+                Sign up
               </Link>
-            </div>
-            <div>
-              <button
-                type="submit"
-                className="w-full px-4 py-2 text-white bg-indigo-600 rounded shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-400"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Logging in..." : "Log In"}
-              </button>
-            </div>
+            </p>
           </form>
-          <div className="text-center text-sm text-gray-600">
-            Not a member?{" "}
-            <Link href="/signup" className="text-indigo-600">Sign up</Link>
-          </div>
         </section>
       </main>
     </>

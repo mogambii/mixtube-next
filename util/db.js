@@ -1,7 +1,7 @@
 "use server";
 import { MongoClient, ServerApiVersion } from "mongodb";
 
-const URI = process.env.URL;
+const URI = process.env.DATABASE_URL;
 const client = new MongoClient(URI, {
   serverApi: {
     timestamps: true,
@@ -17,7 +17,7 @@ async function getDb() {
       await client.connect();
     }
     console.log("connected to MongoDB!");
-    return client.db("kenyanmix");
+    return client.db("mixtube");
   } catch (err) {
     console.error("Failed to connect to MongoDB ", err);
     throw err;
