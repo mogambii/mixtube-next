@@ -114,7 +114,7 @@ function AudioPlayer() {
   useEffect(() => {
     const interval = setInterval(updateProgress, 1000);
     return () => clearInterval(interval);
-  }, [currentMix]);
+  }, [currentMix,updateProgress]);
 
   const handleMouseMove = (e) => {
     if (progressRef.current && audioPlayer.current.duration) {
