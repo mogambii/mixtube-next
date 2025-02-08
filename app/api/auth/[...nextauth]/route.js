@@ -60,6 +60,21 @@ export const authOptions = {
     signIn: "/login",
   },
   callbacks: {
+    async signIn({ account, profile }) {
+      // Only check for Google OAuth sign-ins
+      if (account.provider === "google") {
+        const existingUser = await prisma.user.findUnique({
+          where: { email: profile.email }
+        });
+
+        // If a user exists with this email and has a password (credential-based),
+        // prevent the Google sign-in
+        if (existingUser?.password) {
+          return false;
+        }
+      }
+      return true;
+    },
     async session({ session, token }) {
       if (token) {
         session.user = {

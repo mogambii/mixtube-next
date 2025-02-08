@@ -18,6 +18,14 @@ export async function POST(request) {
       );
     }
 
+    // Check if user has a password (is not a social login only account)
+    if (!user.password) {
+      return NextResponse.json(
+        { error: "This account does not use password authentication" },
+        { status: 400 }
+      );
+    }
+
     // Generate reset token
     const token = crypto.randomBytes(32).toString("hex");
     const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 min from now

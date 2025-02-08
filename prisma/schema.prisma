@@ -153,11 +153,12 @@ model VerificationToken {
 
 model ResetToken {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifier String
+  identifier String   // email of the user
   token      String   @unique
   expires    DateTime
+  createdAt  DateTime @default(now())
 
-  @@unique([identifier, token])
+  @@index([identifier])
 }
 
 model Notification {

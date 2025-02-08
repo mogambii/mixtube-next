@@ -34,7 +34,7 @@ export async function POST(request) {
     });
 
     // Delete used token
-    await prisma.passwordReset.delete({
+    await prisma.resetToken.delete({
       where: { id: resetToken.id },
     });
 
