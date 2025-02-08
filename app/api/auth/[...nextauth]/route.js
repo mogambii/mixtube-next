@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prismadb";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -20,30 +20,35 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials");
+          throw new Error("Please enter both email and password");
         }
-
+      
         const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
+          where: { email: credentials.email },
         });
-
-        if (!user || !user?.password) {
-          throw new Error("Invalid credentials");
+      
+        if (!user || !user.password) {
+          throw new Error("No user found with this email");
         }
-
+      
         const isCorrectPassword = await bcrypt.compare(
           credentials.password,
           user.password
         );
-
+      
         if (!isCorrectPassword) {
-          throw new Error("Invalid credentials");
+          throw new Error("Incorrect password");
         }
-
-        return user;
-      },
+      
+        // Return the user object with required fields
+        return {
+          id: user.id.toString(),
+          name: user.username, // Map username to name
+          email: user.email,   // Include email
+          image: user.profilep, // Map profilep to image
+          type: user.type
+        };
+      }
     }),
   ],
   session: {
@@ -57,17 +62,23 @@ export const authOptions = {
   callbacks: {
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id;
-        session.user.type = token.type;
-        session.user.username = token.username;
+        session.user = {
+          id: token.id,
+          name: token.name,
+          email: token.email,
+          image: token.image,
+          type: token.type
+        };
       }
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.type = user.type;
-        token.username = user.username;
+        token.name = user.name;
+        token.email = user.email;
+        token.image = user.image;
+        token.type = user.type
       }
       return token;
     },

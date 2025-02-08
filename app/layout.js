@@ -9,6 +9,7 @@ import { PlayerProvider } from "@/context/PlayerContext";
 import SessionProvider from "@/providers/SessionProvider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/route";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 export const orbitron = Orbitron({
   subsets: ["latin"],
@@ -28,6 +29,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${righteous.variable} ${orbitron.variable}`}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <SessionProvider session={session}>
           <PlayerProvider>
             <div className="dark:bg-gray-900 min-h-screen">
@@ -44,6 +46,7 @@ export default async function RootLayout({ children }) {
             </div>
           </PlayerProvider>
         </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

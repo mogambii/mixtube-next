@@ -22,7 +22,7 @@ const DiscoverDjs = () => {
     setIsSearching(true);
     try {
       const response = await fetch(
-        `https://api.mixtube.xyz/api/user/dj/search?search=${query}`
+        `/api/dj-search?query=${query}`
       );
       const data = await response.json();
       setResults(data);
@@ -64,7 +64,7 @@ const DiscoverDjs = () => {
     results.map((dj) => (
       <Link href={`/dj/${dj.username}`} key={dj.username}>
         <ProfileCard
-          Djname={dj.Djname}
+          Djname={dj.djName}
           profilep={dj.profilep}
           name={dj.username}
         />

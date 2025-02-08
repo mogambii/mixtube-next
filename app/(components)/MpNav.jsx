@@ -4,7 +4,7 @@ import { FaMagnifyingGlass } from "react-icons/fa6";
 function MpNav() {
   return (
     <form>
-      <div className="flex bg-slate-200 w-3/4 rounded-full items-center dark:bg-gray-950 flex-grow px-2">
+      <div className="flex bg-slate-200 w-4/5 rounded-full items-center dark:bg-gray-950 flex-grow px-2">
           <FaMagnifyingGlass className="dark:text-slate-50 ml-2" />
         <button
           role="search"

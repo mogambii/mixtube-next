@@ -1,39 +1,19 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { FaRegMoon, FaSun } from "react-icons/fa6";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
-const ThemeToggle = () => {
-  const [darkMode, setDarkMode] = useState(true);
-  useEffect(() => {
-    const theme = localStorage.getItem("theme");
-    if (theme === "dark") setDarkMode(true);
-  }, []);
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
+export default function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
 
   return (
-    <div>
-      <button
-        onClick={() => setDarkMode(!darkMode)}
-        className="h-8 w-8 flex items-center justify-center rounded-full bg-black dark:bg-gray-700 text-white hover:bg-gray-600 dark:hover:bg-gray-500"
-        aria-label={`Switch theme`}
-      >
-        {darkMode ? (
-          <FaRegMoon className="h-5 w-5" />
-        ) : (
-          <FaSun className="h-5 w-5" />
-        )}
-      </button>
-    </div>
+    <button
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className="rounded-full p-2 hover:bg-accent transition flex items-center justify-center"
+      aria-label="Toggle theme"
+    >
+      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+    </button>
   );
-};
-
-export default ThemeToggle;
+}

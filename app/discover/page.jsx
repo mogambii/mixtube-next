@@ -15,7 +15,7 @@ const Discovermixxes = () => {
   const [open, setOpen] = useState(false);
   const [mixes, setMixes] = useState([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(12);
+  const limit = 12
   const [totalRecords, setTotalRecords] = useState(0);
 
   useEffect(() => {
@@ -23,10 +23,10 @@ const Discovermixxes = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `https://api.mixtube.xyz/api/discover?page=${page}&limit=${limit}`
+          `/api/discover?page=${page}`
         );
         const data = await response.json();
-        setMixes(data.results);
+        setMixes(data.data);
         setTotalRecords(data.totalmixtapes);
       } catch (error) {
         console.error("Error fetching mixes:", error);
@@ -36,7 +36,7 @@ const Discovermixxes = () => {
     };
 
     fetchMixes();
-  }, [page, limit]);
+  }, [page]);
 
   const handleNextPage = () => {
     if (page * limit < totalRecords) {

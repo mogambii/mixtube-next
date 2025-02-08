@@ -16,7 +16,7 @@ async function fetchMixData(id) {
 
   try {
     const response = await fetch(
-      `https://api.mixtube.xyz/api/mixtape/${id}`,
+      `http://localhost:3000/api/mixtape/${id}`,
       {
         method: "GET",
         headers: { "Content-Type": "application/json" },

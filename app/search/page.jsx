@@ -93,9 +93,9 @@ const SearchPage = () => {
           year={mix.date}
           name={mix.name}
           img={mix.imgthumb}
-          downloads={mix.downloads}
-          Djname={mix.Djname}
-          plays={mix.plays ? mix.plays : 0}
+          downloads={mix.totalDownloads}
+          Djname={mix.djName}
+          plays={mix.totalPlays}
         />
       ))}
     </div>

@@ -1,6 +1,6 @@
+import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { FaBell } from "react-icons/fa6";
-import { cookies } from "next/headers";
 
 async function verifyToken(token) {
   try {
@@ -43,18 +43,13 @@ async function fetchNotificationsCount(token) {
 }
 
 export default async function NotificationIcon() {
-  const cookieStore = await  cookies();
-  // Retrieve cookies on the server side
-  const mixtubeToken = cookieStore.get("mixtube-token");
+  const session = await getServerSession();
 
-  const token = mixtubeToken ? mixtubeToken.value : null;
-
-  const isTokenValid = token ? await verifyToken(token) : false;
-  const notifications = isTokenValid ? await fetchNotificationsCount(token) : 0;
+  const notifications = 10
 
   return (
     <div className="flex items-center gap-4">
-      {token && (
+      {session && (
         <Link
           href="/notifications"
           className="relative flex items-center text-lg text-gray-800 dark:text-slate-100"
@@ -67,25 +62,6 @@ export default async function NotificationIcon() {
           )}
         </Link>
       )}
-        <div className="flex items-center gap-4 dark:text-slate-50">
-          <div className="flex items-center gap-x-2 font-semibold text-base">
-            {token ? (
-              <Link
-                href="/profile"
-                className="px-2 py-1 rounded-full ring-1 ring-slate-900 dark:ring-slate-50 hover:bg-gray-200 dark:hover:bg-gray-700"
-              >
-                Profile
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="px-2 py-1 rounded-full ring-1 dark:ring-slate-50 ring-slate-950 hover:bg-gray-200 dark:hover:bg-gray-700"
-              >
-                Login
-              </Link>
-            )}
-          </div>
-        </div>
     </div>
   );
 }

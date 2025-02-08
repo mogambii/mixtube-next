@@ -1,15 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
-import ThemeToggle from "./ThemeToggle";
 import NotificationIcon from "./NotificationIcon";
 import { getServerSession } from "next-auth";
+import ProfileIcon from "./Profile";
+import ThemeToggle  from "./ThemeToggle";
 
-function Navbar() {
-  const { data: session } = getServerSession();
-  console.log(session);
+async function  Navbar() {
+  const session = await getServerSession();
 
   return (
-    <div className="flex justify-between items-center mb-6 p-4 bg-slate-100 dark:bg-gray-950 dark:text-slate-50 shadow-lg rounded">
+    <div className="flex justify-between items-center mb-6 p-4 bg-slate-100 dark:bg-gray-900 dark:text-slate-50 shadow-lg rounded">
       <div className="flex items-center gap-4">
         <Link href="/" className="flex items-center gap-3">
           <Image
@@ -28,11 +28,7 @@ function Navbar() {
         {session ? (
           <>
             <NotificationIcon />
-            <Link href="/profile">
-              <button className="rounded-full p-2 text-sm font-medium hover:bg-slate-200 dark:hover:bg-gray-800">
-                Profile
-              </button>
-            </Link>
+            <ProfileIcon />
           </>
         ) : (
           <>
@@ -48,7 +44,7 @@ function Navbar() {
             </Link>
           </>
         )}
-        <ThemeToggle />
+        <ThemeToggle/>
       </div>
     </div>
   );
