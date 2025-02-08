@@ -189,7 +189,7 @@ export default async function MixTape({ params}) {
         </div>
 
         {/* Share and Like Buttons */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-start gap-x-6">
           <Share id={unique} />
           {session && <LikeBtn id={unique} likedparam={liked} />}
           <AudioAdd id={unique} />

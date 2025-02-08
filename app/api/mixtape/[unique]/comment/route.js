@@ -40,6 +40,7 @@ export async function POST(req, { params }) {
             username: true,
             djName: true,
             profilep: true,
+            id:true
           },
         },
       },

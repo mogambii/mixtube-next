@@ -13,7 +13,8 @@ export async function GET(request, { params }) {
                 user: {
                     select: {
                         username: true,
-                        profilep: true
+                        profilep: true,
+                        id: true
                     }
                 },
                 comments: {
@@ -61,6 +62,7 @@ export async function GET(request, { params }) {
             user: {
                 username: mixtape.user.username,
                 profilep: mixtape.user.profilep,
+                userId: mixtape.user.id
             },
             comments: mixtape.comments.map(comment => ({
                 id: comment.id,

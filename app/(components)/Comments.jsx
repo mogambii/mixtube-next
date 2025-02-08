@@ -1,8 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { FaSpinner } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa";
+import { FaSpinner, FaTrash } from "react-icons/fa";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import toast from "react-hot-toast";
@@ -11,9 +10,10 @@ const CommentsPage = ({ comments: initialComments, unique }) => {
   const [commentsList, setCommentsList] = useState(initialComments || []);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { data: session } = useSession();
-
-  console.log("commentsList", commentsList, "session", session)
 
   const handleSubmitComment = async (e) => {
     e.preventDefault();
@@ -56,14 +56,15 @@ const CommentsPage = ({ comments: initialComments, unique }) => {
     }
   };
 
-  const handleDeleteComment = async (commentId) => {
+  const handleDeleteComment = async () => {
     if (!session) {
       toast.error("Please login to delete comments");
       return;
     }
 
     try {
-      const response = await fetch(`/api/mixtape/${unique}/comment/${commentId}`, {
+      setIsDeleting(true);
+      const response = await fetch(`/api/mixtape/${unique}/comment/${commentToDelete}`, {
         method: "DELETE",
       });
 
@@ -73,12 +74,26 @@ const CommentsPage = ({ comments: initialComments, unique }) => {
         throw new Error(data.message || "Failed to delete comment");
       }
 
-      setCommentsList(commentsList.filter((comment) => comment.id !== commentId));
+      setCommentsList(commentsList.filter((comment) => comment.id !== commentToDelete));
       toast.success(data.message);
     } catch (error) {
       console.error("Error deleting comment:", error);
       toast.error(error.message || "Failed to delete comment");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      setCommentToDelete(null);
     }
+  };
+
+  const openDeleteModal = (commentId) => {
+    setCommentToDelete(commentId);
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setCommentToDelete(null);
   };
 
   return (
@@ -114,7 +129,7 @@ const CommentsPage = ({ comments: initialComments, unique }) => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add a comment..."
-                className="w-full p-3 border  rounded-lg resize-none h-20 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-3 border rounded-lg resize-none h-20 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <div className="flex justify-end mt-2">
                 <button
@@ -183,10 +198,9 @@ const CommentsPage = ({ comments: initialComments, unique }) => {
                     </p>
                   </div>
                   {session &&
-                    (session.user.id === comment.userId ||
-                      session.user.id === comment.mixtape?.userId) && (
+                    (session.user.id === comment.user.id || session.user.id === comment.mixtape?.userId) && (
                       <button
-                        onClick={() => handleDeleteComment(comment.id)}
+                        onClick={() => openDeleteModal(comment.id)}
                         className="text-red-500 hover:text-red-700 transition-colors p-1 flex-shrink-0"
                         title="Delete comment"
                       >
@@ -206,6 +220,35 @@ const CommentsPage = ({ comments: initialComments, unique }) => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4">Delete Comment</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Are you sure you want to delete this comment? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteComment}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+                disabled={isDeleting}
+              >
+                {isDeleting && <FaSpinner className="animate-spin" />}
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

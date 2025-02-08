@@ -7,7 +7,7 @@ export async function POST(request) {
     const { token, password } = await request.json();
 
     // Find valid reset token
-    const resetToken = await prisma.passwordReset.findFirst({
+    const resetToken = await prisma.resetToken.findFirst({
       where: {
         token,
         expires: {
@@ -16,6 +16,7 @@ export async function POST(request) {
       },
     });
 
+    
     if (!resetToken) {
       return NextResponse.json(
         { error: "Invalid or expired reset token" },
