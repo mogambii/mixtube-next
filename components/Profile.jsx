@@ -42,6 +42,13 @@ export default function ProfileIcon() {
             </Link>
           )}
 
+          {/* Favorites Link */}
+          <Link href="/favorites">
+            <Button className="w-full" variant="outline">
+              My Favorites
+            </Button>
+          </Link>
+
           {/* Logout Button */}
           <Button
             variant="destructive"
@@ -55,4 +62,3 @@ export default function ProfileIcon() {
     </Popover>
   );
 }
-
