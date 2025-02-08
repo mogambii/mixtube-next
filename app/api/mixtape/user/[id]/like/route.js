@@ -1,48 +1,56 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { verifyJwtToken } from "@/lib/jwt";
+import prisma from "@/lib/prismadb";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // Add like
 export async function POST(req, { params }) {
   try {
-    const token = req.headers.get("authorization")?.split(" ")[1];
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const decoded = await verifyJwtToken(token);
-    if (!decoded) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ message: "Please login to like mixtapes" }, { status: 401 });
     }
 
     const { id } = params;
-    const userId = decoded.id;
+    const userId = session.user.id;
+
+    const mixtapeId = await prisma.mixtape.findUnique({
+      where: {
+        unique: id,
+      },
+    }).then((mixtape) => {
+      if (!mixtape) {
+        console.error("Mixtape not found");
+        return null;
+      }
+      return mixtape.id;
+    });
 
     // Check if like already exists
     const existingLike = await prisma.mixtapeLike.findFirst({
       where: {
-        mixtapeId: id,
+        mixtapeId: mixtapeId,
         userId: userId,
       },
     });
 
     if (existingLike) {
-      return NextResponse.json({ error: "Already liked" }, { status: 400 });
+      return NextResponse.json({ message: "Mixtape already in favorites" }, { status: 400 });
     }
 
     // Create new like
     await prisma.mixtapeLike.create({
       data: {
-        mixtapeId: id,
+        mixtapeId: mixtapeId,
         userId: userId,
       },
     });
 
-    return NextResponse.json({ message: "Liked successfully" });
+    return NextResponse.json({ message: "Added to favorites" });
   } catch (error) {
     console.error("Error adding like:", error);
     return NextResponse.json(
-      { error: "Failed to add like" },
+      { message: "Failed to add to favorites" },
       { status: 500 }
     );
   }
@@ -51,32 +59,43 @@ export async function POST(req, { params }) {
 // Remove like
 export async function DELETE(req, { params }) {
   try {
-    const token = req.headers.get("authorization")?.split(" ")[1];
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const decoded = await verifyJwtToken(token);
-    if (!decoded) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ message: "Please login to unlike mixtapes" }, { status: 401 });
     }
 
     const { id } = params;
-    const userId = decoded.id;
+    const userId = session.user.id;
 
-    // Delete like
-    await prisma.mixtapeLike.deleteMany({
+    const mixtapeId = await prisma.mixtape.findUnique({
       where: {
-        mixtapeId: id,
+        unique: id,
+      },
+    }).then((mixtape) => {
+      if (!mixtape) {
+        console.error("Mixtape not found");
+        return null;
+      }
+      return mixtape.id;
+    });
+
+    // Find and delete the like
+    const deletedLike = await prisma.mixtapeLike.deleteMany({
+      where: {
+        mixtapeId: mixtapeId,
         userId: userId,
       },
     });
 
-    return NextResponse.json({ message: "Unliked successfully" });
+    if (deletedLike.count === 0) {
+      return NextResponse.json({ message: "Mixtape not in favorites" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Removed from favorites" });
   } catch (error) {
     console.error("Error removing like:", error);
     return NextResponse.json(
-      { error: "Failed to remove like" },
+      { message: "Failed to remove from favorites" },
       { status: 500 }
     );
   }

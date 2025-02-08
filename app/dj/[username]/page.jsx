@@ -1,23 +1,45 @@
 import ContactsDisplay from "@/components/Contacts";
 import Follow from "@/components/Follow";
 import MyMixxes from "@/components/MyMixxes";
-import { cookies } from "next/headers";
 import Image from "next/image";
+import { FaHeadphones, FaDownload, FaCompactDisc, FaUsers } from 'react-icons/fa';
+import { headers } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-async function fetchProfile(username, cacheOption = "force-cache") {
+async function fetchProfile(username) {
   try {
-    const response = await fetch(
-      `https://api.mixtube.xyz/api/user/dj/profile/?username=${username}`,
-      {
-        method: "GET",
-        cache: cacheOption,
-      }
-    );
+    const response = await fetch(`http://localhost:3000/api/dj/${username}`, {
+      method: "GET",
+      cache: 'no-store'
+    });
     if (!response.ok) throw new Error(`Error: ${response.statusText}`);
     return await response.json();
   } catch (error) {
     console.error(error);
     return null;
+  }
+}
+
+async function checkIsFollowing(username) {
+  try {
+
+    const session = await getServerSession(authOptions);
+    const name = session?.user?.name;
+    const response = await fetch(
+      `http://localhost:3000/api/user/isFollowing?djusername=${username}&username=${name}`,
+      {
+        method: "GET",
+        cache: 'no-store'
+      }
+    );
+    
+    if (!response.ok) return false;
+    const data = await response.json();
+    return data.isFollowing;
+  } catch (error) {
+    console.error("Error checking follow status:", error);
+    return false;
   }
 }
 
@@ -34,20 +56,19 @@ export async function generateMetadata({ params: { username } }) {
     };
   }
 
-  const imageUrl = profile.profilep || 'https://default-image-url.com/default.jpg';
-  const name = profile.Djname || username;
-  const description = ` Discover ${name}'s mixtapes, biography, and social contacts on Mixtube. \n ${profile.Bio && profile.Bio} `;
+  const imageUrl = profile.profilep || '/images/default-avatar.png';
+  const name = profile.djName || username;
+  const description = `Discover ${name}'s mixtapes, biography, and social contacts on Mixtube. ${profile.bio || ''}`;
 
   return {
     title: `${name} | DJ Profile on Mixtube`,
     description,
     keywords: [
       "DJ", 
-      `${name}`, 
+      name, 
       "Mixtube", 
       "DJ Profile", 
       "Mixtape", 
-      `${profile.genre}`, 
       "Music", 
       "Mixes", 
       `${name}'s Mixtube Profile`
@@ -69,98 +90,87 @@ export async function generateMetadata({ params: { username } }) {
   };
 }
 
-const checkFollowing = async (token, username) => {
-  try {
-    const res = await fetch(
-      `https://api.mixtube.xyz/api/user/check_follow?username=${username}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    if (!res.ok) throw new Error("Failed to check following status");
-
-    const results = await res.json();
-    return results.is_followed;
-  } catch (error) {
-    console.error("Error checking following status:", error);
-    return false;
-  }
-};
+const StatCard = ({ icon: Icon, label, value }) => (
+  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex items-center space-x-3">
+    <div className="p-3 bg-blue-50 dark:bg-blue-900 rounded-full">
+      <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+    </div>
+    <div>
+      <p className="text-gray-600 dark:text-gray-400 text-sm">{label}</p>
+      <p className="text-xl font-semibold dark:text-white">{value.toLocaleString()}</p>
+    </div>
+  </div>
+);
 
 const DjProfile = async ({ params: { username } }) => {
-  const cookie = cookies().get("mixtube-token")?.value;
-  const profile = await fetchProfile(username, "no-cache");
-  const following = await checkFollowing(cookie, username);
+  const [profile, isFollowing] = await Promise.all([
+    fetchProfile(username),
+    checkIsFollowing(username)
+  ]);
 
   if (!profile) {
     return (
-      <div className="min-h-screen px-4 text-center">
-        <h1 className="text-xl font-bold">DJ Profile Not Found</h1>
-        <p>The DJ profile you are looking for does not exist.</p>
+      <div className="min-h-screen px-4 py-8 text-center dark:text-white">
+        <h1 className="text-2xl font-bold mb-4">DJ Profile Not Found</h1>
+        <p className="text-gray-600 dark:text-gray-400">The DJ profile you are looking for does not exist.</p>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen px-4" itemScope itemType="http://schema.org/Person">
-      <link rel="canonical" href={`/dj/${username}`} />
-      <div className="grid items-center justify-center grid-cols-1 md:grid-cols-2 mb-6">
-        <div className="flex flex-col items-center mb-4">
-          <Image
-            priority
-            className="rounded-full border-4 border-gray-300 h-44 w-44 object-cover"
-            src={profile.profilep}
-            alt={`Profile picture of DJ ${profile.Djname || username}`}
-            width={200}
-            height={200}
-            itemProp="image"
-          />
-          <h2 className="text-2xl font-righteous dark:text-slate-50 text-center mt-2" itemProp="name">
-            {profile.Djname}
-          </h2>
-          <h3 className="font-righteous dark:text-slate-50 text-center">@{profile.username}</h3>
-          <ContactsDisplay
-            contacts={profile.contacts}
-            socialMediaHandles={profile.socialMediaHandles}
-          />
-        </div>
-        <div className="flex flex-col items-center dark:text-slate-100">
-          <div className="flex flex-col items-center mb-4">
-            <div className="flex gap-6 mb-4">
-              <div className="text-center" itemProp="interactionStatistic" itemScope itemType="http://schema.org/InteractionCounter">
-                <meta itemProp="interactionType" content="http://schema.org/DownloadAction" />
-                <h3 className="font-bold">Downloads</h3>
-                <h3 itemProp="userInteractionCount">{profile.totalDownloads}</h3>
-              </div>
-              <div className="text-center" itemProp="interactionStatistic" itemScope itemType="http://schema.org/InteractionCounter">
-                <meta itemProp="interactionType" content="http://schema.org/LikeAction" />
-                <h3 className="font-bold">Likes</h3>
-                <h3 itemProp="userInteractionCount">{profile.totalLikes}</h3>
-              </div>
-              <div className="text-center" itemProp="interactionStatistic" itemScope itemType="http://schema.org/InteractionCounter">
-                <meta itemProp="interactionType" content="http://schema.org/FollowAction" />
-                <h3 className="font-bold">Followers</h3>
-                <h3 itemProp="userInteractionCount">{profile.totalFollowers || 0}</h3>
-              </div>
+    <div className="min-h-screen px-4 py-8 max-w-7xl mx-auto">
+      {/* Profile Header */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-8">
+        <div className="flex flex-col md:flex-row items-center gap-6">
+          <div className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-gray-100 dark:ring-gray-700">
+            <Image
+              src={profile.profilep || '/images/default-avatar.png'}
+              alt={profile.djName}
+              fill
+              className="object-cover"
+            />
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h1 className="text-3xl font-bold mb-2 dark:text-white">{profile.djName}</h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{profile.bio || 'No bio available'}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-center md:justify-start items-center">
+              <Follow username={username} following={isFollowing} />
+              <ContactsDisplay className="justify-center" username={username} contacts={profile.contacts} socialMediaHandles={profile.socialMediaHandles} />
             </div>
-            {cookie && <Follow username={username} following={following} token={cookie} />}
           </div>
         </div>
       </div>
-      <section className="p-3 border rounded-sm mb-6">
-        <h4 className="dark:text-slate-50 text-center font-righteous">Bio</h4>
-        <p className="dark:text-slate-50 text-center p-2" itemProp="description">
-          {profile.Bio || "Bio not added"}
-        </p>
-      </section>
-      <section className="py-3">
-        <h5 className="dark:text-slate-50 text-center py-2 font-righteous">Mixtapes</h5>
-        <div className="items-center justify-center border rounded-lg p-2 gap-4">
-          <MyMixxes username={profile.username} />
-        </div>
-      </section>
-    </main>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard
+          icon={FaCompactDisc}
+          label="Total Mixtapes"
+          value={profile.totalMixtapes}
+        />
+        <StatCard
+          icon={FaHeadphones}
+          label="Total Plays"
+          value={profile.totalPlays}
+        />
+        <StatCard
+          icon={FaDownload}
+          label="Total Downloads"
+          value={profile.totalDownloads}
+        />
+        <StatCard
+          icon={FaUsers}
+          label="Followers"
+          value={profile.totalFollowers}
+        />
+      </div>
+
+      {/* Mixtapes Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <h2 className="text-2xl font-bold mb-6 dark:text-white">Latest Mixtapes</h2>
+        <MyMixxes username={username} />
+      </div>
+    </div>
   );
 };
 

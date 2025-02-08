@@ -1,23 +1,41 @@
 "use client";
-import { handleLIkeAndUnlike } from "@/actions/handlers";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { FaHeart } from "react-icons/fa";
+import { useSession } from "next-auth/react";
 
 const Likebtn = ({ id, likedparam }) => {
   const [liked, setLiked] = useState(likedparam);
+  const { data: session } = useSession();
 
   const handleLikeToggle = async () => {
+    if (!session) {
+      toast.error("Please login to like mixtapes");
+      return;
+    }
+
     const newLikedState = !liked;
-    setLiked(newLikedState); 
+    setLiked(newLikedState); // Optimistic update
 
     try {
-      const endpoint = newLikedState ? "like" : "unlike";
-      await handleLIkeAndUnlike({ action: endpoint, id: id });
+      const response = await fetch(`/api/mixtape/user/${id}/like`, {
+        method: newLikedState ? 'POST' : 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update like status");
+      }
+
+      toast.success(data.message);
     } catch (error) {
       console.error(`Failed to ${newLikedState ? "like" : "unlike"} mixtape:`, error);
-      toast.error(`Failed to ${newLikedState ? "like" : "unlike"} mixtape`);
-      setLiked(!newLikedState); 
+      toast.error(error.message || `Failed to ${newLikedState ? "like" : "unlike"} mixtape`);
+      setLiked(!newLikedState); // Revert the optimistic update
     }
   };
 

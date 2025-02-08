@@ -9,10 +9,10 @@ import LikeBtn from "@/components/Like-btn";
 import AudioAdd from "@/app/(components)/AudioAdd";
 import { getServerSession } from "next-auth";
 
-async function checkLikeStatus(userId, mixtapeId) {
+async function checkLikeStatus(email, mixtapeId) {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/mixtape/user/${mixtapeId}/liked?userId=${userId}`,
+      `http://localhost:3000/api/mixtape/user/${mixtapeId}/liked?email=${email}`,
       {
         cache: "no-cache",
       }
@@ -87,9 +87,8 @@ export async function generateMetadata({ params }) {
 export default async function MixTape({ params}) {
 
   const session = await getServerSession();
-  console.log(session)
   const { unique } = params;
-  const liked = await checkLikeStatus(session?.user?.id, unique);
+  const liked = await checkLikeStatus(session?.user?.email, unique);
   const mix = await getMixtape(unique);
 
   if (!mix) {
@@ -202,7 +201,7 @@ export default async function MixTape({ params}) {
         </div>
 
         {/* Comments Section */}
-        <CommentsPage comment={mix.comments} id={unique} token={session} username={session?.user?.name} />
+        <CommentsPage comments={mix.comments} unique={unique} />
       </div>
     </div>
   );

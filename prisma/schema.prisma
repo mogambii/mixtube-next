@@ -32,6 +32,8 @@ model User {
   followedBy        Follower[] @relation("FollowedBy")
 
   likedMixtapes     MixtapeLike[]
+  notifications     Notification[] @relation("UserNotifications")
+  notificationsSent Notification[] @relation("NotificationSender")
 }
 
 model Follower {
@@ -78,8 +80,8 @@ model Mixtape {
   userId      String    @db.ObjectId
   user        User?     @relation(fields: [userId], references: [id])
   stats       Stats[]
-
   mixtapeLikes MixtapeLike[]
+  notifications Notification[]
 
   @@index([userId])
   @@index([genre])
@@ -156,4 +158,24 @@ model ResetToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Notification {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  type        String   // e.g., "FOLLOW", "LIKE", "COMMENT"
+  message     String
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  userId      String   @db.ObjectId
+  senderId    String   @db.ObjectId
+  mixtapeId   String?  @db.ObjectId
+  
+  user        User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  sender      User     @relation("NotificationSender", fields: [senderId], references: [id], onDelete: Cascade)
+  mixtape     Mixtape? @relation(fields: [mixtapeId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([senderId])
+  @@index([mixtapeId])
+  @@index([createdAt])
 }

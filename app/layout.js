@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/navbar";
 import { Toaster } from "react-hot-toast";
 import { GoogleAnalytics } from '@next/third-parties/google'
-import AudioPlayer from "./(components)/audioplayer";
+import AudioPlayer from "./(components)/AudioPlayer";
 import { PlayerProvider } from "@/context/PlayerContext";
 import SessionProvider from "@/providers/SessionProvider";
 import { getServerSession } from "next-auth";

@@ -9,21 +9,20 @@ const MyMixxes = ({ username }) => {
   const [loadingMixes, setLoadingMixes] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageCount, setPageCount] = useState(0);
-  const itemsPerPage = 4;
   useEffect(() => {
     async function getMixes() {
       setLoadingMixes(true);
       try {
         const mixResponse = await fetch(
-          `https://api.mixtube.xyz/api/search/mixtapes?search=${username}&page=${currentPage}&limit=${itemsPerPage}`
+          `/api/mixes?username=${username}&page=${currentPage}`
         );
         if (!mixResponse.ok)
           throw new Error(`Error: ${mixResponse.statusText}`);
 
         const mixData = await mixResponse.json();
 
-        setMixes(mixData.results);
-        setPageCount(Math.ceil(mixData.totalmixtapes / itemsPerPage));
+        setMixes(mixData.mixes);
+        setPageCount(mixData.totalPages);
       } catch (error) {
         console.error(error);
         setLoadingMixes(false);
@@ -33,7 +32,7 @@ const MyMixxes = ({ username }) => {
     }
 
     getMixes();
-  }, [username, currentPage, itemsPerPage]);
+  }, [username, currentPage]);
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
@@ -67,20 +66,20 @@ const MyMixxes = ({ username }) => {
             visible={true}
           />
         </div>
-      ) : mixes.length > 0 ? (
+      ) : mixes?.length > 0 ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {mixes.map((mix) => (
+            {mixes?.map((mix) => (
               <MixCard
                 link={`/mix/${mix.unique}`}
                 key={mix.unique}
-                Djname={mix.Djname}
+                Djname={mix.djName}
                 title={mix.title}
                 year={mix.date}
-                name={mix.name}
                 img={mix.imgthumb}
-                downloads={mix.downloads}
-                plays={mix.plays? mix.plays : 0}
+                downloads={mix.engagement.downloads}
+                plays={mix.engagement.plays}
+                loading
               />
             ))}
           </div>

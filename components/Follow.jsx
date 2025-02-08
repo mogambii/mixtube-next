@@ -1,27 +1,35 @@
 "use client";
 import { useState } from "react";
 import { FaSpinner } from "react-icons/fa";
+import { useSession } from "next-auth/react";
 
-const Follow = ({ username, following,token }) => {
+const Follow = ({ username, following }) => {
   const [isFollowing, setIsFollowing] = useState(following);
   const [isFollowingLoading, setIsFollowingLoading] = useState(false);
+  const { data: session } = useSession();
+
+  // Don't render if user is viewing their own profile
+  if (session?.user?.name === username) {
+    return null;
+  }
 
   // Function to handle follow/unfollow API calls
-  const handleFollowUnfollow = async (action, username) => {
+  const handleFollowUnfollow = async (action, djusername) => {
     try {
-      const response = await fetch(
-        `https://api.mixtube.xyz/api/user/engage/${action}?username=${username}`,
-        {
-          method: "POST", 
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`/api/user/${action}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          username: session?.user?.name,
+          djusername 
+        }),
+      });
 
       if (!response.ok) {
-        throw new Error(`Failed to ${action}`);
+        const error = await response.json();
+        throw new Error(error.error || `Failed to ${action}`);
       }
 
       return response.json();
@@ -32,6 +40,10 @@ const Follow = ({ username, following,token }) => {
   };
 
   const handleFollowToggle = async () => {
+    if (!session) {
+      // Redirect to login or show login modal
+      return;
+    }
     setIsFollowingLoading(true);
     const endpoint = isFollowing ? "unfollow" : "follow";
 
@@ -50,20 +62,20 @@ const Follow = ({ username, following,token }) => {
 
   return (
     <div>
-      <div className="flex gap-x-2">
+      <div className="flex justify-center w-full">
         <button
           onClick={handleFollowToggle}
-          className={`mt-2 px-4 py-3 rounded-3xl transition-colors duration-300 ${
-            isFollowing
-              ? "bg-red-500 text-white hover:bg-red-600"
-              : "bg-blue-600 text-white hover:bg-blue-700"
-          }`}
           disabled={isFollowingLoading}
+          className={`px-4 py-2 rounded-full text-sm font-semibold ${
+            isFollowing
+              ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              : "bg-blue-600 text-white hover:bg-blue-700"
+          } transition-colors duration-200`}
         >
           {isFollowingLoading ? (
-            <FaSpinner className="text-slate-50 animate-spin" />
+            <FaSpinner className="animate-spin inline" />
           ) : isFollowing ? (
-            "Unfollow"
+            "Following"
           ) : (
             "Follow"
           )}

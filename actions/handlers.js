@@ -69,25 +69,6 @@ export async function LogOut() {
   
 }
 
-export async function handleLIkeAndUnlike(data) {
-  const action = data.action
-  const id = data.id
-  const token = cookies().get("mixtube-token")?.value
-  try { 
-    const response = await fetch(
-      `https://api.mixtube.xyz/api/${action}?post=${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    const res = await response.json();
-    return res;
-  } catch (error) {
-    console.log(error)
-  }
-}
 
 export async function handleCommentSubmit(data) {
   const token = cookies().get("mixtube-token")?.value

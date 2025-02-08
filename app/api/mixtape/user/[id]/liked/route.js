@@ -3,14 +3,36 @@ import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
   try {
+    const { id } = await params;
+    const email = req.nextUrl.searchParams.get("email");
 
+    const userId = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    }).then((user) => {
+      if (!user) {
+        console.error("User not found");
+        return null;
+      }
+      return user.id;
+    });
 
-    const { id } = params;
-    const userId = req.nextUrl.searchParams.get('userId');
+    const mixtapeId = await prisma.mixtape.findUnique({
+      where: {
+        unique: id,
+      },
+    }).then((mixtape) => {
+      if (!mixtape) {
+        console.error("Mixtape not found");
+        return null;
+      }
+      return mixtape.id;
+    });
 
     const like = await prisma.mixtapeLike.findFirst({
       where: {
-        mixtapeId: id,
+        mixtapeId: mixtapeId,
         userId: userId,
       },
     });

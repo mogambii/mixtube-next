@@ -21,7 +21,8 @@ export async function GET(request, { params }) {
                         user: {
                             select: {
                                 username: true,
-                                profilep: true
+                                profilep: true,
+                                id: true    
                             }
                         }
                     },
@@ -59,7 +60,7 @@ export async function GET(request, { params }) {
             totalLikes: mixtape.mixtapeLikes.length, // Count user likes from mixtapeLikes
             user: {
                 username: mixtape.user.username,
-                profilep: mixtape.user.profilep
+                profilep: mixtape.user.profilep,
             },
             comments: mixtape.comments.map(comment => ({
                 id: comment.id,
@@ -67,7 +68,8 @@ export async function GET(request, { params }) {
                 createdAt: comment.createdAt,
                 user: {
                     username: comment.user.username,
-                    profilep: comment.user.profilep
+                    profilep: comment.user.profilep,
+                    id: comment.user.id
                 }
             }))
         };

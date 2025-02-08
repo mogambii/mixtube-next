@@ -12,7 +12,7 @@ export function PlayerProvider({ children }) {
 
   const playMix = async (id) => {
     try {
-      const response = await fetch(`https://api.mixtube.xyz/api/mixtape/${id}`, {
+      const response = await fetch(`/api/mixdata/${id}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         cache: "no-cache",
@@ -26,7 +26,8 @@ export function PlayerProvider({ children }) {
       setCurrentMix({
         id,
         audio: mixData.audio,
-        thumbnail: mixData.imgthumb
+        imgthumb: mixData.imgthumb,
+        title: mixData.title
       });
     } catch (error) {
       console.error("Error loading mix:", error);
@@ -35,8 +36,12 @@ export function PlayerProvider({ children }) {
 
   const updatePlays = async (id) => {
     try {
-      const response = await fetch(`https://api.mixtube.xyz/api/updateplays?id=${id}`, {
-        method: "GET",
+      const response = await fetch(`/api/mixtape/stats/play`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
       });
       
       if (!response.ok) {

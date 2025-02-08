@@ -37,7 +37,7 @@ function AudioPlayer() {
       audioPlayer.current.pause();
     } else {
       audioPlayer.current.play();
-      // Update play count when starting to pla
+      // Update play count when starting to play
       if (currentMix.id) {
         updatePlays(currentMix.id);
       }
@@ -129,40 +129,87 @@ function AudioPlayer() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-slate-100 dark:bg-gray-900 text-gray-200 p-2 shadow-lg z-50 rounded-t-lg flex items-center justify-between">
-      {currentMix.thumbnail && (
-        <Link href={`/mix/${currentMix.id}`} className="w-16 h-16">
-          <Image src={currentMix.thumbnail} alt="Album Thumbnail" className="w-full h-full rounded-md object-cover" width={64} height={64} />
-        </Link>
-      )}
-
-      <audio ref={audioPlayer} onTimeUpdate={updateProgress} onEnded={() => setIsPlaying(false)} />
-
-      <div className="flex-1 mx-2">
-        <div ref={progressRef} className="relative w-full h-1 bg-gray-600 rounded cursor-pointer" onClick={handleSeek} onMouseMove={handleMouseMove} onMouseLeave={() => setTooltipTime(null)}>
-          <div className="absolute top-0 left-0 h-full bg-blue-500" style={{ width: `${progress}%` }} />
-          <div ref={dotRef} className="absolute h-3 w-3 bg-blue-500 rounded-full" style={{ left: `${progress}%`, top: "50%", transform: "translate(-50%, -50%)" }} />
-          {tooltipTime && (
-            <div className="absolute top-0 left-0 mt-1 text-xs bg-gray-900 text-white rounded px-1 py-0.5">{tooltipTime}</div>
+    <div className="fixed bottom-0 left-0 w-full bg-slate-100 dark:bg-gray-900 text-gray-200 p-4 shadow-lg z-50 rounded-t-lg">
+      <div className="max-w-7xl mx-auto flex items-center gap-4">
+        {/* Thumbnail and Title Section */}
+        <div className="flex items-center gap-4 min-w-[200px]">
+          {currentMix.imgthumb && (
+            <Link href={`/mix/${currentMix.id}`} className="w-16 h-16 flex-shrink-0">
+              <Image 
+                src={currentMix.imgthumb} 
+                alt="Album Thumbnail" 
+                className="w-full h-full rounded-md object-cover" 
+                width={64} 
+                height={64} 
+              />
+            </Link>
           )}
+          <div className="flex flex-col">
+            <div className="font-bold text-sm text-slate-700 dark:text-slate-200  line-clamp-1">{currentMix.title}</div>
+            <div className="text-xs text-gray-400">{currentTimeDisplay} / {durationDisplay}</div>
+          </div>
         </div>
 
-        <div className="flex justify-between text-xs text-blue-500 mt-1">
-          <div>{currentTimeDisplay}</div>
-          <div>{durationDisplay}</div>
-        </div>
-      </div>
+        {/* Controls and Progress Section */}
+        <div className="flex-1 flex flex-col gap-2">
+          <div className="flex items-center justify-center gap-4">
+            <button 
+              onClick={handleRewind} 
+              className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+            >
+              <LiaStepBackwardSolid  className="text-slate-900 dark:text-slate-100" size={20} />
+            </button>
+            <button 
+              onClick={togglePlay} 
+              className="p-3 hover:bg-gray-700 rounded-full transition-colors"
+            >
+              {isBuffering ? (
+                <Bars height={20} width={20} color="#3B82F6" />
+              ) : isPlaying ? (
+                <RiPauseLine   className="text-slate-900 dark:text-slate-100" size={24} />
+              ) : (
+                <RiPlayFill  className="text-slate-900 dark:text-slate-100" size={24} />
+              )}
+            </button>
+            <button 
+              onClick={handleForward} 
+              className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+            >
+              <LiaStepForwardSolid className="text-slate-900 dark:text-slate-100" size={20} />
+            </button>
+          </div>
 
-      <div className="flex space-x-2">
-        <button onClick={handleRewind} aria-label="Rewind 10 seconds" className="hover:text-blue-500">
-          <LiaStepBackwardSolid className="h-5 w-5" />
-        </button>
-        <button onClick={togglePlay} aria-label={isPlaying ? "Pause" : "Play"} className="h-10 w-10 bg-blue-500 text-white rounded-full flex items-center justify-center">
-          {isBuffering ? <Bars height="20" width="20" color="#ffffff" /> : isPlaying ? <RiPauseLine className="h-6 w-6" /> : <RiPlayFill className="h-6 w-6" />}
-        </button>
-        <button onClick={handleForward} aria-label="Forward 10 seconds" className="hover:text-blue-500">
-          <LiaStepForwardSolid className="h-5 w-5" />
-        </button>
+          <div className="w-full px-4">
+            <div 
+              ref={progressRef} 
+              className="relative w-full h-1.5 bg-gray-600 rounded-full cursor-pointer group" 
+              onClick={handleSeek} 
+              onMouseMove={handleMouseMove} 
+              onMouseLeave={() => setTooltipTime(null)}
+            >
+              <div 
+                className="absolute top-0 left-0 h-full bg-blue-500 rounded-full" 
+                style={{ width: `${progress}%` }} 
+              />
+              <div 
+                ref={dotRef} 
+                className="absolute h-3 w-3 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" 
+                style={{ left: `${progress}%`, top: "50%", transform: "translate(-50%, -50%)" }} 
+              />
+              {tooltipTime && (
+                <div 
+                  className="absolute -top-6 text-xs bg-gray-800 text-white rounded px-2 py-1 transform -translate-x-1/2"
+                  style={{ left: `${progress}%` }}
+                >
+                  {tooltipTime}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Audio Element */}
+        <audio ref={audioPlayer} onTimeUpdate={updateProgress} onEnded={() => setIsPlaying(false)} />
       </div>
     </div>
   );

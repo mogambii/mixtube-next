@@ -16,14 +16,11 @@ function NotificationsPage() {
   useEffect(() => {
     async function fetchNotifications() {
       try {
-        const response = await fetch(
-          `/api/notifications?page=${page}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`/api/notifications?page=${page}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
         const data = await response.json();
         if (response.status === 404) {
           setNotifications([]);
@@ -52,25 +49,55 @@ function NotificationsPage() {
   const deleteNotification = async (notificationId) => {
     setActionLoading(true);
     try {
-      const response = await fetch(
-        `/api/notifications?id=${notificationId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        } 
-      );
+      const response = await fetch(`/api/notifications?id=${notificationId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       if (response.ok) {
         setNotifications((prev) =>
           prev.filter((notification) => notification.id !== notificationId)
         );
-      toast.success("Notification deleted successfully");
+        toast.success("Notification deleted successfully");
       } else {
-        alert("Failed to delete notification");
+        toast.error("Failed to delete notification");
       }
     } catch (error) {
-      alert("An error occurred while deleting notification");
+      toast.error("An error occurred while deleting notification");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const toggleNotificationStatus = async (notification) => {
+    setActionLoading(true);
+    try {
+      const response = await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: notification.id,
+          seen: !notification.seen,
+        }),
+      });
+      
+      if (response.ok) {
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === notification.id ? { ...n, seen: !n.seen } : n
+          )
+        );
+        toast.success(
+          `Notification marked as ${!notification.seen ? "read" : "unread"}`
+        );
+      } else {
+        toast.error("Failed to update notification status");
+      }
+    } catch (error) {
+      toast.error("An error occurred while updating notification");
     } finally {
       setActionLoading(false);
     }
@@ -93,7 +120,7 @@ function NotificationsPage() {
   }
 
   return (
-    <div className=" mx-4 ">
+    <div className="mx-4 max-w-4xl mx-auto py-8">
       <h2 className="text-2xl font-semibold mb-6 dark:text-slate-50 text-center">
         Notifications
       </h2>
@@ -103,42 +130,51 @@ function NotificationsPage() {
             {notifications.map((notification) => (
               <li
                 key={notification.id}
-                className={`p-4 bg-white dark:bg-gray-800 shadow-md rounded-lg transition-opacity duration-300 border border-gray-200 dark:border-gray-700 flex justify-between items-center ${
-                  notification.seen ? "opacity-70" : "opacity-100"
-                }`}
+                className={`p-4 bg-white dark:bg-gray-800 shadow-md rounded-lg transition-all duration-300 border ${
+                  notification.seen
+                    ? "border-gray-200 dark:border-gray-700 opacity-70"
+                    : "border-blue-500 dark:border-blue-400 opacity-100"
+                } hover:shadow-lg`}
               >
-                <Link href={`https://mixtube.xyz/mix/${notification.unique}`}>
-                  <div className="flex-1 cursor-pointer">
-                    <p className="text-sm text-gray-800 dark:text-slate-50">
-                      {notification.message}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {new Date(notification.time).toLocaleString()}
-                    </p>
+                <div className="flex justify-between items-start gap-4">
+                  <Link href={`https://mixtube.xyz/mix/${notification.unique}`}>
+                    <div className="flex-1 cursor-pointer">
+                      <p className="text-sm text-gray-800 dark:text-slate-50">
+                        {notification.message}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {new Date(notification.time).toLocaleString()}
+                      </p>
+                    </div>
+                  </Link>
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={() => toggleNotificationStatus(notification)}
+                      className={`${
+                        notification.seen
+                          ? "text-gray-400 hover:text-blue-500"
+                          : "text-blue-500 hover:text-blue-700"
+                      } focus:outline-none transition-colors duration-200`}
+                      aria-label={
+                        notification.seen ? "Mark as unread" : "Mark as read"
+                      }
+                      disabled={actionLoading}
+                    >
+                      {notification.seen ? (
+                        <FaEnvelopeOpen className="h-5 w-5" />
+                      ) : (
+                        <FaEnvelope className="h-5 w-5" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => deleteNotification(notification.id)}
+                      className="text-red-500 hover:text-red-700 focus:outline-none transition-colors duration-200"
+                      aria-label="Delete notification"
+                      disabled={actionLoading}
+                    >
+                      <FaTrashAlt className="h-5 w-5" />
+                    </button>
                   </div>
-                </Link>
-                <div className="flex items-center space-x-4">
-                  <button
-                    className="text-blue-500 hover:text-blue-700 focus:outline-none"
-                    aria-label="Mark as read"
-                    role="button"
-                    disabled={actionLoading}
-                  >
-                    {notification.seen ? (
-                      <FaEnvelopeOpen className="h-5 w-5" />
-                    ) : (
-                      <FaEnvelope className="h-5 w-5" />
-                    )}
-                  </button>
-                  <button
-                    onClick={() => deleteNotification(notification.id)}
-                    className="text-red-500 hover:text-red-700 focus:outline-none"
-                    aria-label="Delete notification"
-                    role="button"
-                    disabled={actionLoading}
-                  >
-                    <FaTrashAlt className="h-5 w-5" />
-                  </button>
                 </div>
               </li>
             ))}
@@ -147,7 +183,7 @@ function NotificationsPage() {
             <button
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
               disabled={page === 1 || actionLoading}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:opacity-50 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-200"
             >
               Previous
             </button>
@@ -157,7 +193,7 @@ function NotificationsPage() {
             <button
               onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={page === totalPages || actionLoading}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:opacity-50 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-200"
             >
               Next
             </button>
