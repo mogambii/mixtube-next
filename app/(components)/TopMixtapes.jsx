@@ -7,7 +7,7 @@ export default async function TopMixList() {
       const response = await fetch(
         "http://localhost:3000/api/home/topmixtapes",
         {
-          cache: "no-cache",
+          cache: "reload",
         }
       );
       if (!response.ok) {

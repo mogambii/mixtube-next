@@ -1,12 +1,13 @@
 import getDb from "@/util/db";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request) {
     try {
 
         const db = await getDb();
-        const url = new URL(request.url);
-        const page = url.searchParams.get("page") || 1;
+        const page = request.nextUrl.searchParams.get("page") || 1;
 
         const totalmixtapes = await db.collection("Mixtape").countDocuments();
 

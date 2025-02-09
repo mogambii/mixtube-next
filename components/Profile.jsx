@@ -44,7 +44,7 @@ export default function ProfileIcon() {
 
           {/* Favorites Link */}
           <Link href="/favorites">
-            <Button className="w-full" variant="outline">
+            <Button className="w-full py-2" variant="outline">
               My Favorites
             </Button>
           </Link>

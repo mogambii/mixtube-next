@@ -3,13 +3,18 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { FaHeart } from "react-icons/fa";
+import { FaHeart, FaSpinner } from "react-icons/fa";
 
 const MixtapeCard = ({ mixtape }) => (
-  <Link href={`/mix/${mixtape.unique}`} className="block hover:shadow-lg transition-shadow duration-300 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+  <Link href={`/mix/${mixtape.unique}`} className="block hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-md">
+    <img
+      src={mixtape.imgthumb}
+      alt={mixtape.title}
+      className="w-full h-48 object-cover"
+    />
     <div className="p-4">
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">{mixtape.title}</h2>
-      <p className="text-gray-600 dark:text-gray-300">{mixtape.desc}</p>
+      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">{mixtape.title}</h2>
+      <p className="text-gray-600 dark:text-gray-300 text-sm">By {mixtape.djName}</p>
     </div>
   </Link>
 );
@@ -20,7 +25,6 @@ export default function FavoritesPage() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
   const limit = 9;
 
   const fetchFavorites = async (page) => {
@@ -31,7 +35,6 @@ export default function FavoritesPage() {
       const data = await response.json();
       setFavorites(data.favorites);
       setTotalPages(data.pagination.pages);
-      setTotalItems(data.pagination.total);
       setCurrentPage(data.pagination.currentPage);
     } catch (error) {
       console.error("Error fetching favorites:", error);
@@ -65,24 +68,23 @@ export default function FavoritesPage() {
   if (loading && favorites.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] bg-gray-100 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+        <FaSpinner className="animate-spin text-blue-500 text-5xl" />
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-8 bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100 text-center">
-        <FaHeart className="inline-block mr-2 text-red-500" />
-        Your Favorite Mixes
+      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100 text-center flex items-center justify-center">
+        <FaHeart className="mr-2 text-red-500" /> Your Favorite Mixes
       </h1>
       {favorites.length === 0 ? (
         <p className="text-gray-600 dark:text-gray-400 text-center bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          You haven't added any mixes to your favorites yet
+          You haven&apos;t added any mixes to your favorites yet
         </p>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {favorites.map((mix) => (
               <MixtapeCard key={mix.id} mixtape={mix} />
             ))}
@@ -93,23 +95,23 @@ export default function FavoritesPage() {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`px-4 py-2 rounded-md transition-colors duration-300 ${
+                className={`px-4 py-2 rounded-md transition-colors duration-300 shadow-md ${
                   currentPage === 1
-                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-500 text-white hover:bg-blue-600"
                 }`}
               >
                 Previous
               </button>
-              <span className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 px-4 py-2 rounded-md">
+              <span className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 px-4 py-2 rounded-md shadow-md">
                 Page {currentPage} of {totalPages}
               </span>
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`px-4 py-2 rounded-md transition-colors duration-300 ${
+                className={`px-4 py-2 rounded-md transition-colors duration-300 shadow-md ${
                   currentPage === totalPages
-                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-500 text-white hover:bg-blue-600"
                 }`}
               >

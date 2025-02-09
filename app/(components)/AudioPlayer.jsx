@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect ,useCallback } from "react";
 import { LiaStepBackwardSolid, LiaStepForwardSolid } from "react-icons/lia";
 import { RiPauseLine, RiPlayFill } from "react-icons/ri";
 import { Bars } from "react-loader-spinner";
@@ -65,23 +65,23 @@ function AudioPlayer() {
     audioPlayer.current.currentTime = seekPosition;
   };
 
-  const updateProgress = () => {
+  const updateProgress = useCallback(() => {
     if (audioPlayer.current) {
       const currentTime = audioPlayer.current.currentTime;
       const duration = audioPlayer.current.duration;
-
+  
       if (!isNaN(duration)) {
         setProgress((currentTime / duration) * 100);
         setCurrentTimeDisplay(formatTime(currentTime));
         setDurationDisplay(formatTime(duration));
-
+  
         if (dotRef.current) {
           dotRef.current.style.left = `${(currentTime / duration) * 100}%`;
         }
         setIsBuffering(false);
       }
     }
-  };
+  }, []); // No dependencies since it only depends on refs and state setters
 
   const formatTime = (time) => {
     if (isNaN(time)) return "00:00";
@@ -114,7 +114,7 @@ function AudioPlayer() {
   useEffect(() => {
     const interval = setInterval(updateProgress, 1000);
     return () => clearInterval(interval);
-  }, [currentMix,updateProgress]);
+  }, [currentMix, updateProgress]); 
 
   const handleMouseMove = (e) => {
     if (progressRef.current && audioPlayer.current.duration) {
