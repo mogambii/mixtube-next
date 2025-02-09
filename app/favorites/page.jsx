@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { FaHeart, FaSpinner } from "react-icons/fa";
+import Image from "next/image";
 
 const MixtapeCard = ({ mixtape }) => (
   <Link href={`/mix/${mixtape.unique}`} className="block hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-md">
-    <img
+    <Image
       src={mixtape.imgthumb}
       alt={mixtape.title}
       className="w-full h-48 object-cover"
