@@ -5,7 +5,7 @@ async function getRecords() {
   try {
     const response = await fetch(`http://localhost:3000/api/home/newmixtapes`, {
       method: "GET",
-      cache: "reload",
+      cache: "no-cache",
     });
 
     if (!response.ok) {

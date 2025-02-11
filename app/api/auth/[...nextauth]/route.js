@@ -61,15 +61,43 @@ export const authOptions = {
   },
   callbacks: {
     async signIn({ account, profile }) {
-      // Only check for Google OAuth sign-ins
       if (account.provider === "google") {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: profile.email }
-        });
+        try {
+          // Check if user exists
+          const existingUser = await prisma.user.findUnique({
+            where: { email: profile.email }
+          });
 
-        // If a user exists with this email and has a password (credential-based),
-        // prevent the Google sign-in
-        if (existingUser?.password) {
+          // If user doesn't exist, create a new one
+          if (!existingUser) {
+            // Generate a username from the email
+            const baseUsername = profile.email.split('@')[0];
+            let username = baseUsername;
+            let counter = 1;
+
+            // Check if username exists and generate a unique one
+            while (true) {
+              const existingUsername = await prisma.user.findUnique({
+                where: { username }
+              });
+              if (!existingUsername) break;
+              username = `${baseUsername}${counter}`;
+              counter++;
+            }
+
+            await prisma.user.create({
+              data: {
+                email: profile.email,
+                username: username,
+                profilep: profile.picture || null,
+                type: 'user',
+                emailVerified: new Date()
+              }
+            });
+          }
+          return true;
+        } catch (error) {
+          console.error("Error in Google sign in:", error);
           return false;
         }
       }
