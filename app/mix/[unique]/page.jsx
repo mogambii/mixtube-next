@@ -10,6 +10,10 @@ import AudioAdd from "@/app/(components)/AudioAdd";
 import { getServerSession } from "next-auth";
 
 async function checkLikeStatus(email, mixtapeId) {
+
+  if(!email){
+    return;
+  }
   try {
     const res = await fetch(
       `http://localhost:3000/api/mixtape/user/${mixtapeId}/liked?email=${email}`,
@@ -87,6 +91,7 @@ export async function generateMetadata({ params }) {
 export default async function MixTape({ params}) {
 
   const session = await getServerSession();
+  console.log(session)
   const { unique } = params;
   const liked = await checkLikeStatus(session?.user?.email, unique);
   const mix = await getMixtape(unique);

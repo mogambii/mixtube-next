@@ -35,16 +35,16 @@ export const authOptions = {
           // Check if user already exists
           const existingUser = await prisma.user.findFirst({
             where: {
-              OR: [
-                { email },
-                { username }
-              ]
-            }
+              OR: [{ email }, { username }],
+            },
           });
 
           if (existingUser) {
-            throw new Error(existingUser.email === email ? 
-              "Email already registered" : "Username already taken");
+            throw new Error(
+              existingUser.email === email
+                ? "Email already registered"
+                : "Username already taken"
+            );
           }
 
           // Create new user
@@ -54,9 +54,9 @@ export const authOptions = {
               email,
               username,
               password: hashedPassword,
-              type: "DJ",
+              type: "user",
               emailVerified: new Date(),
-            }
+            },
           });
 
           return {
@@ -64,13 +64,13 @@ export const authOptions = {
             email: newUser.email,
             name: newUser.username,
             type: newUser.type,
-            image: newUser.profilep,
+            image: newUser.profilePicture,
           };
         }
 
         // Login flow
         const user = await prisma.user.findUnique({
-          where: { email }
+          where: { email },
         });
 
         if (!user) {
@@ -91,7 +91,7 @@ export const authOptions = {
           email: user.email,
           name: user.username || user.djName,
           type: user.type,
-          image: user.profilep,
+          image: user.profilePicture,
         };
       },
     }),
@@ -108,21 +108,25 @@ export const authOptions = {
     async signIn({ account, profile }) {
       if (account.provider === "google") {
         try {
+          if (!profile?.email) {
+            throw new Error("Google profile is missing an email");
+          }
+
           const existingUser = await prisma.user.findUnique({
-            where: { email: profile.email }
+            where: { email: profile.email },
           });
 
           if (!existingUser) {
-            const baseUsername = profile.email.split('@')[0];
+            const baseUsername = profile.email.split("@")[0];
             let username = baseUsername;
             let counter = 1;
 
-            // Find unique username
-            while (true) {
-              const existingUsername = await prisma.user.findUnique({
-                where: { username }
-              });
-              if (!existingUsername) break;
+            // Ensure unique username
+            while (
+              await prisma.user.findUnique({
+                where: { username },
+              })
+            ) {
               username = `${baseUsername}${counter}`;
               counter++;
             }
@@ -131,10 +135,10 @@ export const authOptions = {
               data: {
                 email: profile.email,
                 username,
-                profilep: profile.picture,
-                type: "DJ",
+                profilePicture: profile.picture,
+                type: "user",
                 emailVerified: new Date(),
-              }
+              },
             });
           }
           return true;
@@ -145,7 +149,7 @@ export const authOptions = {
       }
       return true;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.type = user.type;
@@ -154,13 +158,15 @@ export const authOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id;
-        session.user.type = token.type;
-        session.user.username = token.username;
+      if (token?.id) {
+        session.user = {
+          id: token.id,
+          type: token.type,
+          username: token.username,
+        };
       }
       return session;
-    }
+    },
   },
 };
 

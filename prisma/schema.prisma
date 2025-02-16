@@ -147,7 +147,7 @@ model Stats {
   plays     Int      @default(0)
   downloads Int      @default(0)
   shares    Int      @default(0)
-  time      DateTime @default(now())
+  date      DateTime @default(now())
 
   mixtape Mixtape @relation(fields: [mixtapeId], references: [id], onDelete: Cascade)
 
