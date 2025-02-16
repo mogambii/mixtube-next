@@ -29,7 +29,7 @@ export default function ProfileIcon() {
       </PopoverTrigger>
 
       {/* Popup Content (Dropdown) */}
-      <PopoverContent className="w-48 p-2 bg-white dark:bg-gray-900 shadow-lg rounded-lg">
+      <PopoverContent className="w-48 p-2 bg-white dark:bg-gray-900 shadow-lg gap-x-1 rounded-lg">
         <div className="text-center border-b pb-2">
           <h3 className="text-sm text-gray-900 dark:text-gray-50 font-semibold">{name}</h3>
         </div>
@@ -44,7 +44,7 @@ export default function ProfileIcon() {
 
           {/* Favorites Link */}
           <Link href="/favorites">
-            <Button className="w-full py-2" variant="outline">
+            <Button className="w-full" variant="outline">
               My Favorites
             </Button>
           </Link>
