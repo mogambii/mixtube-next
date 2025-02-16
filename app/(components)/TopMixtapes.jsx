@@ -1,27 +1,42 @@
 import React from "react";
 import MixCard from "./MixCard";
 
+// Force dynamic rendering for this component
+export const dynamic = 'force-dynamic';
+
 export default async function TopMixList() {
   const getRecords = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/home/topmixtapes",
-        {
-          cache: "no-cache",
-        }
-      );
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/home/topmixtapes`, {
+        cache: "no-cache",
+      });
+      
       if (!response.ok) {
-        const message = `An error occurred: ${response.statusText}`;
-        console.error(message);
-        return;
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const records = await response.json();
       return records.mixtapes;
     } catch (error) {
       console.error("Failed to fetch top mixtapes:", error);
+      return []; // Return empty array on error
     }
   };
+
   const topMix = await getRecords();
+  
+  // Handle case where topMix is undefined or null
+  if (!topMix || topMix.length === 0) {
+    return (
+      <div className="p-0">
+        <h2 className="font-bold ml-3 dark:text-sky-50 text-2xl mb-4">
+          TOP <span className="text-blue-700">MIXTAPES</span>
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400 ml-3">No mixtapes available at the moment.</p>
+      </div>
+    );
+  }
+
   const topMixes = topMix.map((mix) => (
     <div className="w-full" key={mix.unique}>
       <MixCard

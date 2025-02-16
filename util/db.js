@@ -13,10 +13,15 @@ const client = new MongoClient(URI, {
 
 async function getDb() {
   try {
-    if (!client.isConnected) {
+    // Check if we already have an active connection
+    const isConnected = await client.db("admin").command({ ping: 1 })
+      .then(() => true)
+      .catch(() => false);
+      
+    if (!isConnected) {
       await client.connect();
+      console.log("connected to MongoDB!");
     }
-    console.log("connected to MongoDB!");
     return client.db("mixtube");
   } catch (err) {
     console.error("Failed to connect to MongoDB ", err);

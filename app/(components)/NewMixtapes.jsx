@@ -1,9 +1,12 @@
 import React from "react";
 import MixCard from "./MixCard";
 
+// Force dynamic rendering for this component
+export const dynamic = 'force-dynamic';
+
 async function getRecords() {
   try {
-    const response = await fetch(`http://localhost:3000/api/home/newmixtapes`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/home/newmixtapes`, {
       method: "GET",
       cache: "no-cache",
     });
