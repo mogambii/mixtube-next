@@ -13,42 +13,87 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     CredentialsProvider({
-      name: "credentials",
+      name: "Credentials",
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
+        action: { label: "Action", type: "text" }, // login or signup
+        username: { label: "Username", type: "text" }, // for signup
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Please enter both email and password");
+        if (!credentials?.email || !credentials?.password || !credentials?.action) {
+          throw new Error("Missing required fields");
         }
-      
+
+        const { email, password, action, username } = credentials;
+
+        if (action === "signup") {
+          if (!username) {
+            throw new Error("Username is required for signup");
+          }
+
+          // Check if user already exists
+          const existingUser = await prisma.user.findFirst({
+            where: {
+              OR: [
+                { email },
+                { username }
+              ]
+            }
+          });
+
+          if (existingUser) {
+            throw new Error(existingUser.email === email ? 
+              "Email already registered" : "Username already taken");
+          }
+
+          // Create new user
+          const hashedPassword = await bcrypt.hash(password, 12);
+          const newUser = await prisma.user.create({
+            data: {
+              email,
+              username,
+              password: hashedPassword,
+              type: "DJ",
+              emailVerified: new Date(),
+            }
+          });
+
+          return {
+            id: newUser.id,
+            email: newUser.email,
+            name: newUser.username,
+            type: newUser.type,
+            image: newUser.profilep,
+          };
+        }
+
+        // Login flow
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where: { email }
         });
-      
-        if (!user || !user.password) {
+
+        if (!user) {
           throw new Error("No user found with this email");
         }
-      
-        const isCorrectPassword = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-      
-        if (!isCorrectPassword) {
-          throw new Error("Incorrect password");
+
+        if (!user.password) {
+          throw new Error("This account uses Google sign-in. Please log in with Google.");
         }
-      
-        // Return the user object with required fields
+
+        const isValidPassword = await bcrypt.compare(password, user.password);
+        if (!isValidPassword) {
+          throw new Error("Invalid password");
+        }
+
         return {
-          id: user.id.toString(),
-          name: user.username, // Map username to name
-          email: user.email,   // Include email
-          image: user.profilep, // Map profilep to image
-          type: user.type
+          id: user.id,
+          email: user.email,
+          name: user.username || user.djName,
+          type: user.type,
+          image: user.profilep,
         };
-      }
+      },
     }),
   ],
   session: {
@@ -63,19 +108,16 @@ export const authOptions = {
     async signIn({ account, profile }) {
       if (account.provider === "google") {
         try {
-          // Check if user exists
           const existingUser = await prisma.user.findUnique({
             where: { email: profile.email }
           });
 
-          // If user doesn't exist, create a new one
           if (!existingUser) {
-            // Generate a username from the email
             const baseUsername = profile.email.split('@')[0];
             let username = baseUsername;
             let counter = 1;
 
-            // Check if username exists and generate a unique one
+            // Find unique username
             while (true) {
               const existingUsername = await prisma.user.findUnique({
                 where: { username }
@@ -88,43 +130,37 @@ export const authOptions = {
             await prisma.user.create({
               data: {
                 email: profile.email,
-                username: username,
-                profilep: profile.picture || null,
-                type: 'user',
-                emailVerified: new Date()
+                username,
+                profilep: profile.picture,
+                type: "DJ",
+                emailVerified: new Date(),
               }
             });
           }
           return true;
         } catch (error) {
-          console.error("Error in Google sign in:", error);
+          console.error("Error in Google sign-in:", error);
           return false;
         }
       }
       return true;
     },
-    async session({ session, token }) {
-      if (token) {
-        session.user = {
-          id: token.id,
-          name: token.name,
-          email: token.email,
-          image: token.image,
-          type: token.type
-        };
-      }
-      return session;
-    },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.image = user.image;
-        token.type = user.type
+        token.type = user.type;
+        token.username = user.name;
       }
       return token;
     },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id;
+        session.user.type = token.type;
+        session.user.username = token.username;
+      }
+      return session;
+    }
   },
 };
 
