@@ -11,6 +11,7 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -103,10 +104,11 @@ export const authOptions = {
   debug: process.env.NODE_ENV === "development",
   pages: {
     signIn: "/login",
+    error: '/login',
   },
   callbacks: {
-    async signIn({ account, profile }) {
-      if (account.provider === "google") {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google") {
         try {
           if (!profile?.email) {
             throw new Error("Google profile is missing an email");
@@ -117,16 +119,16 @@ export const authOptions = {
           });
 
           if (!existingUser) {
-            const baseUsername = profile.email.split("@")[0];
+            const baseUsername = profile.email.split('@')[0];
             let username = baseUsername;
             let counter = 1;
 
-            // Ensure unique username
-            while (
-              await prisma.user.findUnique({
-                where: { username },
-              })
-            ) {
+            // Find unique username
+            while (true) {
+              const existingUsername = await prisma.user.findUnique({
+                where: { username }
+              });
+              if (!existingUsername) break;
               username = `${baseUsername}${counter}`;
               counter++;
             }
@@ -135,10 +137,10 @@ export const authOptions = {
               data: {
                 email: profile.email,
                 username,
-                profilePicture: profile.picture,
-                type: "user",
+                profilep: profile.picture,
+                type: "DJ",
                 emailVerified: new Date(),
-              },
+              }
             });
           }
           return true;
