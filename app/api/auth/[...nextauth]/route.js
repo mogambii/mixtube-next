@@ -11,6 +11,7 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -54,7 +55,7 @@ export const authOptions = {
               email,
               username,
               password: hashedPassword,
-              type: "DJ",
+              type: "user",
               emailVerified: new Date(),
             }
           });
@@ -103,40 +104,44 @@ export const authOptions = {
   debug: process.env.NODE_ENV === "development",
   pages: {
     signIn: "/login",
+    error: '/login',
   },
   callbacks: {
-    async signIn({ account, profile }) {
-      if (account.provider === "google") {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google") {
         try {
           const existingUser = await prisma.user.findUnique({
             where: { email: profile.email }
           });
 
-          if (!existingUser) {
-            const baseUsername = profile.email.split('@')[0];
-            let username = baseUsername;
-            let counter = 1;
-
-            // Find unique username
-            while (true) {
-              const existingUsername = await prisma.user.findUnique({
-                where: { username }
-              });
-              if (!existingUsername) break;
-              username = `${baseUsername}${counter}`;
-              counter++;
-            }
-
-            await prisma.user.create({
-              data: {
-                email: profile.email,
-                username,
-                profilep: profile.picture,
-                type: "DJ",
-                emailVerified: new Date(),
-              }
-            });
+          if (existingUser) {
+            return true;
           }
+
+          // Create new user from Google profile
+          const baseUsername = profile.email.split('@')[0];
+          let username = baseUsername;
+          let counter = 1;
+
+          // Find unique username
+          while (true) {
+            const existingUsername = await prisma.user.findUnique({
+              where: { username }
+            });
+            if (!existingUsername) break;
+            username = `${baseUsername}${counter}`;
+            counter++;
+          }
+
+          await prisma.user.create({
+            data: {
+              email: profile.email,
+              username,
+              profilep: profile.picture,
+              type: "DJ",
+              emailVerified: new Date(),
+            }
+          });
           return true;
         } catch (error) {
           console.error("Error in Google sign-in:", error);

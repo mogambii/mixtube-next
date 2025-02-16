@@ -13,8 +13,7 @@ export default function ProfileIcon() {
   const [open, setOpen] = useState(false);
 
   if (!session?.user) return null;
-
-  const { name, image, type } = session.user;
+  const { name, image, type,email } = session.user;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -23,7 +22,7 @@ export default function ProfileIcon() {
         <button className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition">
           <Avatar>
             <AvatarImage src={image} size={8} alt={name} />
-            <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
+            <AvatarFallback>{name?.charAt(0).toUpperCase() || email?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
         </button>
       </PopoverTrigger>
