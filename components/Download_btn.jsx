@@ -7,14 +7,20 @@ import { FaDownload } from "react-icons/fa";
 const Download_btn = ({ url, id }) => {
   const { data: session } = useSession();
 
-  const handleDownload = async () => {
-    if (!session) {
-      toast.error("Please login to download mixtapes");
-      return;
-    }
+ const handleDownload = async () => {
+  if (!session) {
+    toast.error("Please login to download mixtapes");
+    return;
+  }
 
-    try {
-      // First update the download count
+  if (!url) {
+    toast.error("Invalid download link");
+    return;
+  }
+
+  try {
+    if (id) {
+      // Update the download count in the database
       const response = await fetch(`/api/mixtape/download/${id}`, {
         method: "POST",
       });
@@ -23,15 +29,22 @@ const Download_btn = ({ url, id }) => {
         const error = await response.json();
         throw new Error(error.message || "Failed to update download count");
       }
-
-      // Then open the URL in a new tab to initiate the download
-      window.open(url, "_blank");
-      toast.success("Download started");
-    } catch (error) {
-      console.error("Error handling download:", error);
-      toast.error(error.message || "Failed to start download");
     }
-  };
+
+    // Create a hidden anchor tag and force a download
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = ""; // Ensures it is treated as a download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success("Download started");
+  } catch (error) {
+    console.error("Error handling download:", error);
+    toast.error(error.message || "Failed to start download");
+  }
+};
 
   return (
     <button

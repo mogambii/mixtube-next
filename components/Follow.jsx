@@ -9,7 +9,7 @@ const Follow = ({ username, following }) => {
   const { data: session } = useSession();
 
   // Don't render if user is viewing their own profile
-  if (session?.user?.name === username) {
+  if (!session || session.user.name === username) {
     return null;
   }
 
