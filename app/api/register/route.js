@@ -8,7 +8,10 @@ export async function POST(request) {
     const { email, username, password } = body;
 
     if (!email || !username || !password) {
-      return new NextResponse("Missing required fields", { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields: email, username, or password" },
+        { status: 400 }
+      );
     }
 
     // Check if user already exists
@@ -22,8 +25,8 @@ export async function POST(request) {
     });
 
     if (existingUser) {
-      return new NextResponse(
-        "User with this email or username already exists",
+      return NextResponse.json(
+        { error: existingUser.email === email ? "Email already registered" : "Username already taken" },
         { status: 409 }
       );
     }
@@ -37,13 +40,16 @@ export async function POST(request) {
         email,
         username,
         password: hashedPassword,
-        type: "user" // Default type for all users
+        type: "user" 
       }
     });
 
     return NextResponse.json(user);
   } catch (error) {
     console.error(error);
-    return new NextResponse("Internal Error", { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create account. Please try again later." },
+      { status: 500 }
+    );
   }
 }

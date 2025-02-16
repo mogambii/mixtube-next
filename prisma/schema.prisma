@@ -52,10 +52,11 @@ model User {
   email              String    @unique
   username           String?   @unique
   password           String?
-  type               String    @default("DJ")
+  name               String?
+  type               String    @default("user")
   bio                String?
   djName             String?
-  profilep           String?
+  profilep     String?   @default("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png")
   contacts           Json?
   socialMediaHandles Json?
   followers          String[]  @default([])
@@ -73,6 +74,8 @@ model User {
   likedMixtapes MixtapeLike[]
   notifications     Notification[] @relation("UserNotifications")
   notificationsSent Notification[] @relation("NotificationSender")
+
+  @@map("users")
 }
 
 model Follower {

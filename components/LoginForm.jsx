@@ -41,13 +41,17 @@ const Login = () => {
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        if (result.error.includes("Google sign-in")) {
+          setError("This account uses Google sign-in. Please use the Google login button.");
+        } else {
+          setError("Invalid email or password");
+        }
       } else {
         router.push("/");
         router.refresh();
       }
     } catch (error) {
-      console.error(error);
+      console.error("Login error:", error);
       setError("An unexpected error occurred. Please try again later.");
     }
   };

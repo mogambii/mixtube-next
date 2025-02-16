@@ -12,140 +12,103 @@ export const authOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       allowDangerousEmailAccountLinking: true,
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          type: "user",
+          username: profile.email.split("@")[0],
+        };
+      },
     }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
-        action: { label: "Action", type: "text" }, // login or signup
-        username: { label: "Username", type: "text" }, // for signup
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password || !credentials?.action) {
-          throw new Error("Missing required fields");
-        }
-
-        const { email, password, action, username } = credentials;
-
-        if (action === "signup") {
-          if (!username) {
-            throw new Error("Username is required for signup");
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Missing email or password");
           }
 
-          // Check if user already exists
-          const existingUser = await prisma.user.findFirst({
-            where: {
-              OR: [{ email }, { username }],
+          const { email, password } = credentials;
+
+          // Login flow
+          const user = await prisma.user.findUnique({
+            where: { email },
+            select: {
+              id: true,
+              email: true,
+              password: true,
+              name: true,
+              username: true,
+              type: true,
+              profilep: true,
             },
           });
 
-          if (existingUser) {
-            throw new Error(
-              existingUser.email === email
-                ? "Email already registered"
-                : "Username already taken"
-            );
+          if (!user) {
+            return null;
           }
 
-          // Create new user
-          const hashedPassword = await bcrypt.hash(password, 12);
-          const newUser = await prisma.user.create({
-            data: {
-              email,
-              username,
-              password: hashedPassword,
-              type: "user",
-              emailVerified: new Date(),
-            },
-          });
+          if (!user.password) {
+            throw new Error("This account uses Google sign-in. Please log in with Google.");
+          }
+
+          const isValidPassword = await bcrypt.compare(password, user.password);
+          if (!isValidPassword) {
+            return null;
+          }
 
           return {
-            id: newUser.id,
-            email: newUser.email,
-            name: newUser.username,
-            type: newUser.type,
-            image: newUser.profilePicture,
+            id: user.id,
+            email: user.email,
+            name: user.name || user.username,
+            username: user.username,
+            type: user.type,
+            image: user.profilep,
           };
+        } catch (error) {
+          console.error("Authentication error:", error);
+          throw error;
         }
-
-        // Login flow
-        const user = await prisma.user.findUnique({
-          where: { email },
-        });
-
-        if (!user) {
-          throw new Error("No user found with this email");
-        }
-
-        if (!user.password) {
-          throw new Error("This account uses Google sign-in. Please log in with Google.");
-        }
-
-        const isValidPassword = await bcrypt.compare(password, user.password);
-        if (!isValidPassword) {
-          throw new Error("Invalid password");
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.username || user.djName,
-          type: user.type,
-          image: user.profilePicture,
-        };
       },
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === "development",
   pages: {
     signIn: "/login",
-    error: '/login',
+    error: "/login",
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account?.provider === "google") {
         try {
-          if (!profile?.email) {
-            throw new Error("Google profile is missing an email");
-          }
-
           const existingUser = await prisma.user.findUnique({
             where: { email: profile.email },
           });
 
           if (!existingUser) {
-            const baseUsername = profile.email.split('@')[0];
-            let username = baseUsername;
-            let counter = 1;
-
-            // Find unique username
-            while (true) {
-              const existingUsername = await prisma.user.findUnique({
-                where: { username }
-              });
-              if (!existingUsername) break;
-              username = `${baseUsername}${counter}`;
-              counter++;
-            }
-
             await prisma.user.create({
               data: {
                 email: profile.email,
-                username,
-                profilep: profile.picture,
-                type: "DJ",
+                name: profile.name ? profile.name : profile.email.split("@")[0],
+                username: profile.email.split("@")[0],
+                type: "user",
                 emailVerified: new Date(),
-              }
+                image: profile.picture,
+              },
             });
           }
-          return true;
         } catch (error) {
-          console.error("Error in Google sign-in:", error);
+          console.error("Error during Google sign in:", error);
           return false;
         }
       }
@@ -155,21 +118,21 @@ export const authOptions = {
       if (user) {
         token.id = user.id;
         token.type = user.type;
-        token.username = user.name;
+        token.username = user.username;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token?.id) {
-        session.user = {
-          id: token.id,
-          type: token.type,
-          username: token.username,
-        };
+      if (token) {
+        session.user.id = token.id;
+        session.user.type = token.type;
+        session.user.username = token.username;
       }
       return session;
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
 };
 
 const handler = NextAuth(authOptions);

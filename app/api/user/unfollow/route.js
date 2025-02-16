@@ -4,7 +4,8 @@ import prisma from "@/lib/prismadb";
 export async function POST(request) {
   try {
     const { username, djusername } = await request.json();
-    
+    const lowercase_username = username.toLowerCase();
+    const lowercase_djusername = djusername.toLowerCase();
     if (!username || !djusername) {
       return NextResponse.json(
         { error: "Both username and djusername are required" },
@@ -14,8 +15,8 @@ export async function POST(request) {
 
     // Get both users
     const [follower, following] = await Promise.all([
-      prisma.user.findUnique({ where: { username } }),
-      prisma.user.findUnique({ where: { username: djusername } })
+      prisma.user.findUnique({ where: { username: lowercase_username } }),
+      prisma.user.findUnique({ where: { username: lowercase_djusername } })
     ]);
 
     if (!follower || !following) {

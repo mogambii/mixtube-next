@@ -78,16 +78,18 @@ const Signup = () => {
 
         if (result?.error) {
           setError("Failed to sign in after registration");
+          toast.error("Account created but failed to sign in. Please try logging in.");
         } else {
           router.push("/");
         }
       } else {
-        const data = await response.json();
-        throw new Error(data.message || "Failed to create account");
+        const errorData = await response.json();
+        setError(errorData.error);
+        toast.error(errorData.error);
       }
     } catch (err) {
       console.error(err);
-      setError(err.message || "Something went wrong");
+      setError(err.message || "Failed to create account");
       toast.error(err.message || "Failed to create account");
     } finally {
       setSubmitting(false);

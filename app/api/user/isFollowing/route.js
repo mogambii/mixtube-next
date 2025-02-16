@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const username = searchParams.get("username");
-    const djusername = searchParams.get("djusername");
+    const username = searchParams.get("username").toLowerCase()
+    const djusername = searchParams.get("djusername").toLowerCase()
     
     if (!username || !djusername) {
       return NextResponse.json(
