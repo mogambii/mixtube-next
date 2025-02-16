@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 export async function GET(req, { params }) {
   try {
     const { id } = await params;
-    const email = req.nextUrl.searchParams.get("email");
+    const encodedEmail = req.nextUrl.searchParams.get("email");
+    const email = decodeURIComponent(encodedEmail).replace(/\+/g, "+");
 
     const userId = await prisma.user.findUnique({
       where: {
@@ -18,6 +19,15 @@ export async function GET(req, { params }) {
       return user.id;
     });
 
+    console.log("userId", userId, "mixtapeId", id, "email", email);
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
     const mixtapeId = await prisma.mixtape.findUnique({
       where: {
         unique: id,
@@ -29,6 +39,13 @@ export async function GET(req, { params }) {
       }
       return mixtape.id;
     });
+
+    if (!mixtapeId) {
+      return NextResponse.json(
+        { error: "Mixtape not found" },
+        { status: 404 }
+      );
+    }
 
     const like = await prisma.mixtapeLike.findFirst({
       where: {

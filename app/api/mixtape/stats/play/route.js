@@ -18,28 +18,37 @@ export async function POST(req) {
       return NextResponse.json({ message: "Mixtape not found" }, { status: 404 });
     }
 
-    const today = new Date().toISOString();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of day
+    
     // Update play count in stats
-    await prisma.stats.upsert({
+    const existingStats = await prisma.stats.findFirst({
       where: {
-        mixtapeId_date: {
-          mixtapeId: mixtape.id,
-          date: today
-        }
-      },
-      update: {
-        plays: {
-          increment: 1
-        }
-      },
-      create: {
         mixtapeId: mixtape.id,
-        date: today,
-        plays: 1,
-        downloads: 0,
-        likes: 0
+        date: {
+          gte: today,
+          lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Next day
+        }
       }
     });
+
+    if (existingStats) {
+      await prisma.stats.update({
+        where: { id: existingStats.id },
+        data: {
+          plays: { increment: 1 }
+        }
+      });
+    } else {
+      await prisma.stats.create({
+        data: {
+          mixtapeId: mixtape.id,
+          date: today,
+          plays: 1,
+          downloads: 0,
+        }
+      });
+    }
 
     return NextResponse.json({ message: "Play count updated successfully" });
   } catch (error) {

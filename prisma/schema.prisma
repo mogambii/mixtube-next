@@ -154,6 +154,7 @@ model Stats {
 
   mixtape Mixtape @relation(fields: [mixtapeId], references: [id], onDelete: Cascade)
 
+  @@unique([mixtapeId, date])
   @@index([mixtapeId])
 }
 

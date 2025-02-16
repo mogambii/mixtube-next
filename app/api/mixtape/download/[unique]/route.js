@@ -41,7 +41,6 @@ export async function POST(req, { params }) {
         date: today,
         plays: 0,
         downloads: 1,
-        likes: 0
       }
     });
 
