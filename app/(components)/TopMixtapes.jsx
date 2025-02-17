@@ -8,7 +8,7 @@ export default async function TopMixList() {
   const getRecords = async () => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/home/topmixtapes`, {
-        cache: "no-cache",
+        cache: 'no-store', // Disable caching completely
       });
       
       if (!response.ok) {

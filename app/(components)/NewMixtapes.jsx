@@ -7,8 +7,7 @@ export const dynamic = 'force-dynamic';
 async function getRecords() {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/home/newmixtapes`, {
-      method: "GET",
-      cache: "no-cache",
+      cache: 'no-store', // Disable caching completely
     });
 
     if (!response.ok) {
