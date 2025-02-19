@@ -1,18 +1,11 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prismadb";
 
 export async function POST(req, { params }) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ message: "Please login to download" }, { status: 401 });
-    }
+
 
     const { unique } = params;
-    console.log(unique);
-
     // Get mixtape ID from unique identifier
     const mixtape = await prisma.mixtape.findUnique({
       where: { unique },
