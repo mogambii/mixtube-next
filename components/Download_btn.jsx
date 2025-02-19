@@ -4,17 +4,12 @@ import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { FaDownload, FaSpinner } from "react-icons/fa";
 
-const Download_btn = ({ url, id }) => {
+const Download_btn = ({ id }) => {
   const { data: session } = useSession();
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownload = async () => {
-    if (!session) {
-      toast.error("Please login to download mixtapes");
-      return;
-    }
-
-    if (!url || !id) {
+    if (!id) {
       toast.error("Invalid download parameters");
       return;
     }
@@ -59,7 +54,7 @@ const Download_btn = ({ url, id }) => {
     <button
       onClick={handleDownload}
       className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      disabled={!session || isDownloading}
+      disabled={isDownloading}
     >
       <FaDownload className={isDownloading ? "animate-pulse" : ""} />
       <span>{isDownloading ? (

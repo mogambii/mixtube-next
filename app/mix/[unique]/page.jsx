@@ -202,7 +202,7 @@ export default async function MixTape({ params}) {
 
         {/* Download Button */}
         <div>
-          <DownloadBtn url={mix.audio} id={unique} />
+          <DownloadBtn  id={unique} />
         </div>
 
         {/* Comments Section */}
