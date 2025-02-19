@@ -4,7 +4,6 @@ import prisma from "@/lib/prismadb";
 export async function POST(req, { params }) {
   try {
     const { unique } = params;
-    console.log(unique);
     // Get mixtape ID from unique identifier
     const mixtape = await prisma.mixtape.findUnique({
       where: { unique },

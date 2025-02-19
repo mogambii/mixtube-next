@@ -19,7 +19,6 @@ export async function GET(req, { params }) {
       return user.id;
     });
 
-    console.log("userId", userId, "mixtapeId", id, "email", email);
 
     if (!userId) {
       return NextResponse.json(

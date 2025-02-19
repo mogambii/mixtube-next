@@ -15,7 +15,6 @@ export async function GET(req,{params}) {
             }
         })
 
-        console.log(mixtape);
         return NextResponse.json(mixtape);
     } catch (error) {
         return NextResponse.json({ message: error.message }, { status: 500 });

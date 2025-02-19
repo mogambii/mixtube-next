@@ -91,7 +91,6 @@ export async function generateMetadata({ params }) {
 export default async function MixTape({ params}) {
 
   const session = await getServerSession();
-  console.log(session)
   const { unique } = params;
   const liked = await checkLikeStatus(session?.user?.email, unique);
   const mix = await getMixtape(unique);
