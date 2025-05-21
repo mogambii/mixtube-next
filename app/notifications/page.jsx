@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FaTrashAlt, FaEnvelopeOpen, FaEnvelope } from "react-icons/fa";
 import Spinner from "../(components)/Spinner";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);

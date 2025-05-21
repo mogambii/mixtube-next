@@ -27,13 +27,12 @@ function AudioPlayer() {
 
   useEffect(() => {
     if (currentMix && audioPlayer.current) {
-      const wasPlaying = isPlaying;
       audioPlayer.current.src = currentMix.audio;
       audioPlayer.current.volume = volume;
       audioPlayer.current.load();
       setIsBuffering(true);
     }
-  }, [currentMix, updatePlays]);
+  }, [currentMix, volume]);
 
   useEffect(() => {
     const audioElement = audioPlayer.current;
