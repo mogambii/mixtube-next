@@ -7,35 +7,44 @@ export async function POST(req, { params }) {
     // Get mixtape ID from unique identifier
     const mixtape = await prisma.mixtape.findUnique({
       where: { unique },
-      select: { id: true }
+      select: { id: true },
     });
 
     if (!mixtape) {
-      return NextResponse.json({ message: "Mixtape not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Mixtape not found" },
+        { status: 404 }
+      );
     }
 
+    if (mixtape) {
+      await prisma.mixtape.update({
+        where: { id: mixtape.id },
+        data: { totalPlays: mixtape.totalPlays + 1 },
+      });
+    }
 
     // Find or create stats record
     const stats = await prisma.stats.upsert({
       where: {
-        mixtapeId: mixtape.id
+        mixtapeId: mixtape.id,
       },
       update: {
         plays: {
-          increment: 1
-        }
+          increment: 1,
+        },
       },
       create: {
         mixtapeId: mixtape.id,
         plays: 1,
         downloads: 0,
-        likes: 0
-      }
+        likes: 0,
+      },
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: "Play count updated successfully",
-      stats
+      stats,
     });
   } catch (error) {
     console.error("Error updating play count:", error);

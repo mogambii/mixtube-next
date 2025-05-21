@@ -3,8 +3,6 @@ import prisma from "@/lib/prismadb";
 
 export async function POST(req, { params }) {
   try {
-
-
     const { unique } = params;
     // Get mixtape ID from unique identifier
     const mixtape = await prisma.mixtape.findUnique({
@@ -12,33 +10,42 @@ export async function POST(req, { params }) {
     });
 
     if (!mixtape) {
-      return NextResponse.json({ message: "Mixtape not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Mixtape not found" },
+        { status: 404 }
+      );
     }
-
+    if (mixtape) {
+      await prisma.mixtape.update({
+        where: { id: mixtape.id },
+        data: { totalDownloads: mixtape.totalDownloads + 1 },
+      });
+    }
     // Update or create stats record
-    const today = new Date().toISOString()
+    const today = new Date().toISOString();
     await prisma.stats.upsert({
       where: {
         mixtapeId_date: {
           mixtapeId: mixtape.id,
-          date: today
-        }
+          date: today,
+        },
       },
       update: {
         downloads: {
-          increment: 1
-        }
+          increment: 1,
+        },
       },
       create: {
         mixtapeId: mixtape.id,
         date: today,
         plays: 0,
         downloads: 1,
-      }
+      },
     });
 
-
-    return NextResponse.json({ message: "Download count updated successfully" });
+    return NextResponse.json({
+      message: "Download count updated successfully",
+    });
   } catch (error) {
     console.error("Error updating download count:", error);
     return NextResponse.json(
