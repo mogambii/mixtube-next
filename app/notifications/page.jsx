@@ -138,10 +138,13 @@ function NotificationsPage() {
               >
                 {/* Avatar */}
                 <div className="flex-shrink-0">
-                  <img
+                  <Image
+                    priority={true}
                     src={notification.sender?.profilep || "/default-avatar.png"}
                     alt={`${notification.sender?.username || "User"} avatar`}
                     className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                    height={40}
+                    width={40}
                   />
                 </div>
 
@@ -233,7 +236,7 @@ function NotificationsPage() {
               No notifications available.
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              When you receive notifications, they'll appear here.
+              When you receive notifications, they&apos;ll appear here.
             </p>
           </div>
         </div>

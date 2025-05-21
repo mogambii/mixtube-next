@@ -32,40 +32,52 @@ function AudioPlayer() {
       audioPlayer.current.volume = volume;
       audioPlayer.current.load();
       setIsBuffering(true);
-
-      if (currentMix.shouldAutoPlay || wasPlaying) {
-        const playWhenReady = () => {
-          audioPlayer.current
-            .play()
-            .then(() => {
-              setIsPlaying(true);
-              if (currentMix.id) {
-                updatePlays(currentMix.id);
-              }
-            })
-            .catch((error) => {
-              console.error("Auto-play failed:", error);
-              setIsPlaying(false);
-            });
-        };
-
-        audioPlayer.current.addEventListener("canplay", playWhenReady, {
-          once: true,
-        });
-        return () => {
-          audioPlayer.current?.removeEventListener("canplay", playWhenReady);
-        };
-      } else {
-        setIsPlaying(false);
-      }
     }
   }, [currentMix, updatePlays]);
 
+  useEffect(() => {
+    const audioElement = audioPlayer.current;
+    if (!audioElement) return;
+
+    if (isPlaying) {
+      const playWhenReady = () => {
+        audioElement
+          .play()
+          .then(() => {
+            // Update play count after 5 seconds of playback
+            setTimeout(() => {
+              updatePlays(currentMix.id);
+            }, 5000);
+          })
+          .catch((error) => {
+            console.error("Auto-play failed:", error);
+            setIsPlaying(false);
+          });
+      };
+
+      audioElement.addEventListener("canplay", playWhenReady, { once: true });
+      
+      // Cleanup function
+      return () => {
+        audioElement.removeEventListener("canplay", playWhenReady);
+      };
+    } else {
+      audioElement.pause();
+    }
+  }, [currentMix, updatePlays, isPlaying]);
+
   // Handle volume changes without restarting playback
   useEffect(() => {
-    if (audioPlayer.current) {
-      audioPlayer.current.volume = volume;
+    const audioElement = audioPlayer.current;
+    if (audioElement) {
+      audioElement.volume = volume;
     }
+    
+    return () => {
+      if (audioElement) {
+        audioElement.volume = 1; // Reset volume on unmount
+      }
+    };
   }, [volume]);
 
   const togglePlay = () => {

@@ -81,7 +81,7 @@ const DiscoverDjs = () => {
         transition={{ delay: 0.3 }}
         className="text-gray-600 dark:text-gray-400 max-w-sm"
       >
-        We couldn't find any DJs matching your search. Try using different keywords.
+        We couldn&apos;t find any DJs matching your search. Try using different keywords.
       </motion.p>
     </motion.div>
   );
