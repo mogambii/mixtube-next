@@ -7,7 +7,8 @@ export function PlayerProvider({ children }) {
   const [currentMix, setCurrentMix] = useState({
     id: null,
     audio: null,
-    thumbnail: null
+    thumbnail: null,
+    shouldAutoPlay: false
   });
 
   const playMix = async (id) => {
@@ -27,7 +28,8 @@ export function PlayerProvider({ children }) {
         id,
         audio: mixData.audio,
         imgthumb: mixData.imgthumb,
-        title: mixData.title
+        title: mixData.title,
+        shouldAutoPlay: true
       });
     } catch (error) {
       console.error("Error loading mix:", error);

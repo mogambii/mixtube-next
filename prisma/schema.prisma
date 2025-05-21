@@ -124,6 +124,10 @@ model Mixtape {
   user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   stats        Stats[]
   mixtapeLikes MixtapeLike[]
+  totalPlays   Int       @default(0)
+  totalDownloads Int     @default(0)
+  totalLikes   Int       @default(0)
+  
   notifications Notification[]
 
   @@index([userId])
@@ -175,4 +179,13 @@ model Notification {
   @@index([userId])
   @@index([senderId])
   @@index([mixtapeId])
+}
+
+model ResetToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

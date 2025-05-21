@@ -10,8 +10,7 @@ import AudioAdd from "@/app/(components)/AudioAdd";
 import { getServerSession } from "next-auth";
 
 async function checkLikeStatus(email, mixtapeId) {
-
-  if(!email){
+  if (!email) {
     return;
   }
   try {
@@ -36,10 +35,10 @@ async function getMixtape(unique) {
     const res = await fetch(`http://localhost:3000/api/mixtape/${unique}`, {
       cache: "no-cache",
     });
-    if (!res.ok) throw new Error('Failed to fetch mixtape');
+    if (!res.ok) throw new Error("Failed to fetch mixtape");
     return res.json();
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
     return null;
   }
 }
@@ -53,7 +52,10 @@ export async function generateMetadata({ params }) {
 
   return {
     title: mix ? `${mix.title} | Mixtube` : "Mixtape Not Found",
-    description: `${mix?.desc} mix on mixtube | stream, play and download| by  ${mix?.djName || mix?.name}`  || `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtube.`,
+    description:
+      `${mix?.desc} mix on mixtube | stream, play and download| by  ${
+        mix?.djName || mix?.name
+      }` || `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtube.`,
     keywords: [
       "mixtape",
       "music",
@@ -65,7 +67,9 @@ export async function generateMetadata({ params }) {
     ],
     openGraph: {
       title: `${mix?.title || "Mixtape"} | Mixtube`,
-      description: mix?.desc || `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtube.`,
+      description:
+        mix?.desc ||
+        `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtube.`,
       images: [
         {
           url: imageUrl,
@@ -79,7 +83,9 @@ export async function generateMetadata({ params }) {
     twitter: {
       card: "summary_large_image",
       title: `${mix?.title || "Mixtape"} | Mixtube`,
-      description: mix?.desc || `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtube.`,
+      description:
+        mix?.desc ||
+        `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtube.`,
       images: [imageUrl],
     },
     alternates: {
@@ -88,8 +94,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function MixTape({ params}) {
-
+export default async function MixTape({ params }) {
   const session = await getServerSession();
   const { unique } = params;
   const liked = await checkLikeStatus(session?.user?.email, unique);
@@ -127,81 +132,122 @@ export default async function MixTape({ params}) {
           },
         })}
       </script>
-      <div className="dark:bg-gray-800 rounded-lg shadow-lg p-4 md:p-6 space-y-8">
+
+      <div className="max-w-6xl mx-auto dark:bg-gray-800 rounded-lg shadow-lg p-4 md:p-6 space-y-6">
         {/* Mixtape Information */}
-        <div className="flex flex-col md:flex-row pb-4 border-b border-gray-200 dark:border-gray-700 gap-6">
-          <div className="w-full md:w-[200px]">
+        <div className="grid grid-cols-1 md:grid-cols-[300px,1fr] gap-6">
+          {/* Cover Image */}
+          <div className="w-full">
             <Image
               priority
               src={mix.cover}
-              height={400}
-              width={400}
+              height={500}
+              width={500}
               alt={`Cover image of ${mix.title}`}
               className="w-full h-auto rounded-lg shadow-md object-cover"
             />
           </div>
-          <div className="grid items-center justify-center md:items-start text-center md:text-left">
-            <h2 className="text-lg md:text-2xl font-bold text-gray-800 dark:text-slate-100 uppercase">
-              {mix.title}
-            </h2>
-            <Link
-              href={`/dj/${mix.user.username}`}
-              className="text-sm md:text-lg font-semibold text-blue-500 hover:underline"
-            >
-              {mix.djName}
-            </Link>
-            <div className="flex flex-col items-center md:items-start justify-between gap-2 md:gap-4 mt-2 md:mt-4">
-              <p className="text-gray-600 dark:text-gray-400">
-                {new Date(mix.time).toLocaleDateString()}
-              </p>
-              <p className="text-gray-600 dark:text-gray-400">Genre: {mix.genre}</p>
+
+          {/* Mixtape Details */}
+          <div className="flex flex-col justify-between">
+            <div>
+              <h2 className="text-2xl md:text-2xl lg:text-3xl font-bold text-gray-800 dark:text-slate-100 uppercase mb-3">
+                {mix.title}
+              </h2>
+              <div className="space-y-2">
+                <p className="text-gray-600 dark:text-gray-400">
+                  Genre:{" "}
+                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                    {mix.genre}
+                  </span>
+                </p>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Released:{" "}
+                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                    {new Date(mix.time).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </p>
+              </div>
             </div>
-            <div className="flex items-center justify-center md:justify-start gap-4 mt-4 md:mt-6">
-              <span className="flex items-center text-gray-600 dark:text-gray-400">
-                <FaDownload />
-                <span className="ml-1">{mix.totalDownloads}</span>
-              </span>
-              <span className="flex items-center text-gray-600 dark:text-gray-400">
-                <FaHeart />
-                <span className="ml-1">{mix.totalLikes}</span>
-              </span>
-              <span className="flex items-center text-gray-600 dark:text-gray-400">
-                <FaRegCirclePlay className="dark:text-slate-50 h-5 w-5" />
-                <span className="ml-2">{mix.totalPlays}</span>
-              </span>
+
+            {/* Stats */}
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                <FaDownload className="h-4 w-4" />
+                <span>{mix.totalDownloads.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                <FaHeart className="h-4 w-4" />
+                <span>{mix.totalLikes.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                <FaRegCirclePlay className="h-4 w-4" />
+                <span>{mix.totalPlays.toLocaleString()}</span>
+              </div>
             </div>
           </div>
         </div>
 
+        {/* DJ Profile - Horizontal Layout */}
+        <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+          <Link href={`/dj/${mix.user.username}`} className="group">
+            <div className="flex items-center gap-4">
+              <Image
+                src={mix.user.profilep}
+                alt={mix.djName}
+                width={60}
+                height={60}
+                className="rounded-full border-2 border-gray-200 dark:border-gray-600 group-hover:border-blue-500 transition-colors"
+              />
+              <div>
+                <p className="font-medium text-gray-800 dark:text-white group-hover:text-blue-500 transition-colors">
+                  {mix.djName}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  @{mix.user.username}
+                </p>
+              </div>
+            </div>
+          </Link>
+        </div>
+
         {/* Description Section */}
-        <div className="ring-1 ring-gray-200 p-4 md:p-6 rounded-lg shadow-sm">
-          <h3 className="text-sm md:text-lg font-semibold text-gray-800 dark:text-slate-100 mb-2">
-            Description
+        <div className="bg-white dark:bg-gray-700 p-4 md:p-6 rounded-lg shadow">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-3">
+            About This Mix
           </h3>
-          <p className="text-gray-700 dark:text-gray-300 break-words whitespace-pre-wrap">
-            {mix.desc ? (
-              <span dangerouslySetInnerHTML={{
-                __html: mix.desc.replace(
-                  /(https?:\/\/[^\s]+)/g,
-                  '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>'
-                )
-              }} />
-            ) : (
-              "No description available for this mixtape."
-            )}
-          </p>
+          <div className="prose dark:prose-invert max-w-none">
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+              {mix.desc ? (
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: mix.desc.replace(
+                      /(https?:\/\/[^\s]+)/g,
+                      '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>'
+                    ),
+                  }}
+                />
+              ) : (
+                "No description available for this mixtape."
+              )}
+            </p>
+          </div>
         </div>
 
-        {/* Share and Like Buttons */}
-        <div className="flex items-center justify-start gap-x-6">
-          <Share id={unique} />
-          {session && <LikeBtn id={unique} likedparam={liked} />}
-          <AudioAdd id={unique} />
-        </div>
-
-        {/* Download Button */}
-        <div>
-          <DownloadBtn  id={unique} />
+        {/* Action Buttons */}
+        <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Share id={unique} />
+              {session && <LikeBtn id={unique} likedparam={liked} />}
+              <AudioAdd id={unique} />
+            </div>
+            <DownloadBtn url={mix.downloadUrl} />
+          </div>
         </div>
 
         {/* Comments Section */}

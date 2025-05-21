@@ -4,6 +4,7 @@ import prisma from "@/lib/prismadb";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { sendEmail } from "@/lib/email";
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -105,6 +106,89 @@ export const authOptions = {
                 emailVerified: new Date(),
                 image: profile.picture,
               },
+            });
+
+            // Send welcome email for new Google sign-ups
+            await sendEmail({
+              to: profile.email,
+              subject: "Welcome to MixTube!",
+              html: `
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <style>
+                      .email-container {
+                        max-width: 600px;
+                        margin: 0 auto;
+                        font-family: Arial, sans-serif;
+                        color: #333;
+                        padding: 20px;
+                      }
+                      .header {
+                        background-color: #4F46E5;
+                        color: white;
+                        padding: 20px;
+                        text-align: center;
+                        border-radius: 8px 8px 0 0;
+                      }
+                      .content {
+                        background-color: #ffffff;
+                        padding: 20px;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 0 0 8px 8px;
+                      }
+                      .button {
+                        display: inline-block;
+                        background-color: #4F46E5;
+                        color: white;
+                        text-decoration: none;
+                        padding: 12px 24px;
+                        border-radius: 6px;
+                        margin: 20px 0;
+                      }
+                      .footer {
+                        text-align: center;
+                        color: #6B7280;
+                        font-size: 0.875rem;
+                        margin-top: 20px;
+                      }
+                      .feature-list {
+                        margin: 20px 0;
+                        padding-left: 20px;
+                      }
+                      .feature-list li {
+                        margin: 10px 0;
+                        color: #4B5563;
+                      }
+                    </style>
+                  </head>
+                  <body>
+                    <div class="email-container">
+                      <div class="header">
+                        <h1>Welcome to MixTube! 🎵</h1>
+                      </div>
+                      <div class="content">
+                        <p>Hi ${profile.name || profile.email.split("@")[0]},</p>
+                        <p>Welcome to the MixTube community! We're excited to have you on board.</p>
+                        <p>You've successfully signed up using your Google account. Here's what you can do next:</p>
+                        <ul class="feature-list">
+                          <li>Discover amazing mixtapes from talented DJs</li>
+                          <li>Create and share your own music collections</li>
+                          <li>Connect with other music enthusiasts</li>
+                          <li>Get personalized recommendations</li>
+                        </ul>
+                        <a href="${process.env.NEXTAUTH_URL}" class="button">Start Exploring</a>
+                        <p style="color: #6B7280; font-size: 0.875rem;">
+                          Get ready to experience music in a whole new way!
+                        </p>
+                      </div>
+                      <div class="footer">
+                        <p>This email was sent by MixTube. Please do not reply to this email.</p>
+                      </div>
+                    </div>
+                  </body>
+                </html>
+              `,
             });
           }
         } catch (error) {

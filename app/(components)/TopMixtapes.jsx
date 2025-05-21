@@ -2,19 +2,22 @@ import React from "react";
 import MixCard from "./MixCard";
 
 // Force dynamic rendering for this component
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function TopMixList() {
   const getRecords = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/home/topmixtapes`, {
-        cache: 'no-store', // Disable caching completely
-      });
-      
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/home/topmixtapes`,
+        {
+          cache: "no-store", // Disable caching completely
+        }
+      );
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const records = await response.json();
       return records.mixtapes;
     } catch (error) {
@@ -24,7 +27,7 @@ export default async function TopMixList() {
   };
 
   const topMix = await getRecords();
-  
+
   // Handle case where topMix is undefined or null
   if (!topMix || topMix.length === 0) {
     return (
@@ -32,7 +35,9 @@ export default async function TopMixList() {
         <h2 className="font-bold ml-3 dark:text-sky-50 text-2xl mb-4">
           TOP <span className="text-blue-700">MIXTAPES</span>
         </h2>
-        <p className="text-gray-600 dark:text-gray-400 ml-3">No mixtapes available at the moment.</p>
+        <p className="text-gray-600 dark:text-gray-400 ml-3">
+          No mixtapes available at the moment.
+        </p>
       </div>
     );
   }
@@ -44,8 +49,8 @@ export default async function TopMixList() {
         Djname={mix.djName}
         title={mix.title}
         img={mix.imgthumb}
-        downloads={mix.engagement.downloads}
-        plays={mix.engagement.plays}
+        downloads={mix.totalDownloads || 0}
+        plays={mix.totalPlays || 0}
       />
     </div>
   ));

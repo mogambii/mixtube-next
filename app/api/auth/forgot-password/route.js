@@ -43,12 +43,73 @@ export async function POST(request) {
     const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`;
     await sendEmail({
       to: email,
-      subject: "Password Reset Request",
+      subject: "Reset Your MixTube Password",
       html: `
-        <p>You requested a password reset. Click the link below to reset your password:</p>
-        <a href="${resetUrl}">Reset Password</a>
-        <p>This link will expire in 15 minutes.</p>
-        <p>If you didn't request this, please ignore this email.</p>
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <style>
+              .email-container {
+                max-width: 600px;
+                margin: 0 auto;
+                font-family: Arial, sans-serif;
+                color: #333;
+                padding: 20px;
+              }
+              .header {
+                background-color: #4F46E5;
+                color: white;
+                padding: 20px;
+                text-align: center;
+                border-radius: 8px 8px 0 0;
+              }
+              .content {
+                background-color: #ffffff;
+                padding: 20px;
+                border: 1px solid #e5e7eb;
+                border-radius: 0 0 8px 8px;
+              }
+              .button {
+                display: inline-block;
+                background-color: #4F46E5;
+                color: white;
+                text-decoration: none;
+                padding: 12px 24px;
+                border-radius: 6px;
+                margin: 20px 0;
+              }
+              .footer {
+                text-align: center;
+                color: #6B7280;
+                font-size: 0.875rem;
+                margin-top: 20px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="email-container">
+              <div class="header">
+                <h1>Password Reset Request</h1>
+              </div>
+              <div class="content">
+                <p>Hello,</p>
+                <p>We received a request to reset your MixTube password. If you didn't make this request, you can safely ignore this email.</p>
+                <p>To reset your password, click the button below:</p>
+                <a href="${resetUrl}" class="button">Reset My Password</a>
+                <p style="color: #6B7280; font-size: 0.875rem;">
+                  This link will expire in 15 minutes for security reasons.
+                </p>
+                <p style="color: #6B7280; font-size: 0.875rem;">
+                  If the button above doesn't work, you can copy and paste this URL into your browser:<br>
+                  <span style="color: #4F46E5;">${resetUrl}</span>
+                </p>
+              </div>
+              <div class="footer">
+                <p>This email was sent by MixTube. Please do not reply to this email.</p>
+              </div>
+            </div>
+          </body>
+        </html>
       `,
     });
 

@@ -2,13 +2,16 @@ import React from "react";
 import MixCard from "./MixCard";
 
 // Force dynamic rendering for this component
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 async function getRecords() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/home/newmixtapes`, {
-      cache: 'no-store', // Disable caching completely
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/home/newmixtapes`,
+      {
+        cache: "no-store", // Disable caching completely
+      }
+    );
 
     if (!response.ok) {
       console.error(`Error fetching mixtapes: ${response.statusText}`);
@@ -55,10 +58,10 @@ export default async function TopMixList() {
               link={`/mix/${mix.unique}`}
               Djname={mix.djName}
               title={mix.title}
-              year={new Date(mix.date).getFullYear()}
+              year={new Date(mix.time).getFullYear()}
               img={mix.imgthumb}
-              downloads={mix.engagement.downloads}
-              plays={mix.engagement.plays || 0}
+              downloads={mix.totalDownloads || 0}
+              plays={mix.totalPlays || 0}
               loading={false}
             />
           </div>

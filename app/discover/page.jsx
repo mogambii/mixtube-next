@@ -15,18 +15,16 @@ const Discovermixxes = () => {
   const [open, setOpen] = useState(false);
   const [mixes, setMixes] = useState([]);
   const [page, setPage] = useState(1);
-  const limit = 12
+  const limit = 12;
   const [totalRecords, setTotalRecords] = useState(0);
 
   useEffect(() => {
     const fetchMixes = async () => {
       setLoading(true);
       try {
-        const response = await fetch(
-          `/api/discover?page=${page}`
-        );
+        const response = await fetch(`/api/discover?page=${page}`);
         const data = await response.json();
-        setMixes(data.data);
+        setMixes(data.mixtapes);
         setTotalRecords(data.totalmixtapes);
       } catch (error) {
         console.error("Error fetching mixes:", error);
@@ -50,8 +48,6 @@ const Discovermixxes = () => {
     }
   };
 
-
-
   return (
     <>
       <div className="min-h-screen">
@@ -59,15 +55,15 @@ const Discovermixxes = () => {
           DISCOVER MIXTAPES
         </h5>
         <header className="flex justify-between items-center p-0" role="banner">
-        <Link
-          href="/search"
-          className="flex-1 mr-2"
-          aria-label="Search Mixtapes"
-        >
-          <MpNav place="Search Mixtape" />
-        </Link>
-        <NavMenu />
-      </header>
+          <Link
+            href="/search"
+            className="flex-1 mr-2"
+            aria-label="Search Mixtapes"
+          >
+            <MpNav place="Search Mixtape" />
+          </Link>
+          <NavMenu />
+        </header>
         <div className="grid items-center justify-center">
           {loading ? (
             <div className="grid justify-center items-center gap-3 min-h-[80vh]">
@@ -86,12 +82,11 @@ const Discovermixxes = () => {
                   <div className="w-full" key={mix.unique}>
                     <MixCard
                       link={`/mix/${mix.unique}/`}
-                      Djname={mix.Djname}
+                      Djname={mix.djName}
                       title={mix.title}
-                      name={mix.name}
                       img={mix.imgthumb}
-                      downloads={mix.downloads}
-                      plays={mix.plays ? mix.plays : 0}
+                      downloads={mix.totalDownloads}
+                      plays={mix.totalPlays}
                     />
                   </div>
                 ))}

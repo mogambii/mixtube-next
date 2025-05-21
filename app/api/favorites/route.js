@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
+    // console.log(session);
     if (!session?.user) {
       return new Response("Unauthorized", { status: 401 });
     }
@@ -24,28 +25,28 @@ export async function GET(request) {
         userId: session.user.id,
       },
     });
+    // console.log(totalCount);
 
     const favorites = await prisma.mixtapeLike.findMany({
       where: {
         userId: session.user.id,
       },
-      include: {
+      select: {
         mixtape: {
-          include: {
-            user: {
-              select: {
-                djName: true,
-                profilep: true,
-              },
-            },
+          select: {
+            id: true,
+            djName: true,
+            imgthumb: true,
+            unique: true,
+            title: true,
           },
         },
       },
       skip,
       take: limit,
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
     // Transform the data to match the expected format
@@ -54,20 +55,24 @@ export async function GET(request) {
       title: fav.mixtape.title,
       imgthumb: fav.mixtape.imgthumb,
       unique: fav.mixtape.unique,
-      djName: fav.mixtape.user?.djName || "Unknown DJ",
+      djName: fav.mixtape.djName || "Unknown DJ",
+      user: fav.mixtape.user,
     }));
-
-    return new NextResponse(JSON.stringify({
-      favorites: transformedFavorites,
-      pagination: {
-        total: totalCount,
-        pages: Math.ceil(totalCount / limit),
-        currentPage: page,
-        limit
+    // console.log(transformedFavorites);
+    return new NextResponse(
+      JSON.stringify({
+        favorites: transformedFavorites,
+        pagination: {
+          total: totalCount,
+          pages: Math.ceil(totalCount / limit),
+          currentPage: page,
+          limit,
+        },
+      }),
+      {
+        headers: { "Content-Type": "application/json" },
       }
-    }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    );
   } catch (error) {
     console.error("Error fetching favorites:", error);
     return new Response("Internal Server Error", { status: 500 });

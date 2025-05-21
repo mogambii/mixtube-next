@@ -7,15 +7,24 @@ import { FaHeart, FaSpinner } from "react-icons/fa";
 import Image from "next/image";
 
 const MixtapeCard = ({ mixtape }) => (
-  <Link href={`/mix/${mixtape.unique}`} className="block hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-md">
+  <Link
+    href={`/mix/${mixtape.unique}`}
+    className="block hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-md"
+  >
     <Image
+      width={500}
+      height={500}
       src={mixtape.imgthumb}
       alt={mixtape.title}
       className="w-full h-48 object-cover"
     />
     <div className="p-4">
-      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">{mixtape.title}</h2>
-      <p className="text-gray-600 dark:text-gray-300 text-sm">By {mixtape.djName}</p>
+      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+        {mixtape.title}
+      </h2>
+      <p className="text-gray-600 dark:text-gray-300 text-sm">
+        {mixtape.djName.toUpperCase()}
+      </p>
     </div>
   </Link>
 );
@@ -31,7 +40,9 @@ export default function FavoritesPage() {
   const fetchFavorites = async (page) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/favorites?page=${page}&limit=${limit}`);
+      const response = await fetch(
+        `/api/favorites?page=${page}&limit=${limit}`
+      );
       if (!response.ok) throw new Error("Failed to fetch favorites");
       const data = await response.json();
       setFavorites(data.favorites);

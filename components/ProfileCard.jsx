@@ -3,25 +3,26 @@ import React from "react";
 
 const ProfileCard = ({ Djname, profilep, name }) => {
   return (
-    <div className="flex flex-col items-center bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300  h-36  w-28 md:w-48 md:h-60 p-4">
-      <div className="h-16 w-16 md:w-36 md:h-36 flex items-center justify-center mb-3">
+    <div className="group relative flex flex-col items-center bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 h-40 w-32 md:w-52 md:h-64 p-4 overflow-hidden border border-gray-100 dark:border-gray-700">
+      <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-indigo-500/10 dark:from-indigo-400/5 dark:to-indigo-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="relative h-20 w-20 md:w-40 md:h-40 flex items-center justify-center mb-4">
+        <div className="absolute inset-0 bg-indigo-500/10 dark:bg-indigo-400/10 rounded-full group-hover:bg-indigo-500/20 dark:group-hover:bg-indigo-400/20 transition-colors duration-300" />
         <Image
-
-          src={
-            profilep
-              ? profilep
-              : "https://assets.practice365.co.uk/wp-content/uploads/sites/1005/2023/03/Default-Profile-Picture-Transparent.png"
-          }
-          className="rounded-full border-4 border-gray-200 object-cover dark:border-gray-600"
-          alt="profile"
-          width={128}
-          height={128}
+          src={profilep || "https://assets.practice365.co.uk/wp-content/uploads/sites/1005/2023/03/Default-Profile-Picture-Transparent.png"}
+          className="rounded-full border-4 border-white dark:border-gray-700 object-cover shadow-md group-hover:border-indigo-100 dark:group-hover:border-indigo-900 transition-colors duration-300"
+          alt={`${Djname || name}'s profile picture`}
+          width={160}
+          height={160}
+          priority
         />
       </div>
-      <div className="text-center">
-        <h4 className=" text-xs md:text-base font-semibold text-gray-800 dark:text-gray-200 break-words">
-          {Djname ? Djname : name}
+      <div className="text-center z-10">
+        <h4 className="text-sm md:text-lg font-semibold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300 break-words">
+          {Djname || name}
         </h4>
+        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+          View Profile
+        </p>
       </div>
     </div>
   );

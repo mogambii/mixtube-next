@@ -1,69 +1,48 @@
+import prisma from "@/lib/prismadb";
 import { NextResponse } from "next/server";
-import getDb from "@/util/db";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET() {
   try {
-    const db = await getDb();
-    const mixtapes = await db.collection("Mixtape").aggregate([
-      {
-        $lookup: {
-          from: "Stats",
-          localField: "_id",
-          foreignField: "mixtapeId",
-          as: "stats"
-        }
+    const mixtapes = await prisma.mixtape.findMany({
+      take: 12,
+      orderBy: {
+        time: "desc",
       },
-      {
-        $addFields: {
-          totalPlays: {
-            $add: [
-              { $ifNull: ["$plays", 0] },
-              { $ifNull: [{ $sum: "$stats.plays" }, 0] }
-            ]
-          },
-          totalDownloads: {
-            $add: [
-              { $ifNull: ["$downloads", 0] },
-              { $ifNull: [{ $sum: "$stats.downloads" }, 0] }
-            ]
-          }
-        }
+      select: {
+        id: true,
+        title: true,
+        imgthumb: true,
+        unique: true,
+        djName: true,
+        totalPlays: true,
+        totalDownloads: true,
       },
-      {
-        $sort: {
-          time: -1
-        }
-      },
-      {
-        $limit: 12
-      },
-      {
-        $project: {
-          _id: 0,
-          title: 1,
-          imgthumb: 1,
-          unique: 1,
-          djName: 1,
-          engagement: {
-            plays: { $ifNull: ["$totalPlays", 0] },
-            downloads: { $ifNull: ["$totalDownloads", 0] }
-          }
-        }
-      }
-    ]).toArray();
-
-    return NextResponse.json({ mixtapes }, {
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      }
     });
+    // Convert BigInt values to numbers for JSON serialization
+    const serializedMixtapes = mixtapes.map((mixtape) => ({
+      ...mixtape,
+      totalPlays: Number(mixtape.totalPlays),
+      totalDownloads: Number(mixtape.totalDownloads),
+    }));
+    return NextResponse.json(
+      { mixtapes: serializedMixtapes },
+      {
+        headers: {
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error fetching new mixtapes:", error);
-    return NextResponse.json({ error: "Failed to fetch new mixtapes" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch new mixtapes" },
+      { status: 500 }
+    );
   }
 }
