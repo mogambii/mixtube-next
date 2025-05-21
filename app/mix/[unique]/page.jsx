@@ -246,7 +246,7 @@ export default async function MixTape({ params }) {
               {session && <LikeBtn id={unique} likedparam={liked} />}
               <AudioAdd id={unique} />
             </div>
-            <DownloadBtn url={mix.downloadUrl} />
+            <DownloadBtn id={unique} />
           </div>
         </div>
 
