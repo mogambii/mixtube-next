@@ -17,6 +17,7 @@ function AudioPlayer() {
   const [durationDisplay, setDurationDisplay] = useState("00:00");
   const [isBuffering, setIsBuffering] = useState(true);
   const [tooltipTime, setTooltipTime] = useState(null);
+  const [wasPaused, setWasPaused] = useState(false); // Track if the track was paused
 
   const audioPlayer = useRef(null);
   const progressRef = useRef(null);
@@ -25,6 +26,9 @@ function AudioPlayer() {
   // Handle loading new audio when currentMix changes
   useEffect(() => {
     if (currentMix && currentMix.audio && audioPlayer.current) {
+      // Reset play state for new track
+      setWasPaused(false);
+      
       // Store the current play state
       const wasPlaying = isPlaying;
       
@@ -39,7 +43,7 @@ function AudioPlayer() {
           // Try to play automatically
           await audioPlayer.current.play();
           setIsPlaying(true);
-          // Update play count when starting to play
+          // Update play count on first play
           if (currentMix.id) {
             updatePlays(currentMix.id);
           }
@@ -69,17 +73,18 @@ function AudioPlayer() {
       if (isPlaying) {
         await audioPlayer.current.pause();
         setIsPlaying(false);
+        setWasPaused(true); // Track that the track was paused
       } else {
         await audioPlayer.current.play();
-        // Update play count when starting to play
-        if (currentMix?.id) {
+        // Update play count only when resuming after pause
+        if (wasPaused && currentMix?.id) {
           updatePlays(currentMix.id);
+          setWasPaused(false);
         }
         setIsPlaying(true);
       }
     } catch (error) {
       console.error('Error during playback:', error);
-      // Handle any playback errors here
     }
   };
 

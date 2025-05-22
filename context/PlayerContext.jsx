@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useRef } from "react";
 
 const PlayerContext = createContext();
 
@@ -7,8 +7,9 @@ export function PlayerProvider({ children }) {
   const [currentMix, setCurrentMix] = useState({
     id: null,
     audio: null,
-    thumbnail: null
+    thumbnail: null,
   });
+  const playedTracks = useRef(new Set()); // Track played tracks in this session
 
   const playMix = async (id) => {
     try {
@@ -17,17 +18,18 @@ export function PlayerProvider({ children }) {
         headers: { "Content-Type": "application/json" },
         cache: "no-cache",
       });
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch mixtape: ${response.statusText}`);
       }
-      
+
       const mixData = await response.json();
+      const filename = mixData.audio.split("/").pop();
       setCurrentMix({
         id,
-        audio: mixData.audio,
+        audio: `https://files.mixtube.xyz/${encodeURIComponent(filename)}`,
         imgthumb: mixData.imgthumb,
-        title: mixData.title
+        title: mixData.title,
       });
     } catch (error) {
       console.error("Error loading mix:", error);
@@ -36,16 +38,22 @@ export function PlayerProvider({ children }) {
 
   const updatePlays = async (id) => {
     try {
-      const response = await fetch(`/api/mixtape/stats/play`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id }),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to update plays: ${response.statusText}`);
+      // Only update if this track hasn't been played in this session
+      if (!playedTracks.current.has(id)) {
+        const response = await fetch(`/api/mixtape/stats/play`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to update plays: ${response.statusText}`);
+        }
+        
+        // Mark this track as played in this session
+        playedTracks.current.add(id);
       }
     } catch (error) {
       console.error("Error updating plays:", error);
@@ -62,7 +70,7 @@ export function PlayerProvider({ children }) {
 export function usePlayerContext() {
   const context = useContext(PlayerContext);
   if (!context) {
-    throw new Error('usePlayer must be used within a PlayerProvider');
+    throw new Error("usePlayer must be used within a PlayerProvider");
   }
   return context;
 }
