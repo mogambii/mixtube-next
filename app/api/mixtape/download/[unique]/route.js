@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
+import { startOfDay } from "date-fns";
 
 export async function POST(req, { params }) {
   try {
     const { unique } = params;
-    // Get mixtape ID from unique identifier
+
+    // Get mixtape by unique identifier
     const mixtape = await prisma.mixtape.findUnique({
       where: { unique },
     });
@@ -15,19 +17,22 @@ export async function POST(req, { params }) {
         { status: 404 }
       );
     }
-    if (mixtape) {
-      await prisma.mixtape.update({
-        where: { id: mixtape.id },
-        data: { totalDownloads: mixtape.totalDownloads + 1 },
-      });
-    }
-    // Update or create stats record
-    const today = new Date().toISOString();
+
+    // Increment totalDownloads
+    await prisma.mixtape.update({
+      where: { id: mixtape.id },
+      data: { totalDownloads: mixtape.totalDownloads + 1 },
+    });
+
+    // Set today's date at start of day
+    const today = startOfDay(new Date());
+
+    // Update or create daily stats
     await prisma.stats.upsert({
       where: {
         mixtapeId_date: {
           mixtapeId: mixtape.id,
-          date: today,
+          date: today, // Date type, not string
         },
       },
       update: {

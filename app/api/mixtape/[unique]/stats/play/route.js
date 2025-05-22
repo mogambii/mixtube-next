@@ -3,11 +3,12 @@ import prisma from "@/lib/prismadb";
 
 export async function POST(req, { params }) {
   try {
-    const { unique } = params;
-    // Get mixtape ID from unique identifier
+    const { unique } = await params;
+
+    // Fetch mixtape with totalPlays
     const mixtape = await prisma.mixtape.findUnique({
       where: { unique },
-      select: { id: true },
+      select: { id: true, totalPlays: true },
     });
 
     if (!mixtape) {
@@ -17,17 +18,23 @@ export async function POST(req, { params }) {
       );
     }
 
-    if (mixtape) {
-      await prisma.mixtape.update({
-        where: { id: mixtape.id },
-        data: { totalPlays: mixtape.totalPlays + 1 },
-      });
-    }
+    // Increment totalPlays
+    await prisma.mixtape.update({
+      where: { id: mixtape.id },
+      data: { totalPlays: mixtape.totalPlays + 1 },
+    });
 
-    // Find or create stats record
+    // Get today's date, but set time to 00:00:00 to match the unique index on date
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    // Upsert stats with composite unique constraint (mixtapeId + date)
     const stats = await prisma.stats.upsert({
       where: {
-        mixtapeId: mixtape.id,
+        mixtapeId_date: {
+          mixtapeId: mixtape.id,
+          date: today,
+        },
       },
       update: {
         plays: {
@@ -36,9 +43,10 @@ export async function POST(req, { params }) {
       },
       create: {
         mixtapeId: mixtape.id,
+        date: today,
         plays: 1,
         downloads: 0,
-        likes: 0,
+        shares: 0,
       },
     });
 
