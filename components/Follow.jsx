@@ -21,9 +21,9 @@ const Follow = ({ username, following }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           username: session?.user?.name,
-          djusername 
+          djusername,
         }),
       });
 

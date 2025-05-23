@@ -31,42 +31,57 @@ export default async function TopMixList() {
 
   if (!newMix || newMix.length === 0) {
     return (
-      <div className="pb-6">
-        <div className="w-full pl-4">
-          <h2 className="font-bold dark:text-slate-200 py-3 text-2xl">
-            NEW <span className="text-blue-700">MIXTAPES</span>
-          </h2>
+      <section className="py-8 px-4">
+        <div className="container mx-auto">
+          <div className="flex items-center mb-6">
+            <div className="w-1.5 h-8 bg-indigo-600 rounded-full mr-3"></div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              NEW{" "}
+              <span className="text-indigo-600 dark:text-indigo-400">
+                MIXTAPES
+              </span>
+            </h2>
+          </div>
+          <div className="bg-white dark:bg-gray-800/90 rounded-xl p-6 shadow-md border border-gray-100 dark:border-gray-700">
+            <p className="text-gray-600 dark:text-gray-400 text-center">
+              No new mixtapes available.
+            </p>
+          </div>
         </div>
-        <p className="pl-4 text-gray-600 dark:text-slate-400">
-          No new mixtapes available.
-        </p>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="pb-6">
-      <div className="w-full pl-4">
-        <h2 className="font-bold dark:text-slate-200 py-3 text-2xl">
-          NEW <span className="text-blue-700">MIXTAPES</span>
-        </h2>
+    <section className="py-8 px-4">
+      <div className="container mx-auto">
+        <div className="flex items-center mb-6">
+          <div className="w-1.5 h-8 bg-indigo-600 rounded-full mr-3"></div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            NEW{" "}
+            <span className="text-indigo-600 dark:text-indigo-400">
+              MIXTAPES
+            </span>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+          {newMix.map((mix) => (
+            <div key={mix.unique}>
+              <MixCard
+                link={`/mix/${mix.unique}`}
+                Djname={mix.djName}
+                title={mix.title}
+                year={new Date(mix.time).getFullYear()}
+                img={mix.imgthumb}
+                downloads={mix.totalDownloads || 0}
+                plays={mix.totalPlays || 0}
+                loading={false}
+              />
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
-        {newMix.map((mix) => (
-          <div className="w-full" key={mix.unique}>
-            <MixCard
-              link={`/mix/${mix.unique}`}
-              Djname={mix.djName}
-              title={mix.title}
-              year={new Date(mix.time).getFullYear()}
-              img={mix.imgthumb}
-              downloads={mix.totalDownloads || 0}
-              plays={mix.totalPlays || 0}
-              loading={false}
-            />
-          </div>
-        ))}
-      </div>
-    </div>
+    </section>
   );
 }

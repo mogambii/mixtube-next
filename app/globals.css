@@ -2,6 +2,93 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom animations for audio player and floating particles */
+@keyframes gradient-x {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes music-bar1 {
+  0%, 100% { height: 30%; }
+  50% { height: 100%; }
+}
+
+@keyframes music-bar2 {
+  0%, 100% { height: 40%; }
+  25% { height: 80%; }
+  75% { height: 60%; }
+}
+
+@keyframes music-bar3 {
+  0%, 100% { height: 60%; }
+  33% { height: 100%; }
+  66% { height: 40%; }
+}
+@keyframes float-slow {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(20px, 15px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes subtle-float {
+  0% { transform: scale(1.1) translate(0, 0); }
+  25% { transform: scale(1.12) translate(-5px, -2px); }
+  50% { transform: scale(1.1) translate(-8px, 4px); }
+  75% { transform: scale(1.13) translate(-3px, 1px); }
+  100% { transform: scale(1.1) translate(0, 0); }
+}
+
+@keyframes float-medium {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(-15px, 10px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes float-fast {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(10px, -15px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.animate-float-medium {
+  animation: float-medium 6s ease-in-out infinite;
+}
+
+.animate-float-fast {
+  animation: float-fast 4s ease-in-out infinite;
+}
+
+@layer utilities {
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background-image: linear-gradient(to right, transparent 0%, theme('colors.gray.300 / 0.2') 20%, theme('colors.gray.300 / 0.5') 60%, transparent 100%);
+    background-size: 200% 100%;
+  }
+
+  .dark .animate-shimmer {
+    background-image: linear-gradient(to right, transparent 0%, theme('colors.gray.700 / 0.2') 20%, theme('colors.gray.700 / 0.5') 60%, transparent 100%);
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}
+
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   height: 12px;

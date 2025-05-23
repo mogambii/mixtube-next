@@ -1,10 +1,12 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { Blocks } from "react-loader-spinner";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { FaSpinner } from "react-icons/fa";
 import MpNav from "../(components)/MpNav";
 import MixCard from "../(components)/MixCard";
+import MixCardSkeleton from "../(components)/MixCardSkeleton";
 import NavMenu from "@/components/NavMenu";
+import { useInView } from "react-intersection-observer";
 
 const Discovermixxes = () => {
   useEffect(() => {
@@ -12,41 +14,56 @@ const Discovermixxes = () => {
   }, []);
 
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
   const [mixes, setMixes] = useState([]);
   const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const { ref: loadMoreRef, inView } = useInView();
   const limit = 12;
-  const [totalRecords, setTotalRecords] = useState(0);
 
+  const fetchMixes = async (pageNumber) => {
+    try {
+      const response = await fetch(`/api/discover?page=${pageNumber}`);
+      const data = await response.json();
+      return {
+        mixtapes: data.mixtapes,
+        hasMore: data.mixtapes.length === limit,
+      };
+    } catch (error) {
+      console.error("Error fetching mixes:", error);
+      return { mixtapes: [], hasMore: false };
+    }
+  };
+
+  // Initial load
   useEffect(() => {
-    const fetchMixes = async () => {
+    const loadInitialMixes = async () => {
       setLoading(true);
-      try {
-        const response = await fetch(`/api/discover?page=${page}`);
-        const data = await response.json();
-        setMixes(data.mixtapes);
-        setTotalRecords(data.totalmixtapes);
-      } catch (error) {
-        console.error("Error fetching mixes:", error);
-      } finally {
-        setLoading(false);
+      const { mixtapes, hasMore } = await fetchMixes(1);
+      setMixes(mixtapes);
+      setHasMore(hasMore);
+      setLoading(false);
+    };
+
+    loadInitialMixes();
+  }, []);
+
+  // Load more when scrolling to bottom
+  useEffect(() => {
+    const loadMore = async () => {
+      if (inView && !loadingMore && hasMore) {
+        setLoadingMore(true);
+        const nextPage = page + 1;
+        const { mixtapes, hasMore: moreAvailable } = await fetchMixes(nextPage);
+        setMixes((prev) => [...prev, ...mixtapes]);
+        setHasMore(moreAvailable);
+        setPage(nextPage);
+        setLoadingMore(false);
       }
     };
 
-    fetchMixes();
-  }, [page]);
-
-  const handleNextPage = () => {
-    if (page * limit < totalRecords) {
-      setPage((prevPage) => prevPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (page > 1) {
-      setPage((prevPage) => prevPage - 1);
-    }
-  };
+    loadMore();
+  }, [inView, loadingMore, hasMore, page]);
 
   return (
     <>
@@ -64,22 +81,23 @@ const Discovermixxes = () => {
           </Link>
           <NavMenu />
         </header>
-        <div className="grid items-center justify-center">
+        <div className="max-w-7xl mx-auto px-4">
           {loading ? (
-            <div className="grid justify-center items-center gap-3 min-h-[80vh]">
-              <Blocks
-                height="100"
-                width="100"
-                color="#4fa94d"
-                ariaLabel="blocks-loading"
-                visible={true}
-              />
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pt-4">
+              {[...Array(12)].map((_, index) => (
+                <div key={index} className="w-full">
+                  <MixCardSkeleton />
+                </div>
+              ))}
             </div>
           ) : (
             <div>
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pt-4">
                 {mixes.map((mix) => (
-                  <div className="w-full" key={mix.unique}>
+                  <div
+                    className="w-full transform hover:scale-[1.02] transition-transform duration-200"
+                    key={mix.unique}
+                  >
                     <MixCard
                       link={`/mix/${mix.unique}/`}
                       Djname={mix.djName}
@@ -91,24 +109,21 @@ const Discovermixxes = () => {
                   </div>
                 ))}
               </div>
-              <div className="flex justify-center gap-4 mt-4 ring-1 ring-slate-50 p-2 rounded-lg">
-                <button
-                  onClick={handlePreviousPage}
-                  disabled={page === 1}
-                  className="px-4 py-2 bg-gray-300 text-black rounded-lg disabled:cursor-not-allowed disabled:bg-gray-400 w-24"
-                  aria-label="Previous page"
+              {hasMore && (
+                <div
+                  ref={loadMoreRef}
+                  className="flex justify-center py-8 gap-3 items-center text-gray-500 dark:text-gray-400"
                 >
-                  Previous
-                </button>
-                <button
-                  onClick={handleNextPage}
-                  disabled={page * limit >= totalRecords}
-                  className="px-4 py-2 bg-gray-300 text-black rounded-lg disabled:bg-gray-600 w-24"
-                  aria-label="Next page"
-                >
-                  Next
-                </button>
-              </div>
+                  {loadingMore ? (
+                    <>
+                      <FaSpinner className="animate-spin h-5 w-5" />
+                      <span>Loading more mixtapes...</span>
+                    </>
+                  ) : (
+                    <span className="text-sm">Scroll for more</span>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

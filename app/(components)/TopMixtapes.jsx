@@ -31,38 +31,55 @@ export default async function TopMixList() {
   // Handle case where topMix is undefined or null
   if (!topMix || topMix.length === 0) {
     return (
-      <div className="p-0">
-        <h2 className="font-bold ml-3 dark:text-sky-50 text-2xl mb-4">
-          TOP <span className="text-blue-700">MIXTAPES</span>
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 ml-3">
-          No mixtapes available at the moment.
-        </p>
-      </div>
+      <section className="py-8 px-4">
+        <div className="container mx-auto">
+          <div className="flex items-center mb-6">
+            <div className="w-1.5 h-8 bg-indigo-600 rounded-full mr-3"></div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              TOP{" "}
+              <span className="text-indigo-600 dark:text-indigo-400">
+                MIXTAPES
+              </span>
+            </h2>
+          </div>
+          <div className="bg-white dark:bg-gray-800/90 rounded-xl p-6 shadow-md border border-gray-100 dark:border-gray-700">
+            <p className="text-gray-600 dark:text-gray-400 text-center">
+              No mixtapes available at the moment.
+            </p>
+          </div>
+        </div>
+      </section>
     );
   }
 
-  const topMixes = topMix.map((mix) => (
-    <div className="w-full" key={mix.unique}>
-      <MixCard
-        link={`/mix/${mix.unique}`}
-        Djname={mix.djName}
-        title={mix.title}
-        img={mix.imgthumb}
-        downloads={mix.totalDownloads || 0}
-        plays={mix.totalPlays || 0}
-      />
-    </div>
-  ));
-
   return (
-    <div className="p-0">
-      <h2 className="font-bold ml-3 dark:text-sky-50 text-2xl mb-4">
-        TOP <span className="text-blue-700">MIXTAPES</span>
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
-        {topMixes}
+    <section className="py-8 px-4">
+      <div className="container mx-auto">
+        <div className="flex items-center mb-6">
+          <div className="w-1.5 h-8 bg-indigo-600 rounded-full mr-3"></div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            TOP{" "}
+            <span className="text-indigo-600 dark:text-indigo-400">
+              MIXTAPES
+            </span>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+          {topMix.map((mix) => (
+            <div key={mix.unique}>
+              <MixCard
+                link={`/mix/${mix.unique}`}
+                Djname={mix.djName}
+                title={mix.title}
+                img={mix.imgthumb}
+                downloads={mix.totalDownloads || 0}
+                plays={mix.totalPlays || 0}
+              />
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -5,13 +5,15 @@ import { BiShare } from "react-icons/bi";
 
 const Share = ({ id }) => {
   const [show, setShow] = useState(false);
+  
   return (
     <div>
       <button
         onClick={() => setShow(true)}
-        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-300 transition duration-300 flex items-center justify-center gap-x-1 ring-1"
+        className="bg-gray-100 dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 p-3 rounded-full hover:bg-indigo-50 dark:hover:bg-gray-700 transition duration-300 flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+        aria-label="Share mixtape"
       >
-        Share <BiShare />
+        <BiShare className="w-5 h-5" />
       </button>
       {show && (
         <ShareModal

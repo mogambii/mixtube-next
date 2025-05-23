@@ -1,11 +1,33 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
+import { authOptions } from "../../auth/[...nextauth]/route";
+import { getServerSession } from "next-auth";
 
 export async function POST(request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { username, djusername } = await request.json();
-    const lowercase_username = username.toLowerCase();
-    const lowercase_djusername = djusername.toLowerCase();
+    const lowercase_username = await prisma.user
+      .findUnique({ where: { email: session.user.email } })
+      .then((user) => {
+        if (!user) {
+          console.error("User not found");
+          return null;
+        }
+        return user.username.toLowerCase();
+      });
+    const lowercase_djusername = await prisma.user
+      .findUnique({ where: { username: djusername } })
+      .then((user) => {
+        if (!user) {
+          console.error("User not found");
+          return null;
+        }
+        return user.username.toLowerCase();
+      });
     if (!username || !djusername) {
       return NextResponse.json(
         { error: "Both username and djusername are required" },
@@ -15,8 +37,8 @@ export async function POST(request) {
 
     // Get both users
     const [follower, following] = await Promise.all([
-      prisma.user.findUnique({ where: { username : lowercase_username } }),
-      prisma.user.findUnique({ where: { username: lowercase_djusername } })
+      prisma.user.findUnique({ where: { username: lowercase_username } }),
+      prisma.user.findUnique({ where: { username: lowercase_djusername } }),
     ]);
 
     if (!follower || !following) {
@@ -49,10 +71,10 @@ export async function POST(request) {
       },
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
       follow,
-      message: `${username} is now following ${djusername}`
+      message: `${username} is now following ${djusername}`,
     });
   } catch (error) {
     console.error("Follow error:", error);

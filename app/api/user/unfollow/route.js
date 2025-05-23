@@ -4,6 +4,7 @@ import prisma from "@/lib/prismadb";
 export async function POST(request) {
   try {
     const { username, djusername } = await request.json();
+    console.log(username, djusername);
     const lowercase_username = username.toLowerCase();
     const lowercase_djusername = djusername.toLowerCase();
     if (!username || !djusername) {
@@ -16,7 +17,7 @@ export async function POST(request) {
     // Get both users
     const [follower, following] = await Promise.all([
       prisma.user.findUnique({ where: { username: lowercase_username } }),
-      prisma.user.findUnique({ where: { username: lowercase_djusername } })
+      prisma.user.findUnique({ where: { username: lowercase_djusername } }),
     ]);
 
     if (!follower || !following) {
@@ -41,9 +42,9 @@ export async function POST(request) {
       );
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      message: `${username} has unfollowed ${djusername}`
+      message: `${username} has unfollowed ${djusername}`,
     });
   } catch (error) {
     console.error("Unfollow error:", error);
