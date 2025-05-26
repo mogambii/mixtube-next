@@ -9,7 +9,7 @@ async function Navbar() {
   const session = await getServerSession();
 
   return (
-    <div className="flex mx-2 justify-between items-center p-2 bg-slate-100 dark:bg-gray-950 dark:text-slate-50 shadow-lg rounded-t-md">
+    <div className="flex mx-2 justify-between items-center p-2 bg-slate-100 dark:bg-gray-800 dark:text-slate-50 shadow-lg rounded-t-md">
       <div className="flex items-center gap-4">
         <Link href="/" className="flex items-center gap-3">
           <Image

@@ -71,7 +71,10 @@ const Discovermixxes = () => {
         <h5 className="dark:text-slate-50 py-2 pl-3 font-righteous">
           DISCOVER MIXTAPES
         </h5>
-        <header className="flex justify-between items-center p-0" role="banner">
+        <header
+          className="flex justify-between items-center mx-2 p-0"
+          role="banner"
+        >
           <Link
             href="/search"
             className="flex-1 mr-2"

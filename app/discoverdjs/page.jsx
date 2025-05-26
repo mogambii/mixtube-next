@@ -77,10 +77,10 @@ const DiscoverDjs = () => {
   if (typeof window !== "undefined") {
     document.title = "MixTube - Discover DJs";
   }
-  
+
   // State for modal
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  
+
   // State for infinite scroll
   const [results, setResults] = useState([]);
   const [sortBy, setSortBy] = useState("popular");
@@ -91,12 +91,12 @@ const DiscoverDjs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  
+
   // Open search modal handler
   const openSearchModal = () => {
     setIsSearchModalOpen(true);
   };
-  
+
   // Close search modal handler
   const closeSearchModal = () => {
     setIsSearchModalOpen(false);
@@ -228,18 +228,13 @@ const DiscoverDjs = () => {
   // This effect handles infinite scrolling
   useEffect(() => {
     // Only trigger loading more if we're not already loading and the loading trigger is in view
-    if (
-      inView &&
-      hasMore &&
-      !loadingMore &&
-      !isInitialLoad
-    ) {
+    if (inView && hasMore && !loadingMore && !isInitialLoad) {
       // Add a small delay to prevent rapid firing of requests
       const timer = setTimeout(() => {
         console.log(`Loading more DJs, page ${currentPage + 1}`);
         fetchDjs(sortBy, activeFilter, currentPage + 1, true);
       }, 300);
-      
+
       return () => clearTimeout(timer);
     }
   }, [
@@ -262,7 +257,8 @@ const DiscoverDjs = () => {
         No DJs Found
       </h4>
       <p className="text-gray-600 dark:text-gray-400 max-w-sm">
-        We couldn&apos;t find any DJs with the current filters. Try changing your filter options.
+        We couldn&apos;t find any DJs with the current filters. Try changing
+        your filter options.
       </p>
     </div>
   );
@@ -310,10 +306,10 @@ const DiscoverDjs = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 rounded-md">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 rounded-b-md">
       {/* Search Modal */}
       <DjSearchModal isOpen={isSearchModalOpen} onClose={closeSearchModal} />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col">
           <div className="flex items-center justify-between gap-4 mb-6">
@@ -430,10 +426,10 @@ const DiscoverDjs = () => {
                       {activeFilter === "new" ? "New DJs" : "Featured DJs"}
                     </h2>
                   </div>
-                  
+
                   {/* DJ Grid */}
                   <DjGrid />
-                  
+
                   {/* Infinite Scroll Trigger */}
                   <div
                     ref={ref}

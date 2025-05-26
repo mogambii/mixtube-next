@@ -103,7 +103,7 @@ export async function generateMetadata({ params: { username } }) {
 }
 
 const StatCard = ({ icon: Icon, label, value }) => (
-  <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center space-x-4">
+  <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center space-x-2">
     <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-full">
       <Icon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
     </div>
@@ -147,9 +147,9 @@ const DjProfile = async ({ params: { username } }) => {
   };
 
   return (
-    <div className="min-h-screen px-4 py-8 max-w-7xl mx-auto">
+    <div className="min-h-screen py-1">
       {/* Profile Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 mb-8 relative overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-b-xl shadow-md p-8 mb-8 relative overflow-hidden">
         {/* Background pattern */}
         <div className="absolute top-0 right-0 w-full h-32 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-50"></div>
 
