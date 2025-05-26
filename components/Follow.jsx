@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const Follow = ({ username, following }) => {
   const [isFollowing, setIsFollowing] = useState(following);
-  const [isFollowingLoading, setIsFollowingLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const { data: session } = useSession();
 
@@ -17,8 +17,7 @@ const Follow = ({ username, following }) => {
     return null;
   }
 
-  // Function to handle follow/unfollow API calls
-  const handleFollowUnfollow = async (action, djusername) => {
+  const handleFollowAction = async (action) => {
     try {
       const response = await fetch(`/api/user/${action}`, {
         method: "POST",
@@ -26,24 +25,20 @@ const Follow = ({ username, following }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: session?.user?.email,
-          djusername,
+          email: session.user.email,
+          djusername: username,
         }),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || `Failed to ${action}`);
-      }
-
-      return response.json();
+      if (!response.ok) throw new Error(`Failed to ${action}`);
+      return await response.json();
     } catch (error) {
-      console.error("Error during follow/unfollow:", error);
+      console.error("Error:", error);
       throw error;
     }
   };
 
-  const handleFollowToggle = async () => {
+  const toggleFollow = async () => {
     if (!session) {
       toast.error("Please sign in to follow DJs", {
         position: "bottom-center",
@@ -51,97 +46,87 @@ const Follow = ({ username, following }) => {
       });
       return;
     }
-    
-    setIsFollowingLoading(true);
-    const endpoint = isFollowing ? "unfollow" : "follow";
+
+    setIsLoading(true);
+    const action = isFollowing ? "unfollow" : "follow";
     const actionText = isFollowing ? "unfollowed" : "followed";
 
     try {
-      // Call the API to toggle follow/unfollow
-      await handleFollowUnfollow(endpoint, username);
+      await handleFollowAction(action);
+      setIsFollowing(!isFollowing);
 
-      // Toggle the local state
-      setIsFollowing((prev) => !prev);
-      
-      // Show success toast
-      toast.success(`You have ${actionText} ${username}`, {
+      toast.success(`You ${actionText} ${username}`, {
         position: "bottom-center",
         icon: isFollowing ? "👋" : "🎉",
         duration: 3000,
       });
     } catch (error) {
-      toast.error(`Failed to ${endpoint} ${username}. Please try again.`, {
+      toast.error(`Failed to ${action}. Please try again.`, {
         position: "bottom-center",
         duration: 3000,
       });
     } finally {
-      setIsFollowingLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="relative">
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         <motion.button
-          onClick={handleFollowToggle}
-          disabled={isFollowingLoading}
+          onClick={toggleFollow}
+          disabled={isLoading}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
           whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.03 }}
           initial={{ opacity: 0.9 }}
           animate={{ opacity: 1 }}
           className={`
             flex items-center justify-center gap-2 px-5 py-2.5 rounded-full 
-            font-medium text-sm shadow-sm transition-all duration-300 
-            ${isFollowing 
-              ? isHovering
-                ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
-                : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
-              : "bg-indigo-600 text-white hover:bg-indigo-700 border border-indigo-600"}
-            ${isFollowingLoading ? "opacity-75 cursor-not-allowed" : "cursor-pointer"}
+            font-medium text-sm transition-all duration-200 ease-out
+            ${
+              isFollowing
+                ? isHovering
+                  ? "bg-red-50 text-red-600 border border-red-200 hover:shadow-red-100/50"
+                  : "bg-gray-50 text-gray-700 border border-gray-200 hover:shadow-gray-100/50"
+                : "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-indigo-500/30"
+            }
+            ${isLoading ? "cursor-not-allowed opacity-80" : "cursor-pointer"}
+            shadow-sm hover:shadow-md min-w-[130px]
           `}
         >
-          {isFollowingLoading ? (
+          {isLoading ? (
             <>
-              <FaSpinner className="animate-spin text-sm" />
-              <span>{isFollowing ? "Unfollowing..." : "Following..."}</span>
+              <FaSpinner className="animate-spin" size={14} />
+              <span className="block">Loading...</span>
             </>
           ) : isFollowing ? (
-            <>
-              {isHovering ? (
-                <>
-                  <HiOutlineUserRemove className="text-red-500" />
-                  <span>Unfollow</span>
-                </>
-              ) : (
-                <>
-                  <FaUserCheck />
-                  <span>Following</span>
-                </>
-              )}
-            </>
+            isHovering ? (
+              <>
+                <HiOutlineUserRemove size={14} />
+                <span className="block">Unfollow</span>
+              </>
+            ) : (
+              <>
+                <FaUserCheck size={14} />
+                <span className="block">Following</span>
+              </>
+            )
           ) : (
             <>
-              <FaUserPlus />
-              <span>Follow</span>
+              <FaUserPlus size={14} />
+              <span className="block">Follow</span>
             </>
           )}
+
+          {/* Invisible element to reserve space for longest possible text */}
+          <span className="invisible absolute pointer-events-none">
+            <FaUserCheck size={14} />
+            <span>Unfollowing...</span>
+          </span>
         </motion.button>
       </AnimatePresence>
-      
-      {isFollowing && !isHovering && (
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 bg-white px-2 py-1 rounded-md shadow-sm border border-gray-100 whitespace-nowrap"
-        >
-          <div className="flex items-center gap-1">
-            <FaBell className="text-indigo-500" size={10} />
-            <span>You'll receive updates</span>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 };
