@@ -41,6 +41,7 @@ export async function GET(request) {
             title: true,
           },
         },
+        createdAt: true,
       },
       skip,
       take: limit,
@@ -57,6 +58,7 @@ export async function GET(request) {
       unique: fav.mixtape.unique,
       djName: fav.mixtape.djName || "Unknown DJ",
       user: fav.mixtape.user,
+      createdAt: fav.createdAt,
     }));
     // console.log(transformedFavorites);
     return new NextResponse(

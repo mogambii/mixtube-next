@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -9,11 +9,15 @@ import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const MixtapeCardSkeleton = () => (
-  <div className="block rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-md">
-    <Skeleton className="w-full h-48" />
-    <div className="p-4">
-      <Skeleton className="h-6 w-3/4 mb-2" />
-      <Skeleton className="h-4 w-1/2" />
+  <div className="block rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-300 h-full">
+    <Skeleton className="w-full h-52 object-cover" />
+    <div className="p-5">
+      <Skeleton className="h-6 w-3/4 mb-3" />
+      <Skeleton className="h-4 w-1/2 mb-2" />
+      <div className="flex justify-between items-center mt-3">
+        <Skeleton className="h-4 w-1/4" />
+        <Skeleton className="h-8 w-8 rounded-full" />
+      </div>
     </div>
   </div>
 );
@@ -21,22 +25,33 @@ const MixtapeCardSkeleton = () => (
 const MixtapeCard = ({ mixtape }) => (
   <Link
     href={`/mix/${mixtape.unique}`}
-    className="block hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-md"
+    className="group block rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-300 h-full"
   >
-    <Image
-      width={500}
-      height={500}
-      src={mixtape.imgthumb}
-      alt={mixtape.title}
-      className="w-full h-48 object-cover"
-    />
-    <div className="p-4">
-      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+    <div className="relative">
+      <Image
+        width={500}
+        height={500}
+        src={mixtape.imgthumb}
+        alt={mixtape.title}
+        className="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-500"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    </div>
+    <div className="p-5">
+      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
         {mixtape.title}
       </h2>
-      <p className="text-gray-600 dark:text-gray-300 text-sm">
+      <p className="text-gray-600 dark:text-gray-300 text-sm font-medium">
         {mixtape.djName.toUpperCase()}
       </p>
+      <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          {new Date(mixtape.createdAt).toLocaleDateString()}
+        </span>
+        <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-full">
+          <FaHeart className="text-red-500 h-4 w-4" />
+        </div>
+      </div>
     </div>
   </Link>
 );
@@ -99,64 +114,120 @@ export default function FavoritesPage() {
 
   if (!session?.user) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh] bg-gray-100 dark:bg-gray-900">
-        <p className="text-lg text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          Please sign in to view your favorites
-        </p>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center px-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 max-w-md w-full text-center">
+          <div className="bg-indigo-100 dark:bg-indigo-900/30 p-4 rounded-full inline-block mb-4">
+            <FaHeart className="text-indigo-500 h-8 w-8" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+            Sign in required
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Please sign in to view and manage your favorite mixtapes
+          </p>
+          <Link
+            href="/signin"
+            className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+          >
+            Sign In
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (loading && favorites.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8 bg-gray-100 dark:bg-gray-900 min-h-screen">
-        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100 text-center flex items-center justify-center">
-          <FaHeart className="mr-2 text-red-500" /> Your Favorite Mixes
-        </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {Array.from({ length: limit }).map((_, index) => (
-            <MixtapeCardSkeleton key={index} />
-          ))}
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 rounded-md to-gray-100 dark:from-gray-950 dark:to-gray-900">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col items-center mb-10">
+            <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-full mb-4">
+              <FaHeart className="text-red-500 h-6 w-6" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center">
+              Your Favorite Mixes
+            </h1>
+            <p className="mt-2 text-gray-600 dark:text-gray-400 max-w-2xl text-center">
+              Your personal collection of mixtapes that you've loved and saved
+              for easy access
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: limit }).map((_, index) => (
+              <MixtapeCardSkeleton key={index} />
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gray-100 dark:bg-gray-900 min-h-screen">
-      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100 text-center flex items-center justify-center">
-        <FaHeart className="mr-2 text-red-500" /> Your Favorite Mixes
-      </h1>
-      {favorites.length === 0 ? (
-        <p className="text-gray-600 dark:text-gray-400 text-center bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          You haven&apos;t added any mixes to your favorites yet
-        </p>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {favorites.map((mix) => (
-              <MixtapeCard key={mix.id} mixtape={mix} />
-            ))}
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col items-center mb-10">
+          <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-full mb-4">
+            <FaHeart className="text-red-500 h-6 w-6" />
           </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center">
+            Your Favorite Mixes
+          </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400 max-w-2xl text-center">
+            Your personal collection of mixtapes that you've loved and saved for
+            easy access
+          </p>
+        </div>
 
-          {/* Infinite scroll loader */}
-          {(loadingMore || (hasMore && favorites.length > 0)) && (
-            <div
-              ref={ref}
-              className="col-span-full flex justify-center items-center py-8"
+        {favorites.length === 0 ? (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 max-w-md mx-auto text-center">
+            <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-full inline-block mb-4">
+              <FaHeart className="text-gray-400 dark:text-gray-500 h-8 w-8" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              No favorites yet
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              You haven&apos;t added any mixes to your favorites yet. Browse
+              mixtapes and click the heart icon to add them here.
+            </p>
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
             >
-              {loadingMore && (
-                <FaSpinner className="animate-spin text-blue-500 text-4xl" />
-              )}
+              Discover Mixtapes
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {favorites.map((mix) => (
+                <MixtapeCard key={mix.id} mixtape={mix} />
+              ))}
             </div>
-          )}
-          {!hasMore && favorites.length > 0 && (
-            <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
-              You&apos;ve reached the end of your favorites!
-            </div>
-          )}
-        </>
-      )}
+
+            {/* Infinite scroll loader */}
+            {(loadingMore || (hasMore && favorites.length > 0)) && (
+              <div
+                ref={ref}
+                className="flex justify-center items-center py-8 mt-6"
+              >
+                {loadingMore && (
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded-full shadow-lg">
+                    <FaSpinner className="animate-spin text-indigo-500 h-6 w-6" />
+                  </div>
+                )}
+              </div>
+            )}
+            {!hasMore && favorites.length > 0 && (
+              <div className="text-center py-8 mt-4 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-xl shadow-sm px-6 max-w-md mx-auto">
+                <p className="font-medium">
+                  You&apos;ve reached the end of your favorites!
+                </p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
