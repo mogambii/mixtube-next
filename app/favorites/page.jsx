@@ -148,8 +148,8 @@ export default function FavoritesPage() {
               Your Favorite Mixes
             </h1>
             <p className="mt-2 text-gray-600 dark:text-gray-400 max-w-2xl text-center">
-              Your personal collection of mixtapes that you've loved and saved
-              for easy access
+              Your personal collection of mixtapes that you&apos;ve loved and
+              saved for easy access
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -173,8 +173,8 @@ export default function FavoritesPage() {
             Your Favorite Mixes
           </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400 max-w-2xl text-center">
-            Your personal collection of mixtapes that you've loved and saved for
-            easy access
+            Your personal collection of mixtapes that you&apos;ve loved and
+            saved for easy access
           </p>
         </div>
 

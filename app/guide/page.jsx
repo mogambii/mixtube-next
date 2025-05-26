@@ -47,11 +47,12 @@ export default function GuidePage() {
                 How do I create an account?
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Creating an account is easy! Click on the "Sign Up" button in
-                the top right corner of the homepage. Fill in your details,
-                verify your email address, and you're ready to go. You can also
-                sign up using your Google or Facebook account for a quicker
-                registration process.
+                Creating an account is easy! Click on the{" "}
+                <code>&quot;Sign Up&quot;</code> button in the top right corner
+                of the homepage. Fill in your details, verify your email
+                address, and you&apos;re ready to go. You can also sign up using
+                your Google or Facebook account for a quicker registration
+                process.
               </p>
             </div>
 
@@ -60,11 +61,12 @@ export default function GuidePage() {
                 I forgot my password. How do I reset it?
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                If you've forgotten your password, click on the "Login" button,
-                then select "Forgot Password". Enter the email address
-                associated with your account, and we'll send you a password
-                reset link. The link is valid for 15 minutes. Follow the
-                instructions in the email to create a new password.
+                If you&apos;ve forgotten your password, click on the{" "}
+                <code>&quot;Login&quot;</code> button, then select{" "}
+                <code>&quot;Forgot Password&quot;</code>. Enter the email
+                address associated with your account, and we&apos;ll send you a
+                password reset link. The link is valid for 15 minutes. Follow
+                the instructions in the email to create a new password.
               </p>
             </div>
 
@@ -74,10 +76,10 @@ export default function GuidePage() {
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
                 To follow a DJ, navigate to their profile page by clicking on
-                their name or profile picture. On their profile page, you'll
-                find a "Follow" button. Click on it to start following them.
-                You'll receive notifications when they upload new mixtapes or
-                make updates to their profile.
+                their name or profile picture. On their profile page,
+                you&apos;ll find a <code>&quot;Follow&quot;</code> button. Click
+                on it to start following them. You&apos;ll receive notifications
+                when they upload new mixtapes or make updates to their profile.
               </p>
             </div>
 
@@ -90,7 +92,7 @@ export default function GuidePage() {
                 playing a mixtape, look for the download icon in the player
                 controls. Click on it to download the mixtape to your device.
                 Please note that some mixtapes may not be available for download
-                based on the DJ's preferences.
+                based on the DJ&apos;s preferences.
               </p>
             </div>
 
@@ -197,8 +199,8 @@ export default function GuidePage() {
                   Playback Issues
                 </h4>
                 <p className="text-gray-600 dark:text-gray-300">
-                  If you're experiencing playback issues, try refreshing the
-                  page, clearing your browser cache, or using a different
+                  If you&apos;re experiencing playback issues, try refreshing
+                  the page, clearing your browser cache, or using a different
                   browser. Make sure your internet connection is stable and that
                   you have the latest version of your browser.
                 </p>
@@ -210,8 +212,8 @@ export default function GuidePage() {
                 </h4>
                 <p className="text-gray-600 dark:text-gray-300">
                   For DJs experiencing upload issues, ensure your file is in a
-                  supported format (MP3, WAV) and doesn't exceed the 500MB size
-                  limit. Check your internet connection stability during
+                  supported format (MP3, WAV) and doesn&apos;t exceed the 500MB
+                  size limit. Check your internet connection stability during
                   uploads.
                 </p>
               </div>
@@ -221,9 +223,10 @@ export default function GuidePage() {
                   Account Access
                 </h4>
                 <p className="text-gray-600 dark:text-gray-300">
-                  If you can't access your account, try resetting your password.
-                  If you still have issues, contact our support team with your
-                  username and the email address associated with your account.
+                  If you can&apos;t access your account, try resetting your
+                  password. If you still have issues, contact our support team
+                  with your username and the email address associated with your
+                  account.
                 </p>
               </div>
             </div>
@@ -234,8 +237,8 @@ export default function GuidePage() {
               Contact Support
             </h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              Can't find what you're looking for? Our support team is here to
-              help!
+              Can&apos;t find what you&apos;re looking for? Our support team is
+              here to help!
             </p>
             <p className="text-gray-600 dark:text-gray-300 mb-2">
               Email:{" "}

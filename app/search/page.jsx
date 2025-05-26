@@ -230,7 +230,8 @@ const SearchPage = () => {
       {searchResults.length > 0 && (
         <div className="text-center text-gray-500 dark:text-gray-400 mt-8 bg-gray-50 dark:bg-gray-800/50 py-3 px-6 rounded-full inline-block mx-auto shadow-sm">
           Found {searchResults.length} result
-          {searchResults.length !== 1 ? "s" : ""} for "{inputValue}"
+          {searchResults.length !== 1 ? "s" : ""} for{" "}
+          <span className="font-semibold">&quot;{inputValue}&quot;</span>
         </div>
       )}
     </div>

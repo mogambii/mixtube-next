@@ -29,7 +29,7 @@ export default function SupportPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             <div className="absolute bottom-0 left-0 p-6">
               <h2 className="text-2xl font-bold text-white mb-2">
-                We're Here To Help
+                We&apos;re Here To Help
               </h2>
               <p className="text-white/80">Get assistance with any issues</p>
             </div>
@@ -167,8 +167,8 @@ export default function SupportPage() {
                 For Listeners
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                If you're experiencing issues with your listener account, please
-                include:
+                If you&apos;re experiencing issues with your listener account,
+                please include:
               </p>
               <ul className="text-gray-600 dark:text-gray-300 space-y-1">
                 <li>• Your username</li>
@@ -199,7 +199,7 @@ export default function SupportPage() {
                 For DJs
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                If you're experiencing issues with your DJ account, please
+                If you&apos;re experiencing issues with your DJ account, please
                 include:
               </p>
               <ul className="text-gray-600 dark:text-gray-300 space-y-1">
@@ -223,7 +223,7 @@ export default function SupportPage() {
                 Playback Issues
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                If you're having trouble playing mixtapes, try these steps:
+                If you&apos;re having trouble playing mixtapes, try these steps:
               </p>
               <ol className="text-gray-600 dark:text-gray-300 space-y-2 list-decimal pl-5">
                 <li>Refresh the page</li>
@@ -239,14 +239,14 @@ export default function SupportPage() {
                 Account Access
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                If you can't access your account:
+                If you can&apos;t access your account:
               </p>
               <ol className="text-gray-600 dark:text-gray-300 space-y-2 list-decimal pl-5">
                 <li>Try resetting your password</li>
-                <li>Check if you're using the correct email address</li>
+                <li>Check if you&apos;re using the correct email address</li>
                 <li>
-                  Make sure you're not using a social login if you created your
-                  account with email
+                  Make sure you&apos;re not using a social login if you created
+                  your account with email
                 </li>
                 <li>Clear your browser cookies</li>
                 <li>Contact support if issues persist</li>
@@ -258,12 +258,12 @@ export default function SupportPage() {
                 Upload Problems (For DJs)
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                If you're having trouble uploading mixtapes:
+                If you&apos;re having trouble uploading mixtapes:
               </p>
               <ol className="text-gray-600 dark:text-gray-300 space-y-2 list-decimal pl-5">
                 <li>Ensure your file is in a supported format (MP3, WAV)</li>
                 <li>
-                  Check that your file doesn't exceed the 500MB size limit
+                  Check that your file doesn&apos;t exceed the 500MB size limit
                 </li>
                 <li>Verify your internet connection is stable</li>
                 <li>Try a different browser</li>
@@ -286,15 +286,15 @@ export default function SupportPage() {
               If you need to reset your password:
             </p>
             <ol className="text-gray-600 dark:text-gray-300 space-y-2 list-decimal pl-5">
-              <li>Click on "Login" in the top navigation</li>
-              <li>Select "Forgot Password"</li>
+              <li>Click on &quot;Login&quot; in the top navigation</li>
+              <li>Select &quot;Forgot Password&quot;</li>
               <li>Enter the email address associated with your account</li>
               <li>Check your email for a reset link (valid for 15 minutes)</li>
               <li>Click the link and create a new password</li>
             </ol>
             <p className="text-gray-600 dark:text-gray-300 mt-4">
-              Note: If you don't receive the email, check your spam folder. If
-              you still don't see it, contact support.
+              Note: If you don&apos;t receive the email, check your spam folder.
+              If you still don&apos;t see it, contact support.
             </p>
           </div>
         </section>
