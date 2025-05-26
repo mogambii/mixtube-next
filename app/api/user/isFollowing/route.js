@@ -2,14 +2,13 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 export const dynamic = "force-dynamic";
 
-
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const username = searchParams.get("username").toLowerCase()
-    const djusername = searchParams.get("djusername").toLowerCase()
-    
-    if (!username || !djusername) {
+    const djusername = searchParams.get("djusername").toLowerCase();
+    const email = searchParams.get("email").toLowerCase();
+
+    if (!djusername || !email) {
       return NextResponse.json(
         { error: "Both username and djusername parameters are required" },
         { status: 400 }
@@ -18,8 +17,8 @@ export async function GET(request) {
 
     // Get both users
     const [follower, following] = await Promise.all([
-      prisma.user.findUnique({ where: { username } }),
-      prisma.user.findUnique({ where: { username: djusername } })
+      prisma.user.findUnique({ where: { email } }),
+      prisma.user.findUnique({ where: { username: djusername } }),
     ]);
 
     if (!follower || !following) {
@@ -37,10 +36,10 @@ export async function GET(request) {
       },
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       isFollowing: !!follow,
       follower: { id: follower.id, username: follower.username },
-      following: { id: following.id, username: following.username }
+      following: { id: following.id, username: following.username },
     });
   } catch (error) {
     console.error("Error checking follow status:", error);

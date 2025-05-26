@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import TopMixtapes from "./(components)/TopMixtapes";
 import NewMixtapes from "./(components)/NewMixtapes";
 import Link from "next/link";
+import { FaArrowRight } from "react-icons/fa";
 
 // Dynamically import MpNav and NavMenu for performance optimization
 const MpNav = dynamic(() => import("./(components)/MpNav"));
@@ -365,12 +366,10 @@ export default function Mainpage() {
                 <p className="text-gray-600 dark:text-gray-300 mb-3">
                   Create your DJ profile on our dedicated DJ portal. Upload mixtapes, track plays, and grow your audience.
                 </p>
-                <a href="https://dj.mixtube.xyz" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors inline-flex items-center">
+                <Link href="https://dj.mixtube.xyz" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors inline-flex items-center">
                   Visit DJ portal
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
+                  <FaArrowRight className="h-4 w-4 ml-1" />
+                </Link>
               </div>
             </div>
             

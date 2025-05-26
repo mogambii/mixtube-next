@@ -22,6 +22,18 @@ module.exports = {
       animation: {
         'subtle-float': 'subtle-float 30s ease-in-out infinite alternate',
       },
+      keyframes: {
+        'subtle-float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' },
+        },
+      },
+      animationDelay: {
+        '0': '0ms',
+        '300': '300ms',
+        '500': '500ms',
+        '700': '700ms',
+      },
       fontFamily: {
         orbitron: ['var(--font-orbitron)'],
         righteous: ['var(--font-righteous)']

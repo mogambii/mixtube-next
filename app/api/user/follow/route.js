@@ -9,7 +9,7 @@ export async function POST(request) {
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const { username, djusername } = await request.json();
+    const { email, djusername } = await request.json();
     const lowercase_username = await prisma.user
       .findUnique({ where: { email: session.user.email } })
       .then((user) => {
@@ -28,9 +28,9 @@ export async function POST(request) {
         }
         return user.username.toLowerCase();
       });
-    if (!username || !djusername) {
+    if (!email || !djusername) {
       return NextResponse.json(
-        { error: "Both username and djusername are required" },
+        { error: "Both email and djusername are required" },
         { status: 400 }
       );
     }
@@ -74,7 +74,7 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       follow,
-      message: `${username} is now following ${djusername}`,
+      message: `${email} is now following ${djusername}`,
     });
   } catch (error) {
     console.error("Follow error:", error);

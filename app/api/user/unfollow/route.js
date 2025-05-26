@@ -3,11 +3,10 @@ import prisma from "@/lib/prismadb";
 
 export async function POST(request) {
   try {
-    const { username, djusername } = await request.json();
-    console.log(username, djusername);
-    const lowercase_username = username.toLowerCase();
+    const { email, djusername } = await request.json();
+
     const lowercase_djusername = djusername.toLowerCase();
-    if (!username || !djusername) {
+    if (!email || !djusername) {
       return NextResponse.json(
         { error: "Both username and djusername are required" },
         { status: 400 }
@@ -16,7 +15,7 @@ export async function POST(request) {
 
     // Get both users
     const [follower, following] = await Promise.all([
-      prisma.user.findUnique({ where: { username: lowercase_username } }),
+      prisma.user.findUnique({ where: { email } }),
       prisma.user.findUnique({ where: { username: lowercase_djusername } }),
     ]);
 
@@ -44,7 +43,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: `${username} has unfollowed ${djusername}`,
+      message: `${email} has unfollowed ${djusername}`,
     });
   } catch (error) {
     console.error("Unfollow error:", error);

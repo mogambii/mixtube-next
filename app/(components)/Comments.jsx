@@ -5,6 +5,7 @@ import { FaSpinner, FaTrash } from "react-icons/fa";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 const CommentsPage = ({ comments: initialComments, unique }) => {
   const [commentsList, setCommentsList] = useState(initialComments || []);
@@ -118,9 +119,9 @@ const CommentsPage = ({ comments: initialComments, unique }) => {
         <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl text-center mb-8">
           <p className="text-gray-600 dark:text-gray-300">
             Please{" "}
-            <a href="/login" className="text-blue-600 hover:underline">
+            <Link href="/login" className="text-blue-600 hover:underline">
               login
-            </a>{" "}
+            </Link>{" "}
             to comment.
           </p>
         </div>

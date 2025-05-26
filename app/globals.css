@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Animation delay utilities */
+.animation-delay-0 {
+  animation-delay: 0ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animation-delay-500 {
+  animation-delay: 500ms;
+}
+
+.animation-delay-700 {
+  animation-delay: 700ms;
+}
+
 /* Custom animations for audio player and floating particles */
 @keyframes gradient-x {
   0% { background-position: 0% 50%; }

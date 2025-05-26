@@ -327,6 +327,11 @@ export default async function MixTape({ params }) {
                   {/* Play indicator on hover */}
 
                   {/* Play button overlay on hover */}
+                  <div className="absolute inset-0 z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div className="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center">
+                      <AudioAdd id={mix.unique} />
+                    </div>
+                  </div>
 
                   {/* Bottom info bar */}
                   <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent p-3 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
@@ -424,61 +429,6 @@ export default async function MixTape({ params }) {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* DJ Profile - Horizontal Layout */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mt-6 border border-gray-100 dark:border-gray-700">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <Link
-              href={`/dj/${mix.user.username}`}
-              className="group flex items-center gap-4"
-            >
-              <div className="relative">
-                <Image
-                  src={mix.user.profilep}
-                  alt={mix.djName}
-                  width={80}
-                  height={80}
-                  className="rounded-full border-2 border-gray-200 dark:border-gray-600 group-hover:border-indigo-500 transition-colors object-cover"
-                />
-                <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white dark:border-gray-800"></div>
-              </div>
-              <div>
-                <p className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                  {mix.djName}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  @{mix.user.username}
-                </p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
-                    DJ
-                  </span>
-                </div>
-              </div>
-            </Link>
-
-            <Link
-              href={`/dj/${mix.user.username}`}
-              className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium rounded-lg transition-colors text-sm flex items-center gap-2"
-            >
-              <span>View Profile</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </Link>
           </div>
         </div>
 
@@ -692,6 +642,60 @@ export default async function MixTape({ params }) {
                 "No description available for this mixtape."
               )}
             </p>
+          </div>
+        </div>
+        {/* DJ Profile - Horizontal Layout */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mt-6 border border-gray-100 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <Link
+              href={`/dj/${mix.user.username}`}
+              className="group flex items-center gap-4"
+            >
+              <div className="relative">
+                <Image
+                  src={mix.user.profilep}
+                  alt={mix.djName}
+                  width={80}
+                  height={80}
+                  className="rounded-full border-2 border-gray-200 dark:border-gray-600 group-hover:border-indigo-500 transition-colors object-cover"
+                />
+                <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white dark:border-gray-800"></div>
+              </div>
+              <div>
+                <p className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  {mix.djName}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  @{mix.user.username}
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
+                    DJ
+                  </span>
+                </div>
+              </div>
+            </Link>
+
+            <Link
+              href={`/dj/${mix.user.username}`}
+              className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium rounded-lg transition-colors text-sm flex items-center gap-2"
+            >
+              <span>View Profile</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
           </div>
         </div>
 

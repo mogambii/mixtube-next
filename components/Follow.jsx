@@ -22,7 +22,7 @@ const Follow = ({ username, following }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: session?.user?.name,
+          email: session?.user?.email,
           djusername,
         }),
       });
