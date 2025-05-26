@@ -1,11 +1,15 @@
 "use client";
-import { useState } from "react";
-import { FaSpinner } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaSpinner, FaUserPlus, FaUserCheck, FaBell } from "react-icons/fa";
+import { HiOutlineUserRemove } from "react-icons/hi";
 import { useSession } from "next-auth/react";
+import { toast } from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Follow = ({ username, following }) => {
   const [isFollowing, setIsFollowing] = useState(following);
   const [isFollowingLoading, setIsFollowingLoading] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   const { data: session } = useSession();
 
   // Don't render if user is viewing their own profile
@@ -41,11 +45,16 @@ const Follow = ({ username, following }) => {
 
   const handleFollowToggle = async () => {
     if (!session) {
-      // Redirect to login or show login modal
+      toast.error("Please sign in to follow DJs", {
+        position: "bottom-center",
+        duration: 3000,
+      });
       return;
     }
+    
     setIsFollowingLoading(true);
     const endpoint = isFollowing ? "unfollow" : "follow";
+    const actionText = isFollowing ? "unfollowed" : "followed";
 
     try {
       // Call the API to toggle follow/unfollow
@@ -53,34 +62,86 @@ const Follow = ({ username, following }) => {
 
       // Toggle the local state
       setIsFollowing((prev) => !prev);
+      
+      // Show success toast
+      toast.success(`You have ${actionText} ${username}`, {
+        position: "bottom-center",
+        icon: isFollowing ? "👋" : "🎉",
+        duration: 3000,
+      });
     } catch (error) {
-      alert("An error occurred while trying to follow/unfollow.");
+      toast.error(`Failed to ${endpoint} ${username}. Please try again.`, {
+        position: "bottom-center",
+        duration: 3000,
+      });
     } finally {
       setIsFollowingLoading(false);
     }
   };
 
   return (
-    <div>
-      <div className="flex justify-center w-full">
-        <button
+    <div className="relative">
+      <AnimatePresence>
+        <motion.button
           onClick={handleFollowToggle}
           disabled={isFollowingLoading}
-          className={`px-4 py-2 rounded-full text-sm font-semibold ${
-            isFollowing
-              ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              : "bg-blue-600 text-white hover:bg-blue-700"
-          } transition-colors duration-200`}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+          whileTap={{ scale: 0.95 }}
+          initial={{ opacity: 0.9 }}
+          animate={{ opacity: 1 }}
+          className={`
+            flex items-center justify-center gap-2 px-5 py-2.5 rounded-full 
+            font-medium text-sm shadow-sm transition-all duration-300 
+            ${isFollowing 
+              ? isHovering
+                ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
+              : "bg-indigo-600 text-white hover:bg-indigo-700 border border-indigo-600"}
+            ${isFollowingLoading ? "opacity-75 cursor-not-allowed" : "cursor-pointer"}
+          `}
         >
           {isFollowingLoading ? (
-            <FaSpinner className="animate-spin inline" />
+            <>
+              <FaSpinner className="animate-spin text-sm" />
+              <span>{isFollowing ? "Unfollowing..." : "Following..."}</span>
+            </>
           ) : isFollowing ? (
-            "Following"
+            <>
+              {isHovering ? (
+                <>
+                  <HiOutlineUserRemove className="text-red-500" />
+                  <span>Unfollow</span>
+                </>
+              ) : (
+                <>
+                  <FaUserCheck />
+                  <span>Following</span>
+                </>
+              )}
+            </>
           ) : (
-            "Follow"
+            <>
+              <FaUserPlus />
+              <span>Follow</span>
+            </>
           )}
-        </button>
-      </div>
+        </motion.button>
+      </AnimatePresence>
+      
+      {isFollowing && !isHovering && (
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 bg-white px-2 py-1 rounded-md shadow-sm border border-gray-100 whitespace-nowrap"
+        >
+          <div className="flex items-center gap-1">
+            <FaBell className="text-indigo-500" size={10} />
+            <span>You'll receive updates</span>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

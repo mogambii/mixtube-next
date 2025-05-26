@@ -50,7 +50,7 @@ export default function UserList({ email }) {
     if (isIntersecting) {
       fetchUsers();
     }
-  }, [isIntersecting]);
+  }, [isIntersecting, fetchUsers]);
 
   return (
     <div className="space-y-4">

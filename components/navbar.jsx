@@ -3,13 +3,13 @@ import Link from "next/link";
 import NotificationIcon from "./NotificationIcon";
 import { getServerSession } from "next-auth";
 import ProfileIcon from "./Profile";
-import ThemeToggle  from "./ThemeToggle";
+import ThemeToggle from "./ThemeToggle";
 
-async function  Navbar() {
+async function Navbar() {
   const session = await getServerSession();
 
   return (
-    <div className="flex justify-between items-center mb-6 p-4 bg-slate-100 dark:bg-gray-900 dark:text-slate-50 shadow-lg rounded">
+    <div className="flex mx-2 justify-between items-center p-2 bg-slate-100 dark:bg-gray-950 dark:text-slate-50 shadow-lg rounded-t-md">
       <div className="flex items-center gap-4">
         <Link href="/" className="flex items-center gap-3">
           <Image
@@ -44,7 +44,7 @@ async function  Navbar() {
             </Link>
           </>
         )}
-        <ThemeToggle/>
+        <ThemeToggle />
       </div>
     </div>
   );

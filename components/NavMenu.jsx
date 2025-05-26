@@ -12,7 +12,7 @@ const NavMenu = () => {
 
   // Close menu on pathname change
   useEffect(() => {
-    setOpen(false); // ✅ Closes menu when route changes
+    setOpen(false);
   }, [pathname]);
 
   // Close menu on outside click
@@ -64,10 +64,10 @@ const NavMenu = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`rounded-full px-4 py-2 font-medium text-sm transition-all duration-300 ease-in-out ${
+              className={`rounded-full px-4 py-2 font-medium text-sm transition-all duration-200 ease-out ${
                 active
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md hover:shadow-indigo-500/30"
-                  : "hover:bg-slate-200 dark:hover:bg-gray-800 ring-1 ring-slate-600 dark:ring-gray-500 dark:text-slate-200 hover:scale-105"
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg hover:shadow-indigo-500/40"
+                  : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 ring-1 ring-gray-300 dark:ring-gray-600 hover:shadow-md"
               }`}
               aria-current={active ? "page" : undefined}
             >
@@ -86,19 +86,18 @@ const NavMenu = () => {
         aria-label="Toggle navigation menu"
         aria-expanded={open}
         aria-controls="mobile-menu"
-        className="md:hidden rounded-full p-2 transition-all duration-200 ring-2 bg-white dark:bg-gray-900 hover:bg-slate-50 dark:hover:bg-gray-800 relative z-10 active:scale-95 active:bg-indigo-50 dark:active:bg-indigo-900/30 focus:outline-none"
-        style={{
-          boxShadow: open ? "0 0 0 2px rgba(79, 70, 229, 0.5)" : "none",
-          borderColor: open ? "#6366f1" : "#64748b",
-          transform: `scale(${open ? "0.98" : "1"})`,
-        }}
+        className={`md:hidden rounded-full p-2 transition-all duration-200 ${
+          open
+            ? "ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
+            : "ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+        } relative z-10 focus:outline-none focus:ring-2 focus:ring-indigo-500`}
       >
         <div className="relative w-5 h-5">
           <span
             className={`absolute top-1/2 left-0 block w-5 h-0.5 rounded-full transition-all duration-300 ${
               open
-                ? "bg-indigo-600 dark:bg-indigo-400 rotate-45"
-                : "bg-gray-600 dark:bg-gray-300 -translate-y-1"
+                ? "bg-indigo-600 dark:bg-indigo-400 rotate-45 translate-y-0"
+                : "bg-gray-600 dark:bg-gray-300 -translate-y-1.5"
             }`}
           />
           <span
@@ -111,8 +110,8 @@ const NavMenu = () => {
           <span
             className={`absolute top-1/2 left-0 block w-5 h-0.5 rounded-full transition-all duration-300 ${
               open
-                ? "bg-indigo-600 dark:bg-indigo-400 -rotate-45"
-                : "bg-gray-600 dark:bg-gray-300 translate-y-1"
+                ? "bg-indigo-600 dark:bg-indigo-400 -rotate-45 translate-y-0"
+                : "bg-gray-600 dark:bg-gray-300 translate-y-1.5"
             }`}
           />
         </div>
@@ -122,22 +121,21 @@ const NavMenu = () => {
       {open && (
         <div
           id="mobile-menu"
-          className="md:hidden absolute top-full right-0 mt-2 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 z-50"
-          style={{ animation: "fadeIn 0.2s ease-out" }}
+          className="md:hidden absolute top-full right-0 mt-2 w-56 rounded-lg shadow-xl bg-white dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700 z-50 animate-fade-in"
         >
-          <div className="py-2 px-1">
+          <div className="py-1 px-1">
             {menuItems.map((item) => {
               const active = isActive(item.href);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-4 py-2.5 my-1 text-sm rounded-lg transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-2.5 my-1 text-sm rounded-md transition-all duration-200 ${
                     active
-                      ? "bg-gradient-to-r from-indigo-600/90 to-purple-600/90 text-white font-medium"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium shadow-md"
+                      : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/80"
                   }`}
-                  onClick={() => setOpen(false)} // ✅ Ensures it closes when clicked
+                  onClick={() => setOpen(false)}
                   aria-current={active ? "page" : undefined}
                 >
                   <span className="flex items-center gap-2 w-full">
@@ -155,6 +153,23 @@ const NavMenu = () => {
           </div>
         </div>
       )}
+
+      {/* Add this to your global CSS for the fade-in animation */}
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-5px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.15s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 };

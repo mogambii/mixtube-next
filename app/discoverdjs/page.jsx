@@ -205,7 +205,7 @@ const DiscoverDjs = () => {
   // Initial fetch when component mounts
   useEffect(() => {
     fetchDjs(sortBy, activeFilter, 1, false);
-  }, [fetchDjs]);
+  }, [fetchDjs, sortBy, activeFilter]);
 
   // Use a ref to track if we're currently in the middle of loading more items
   const isLoadingRef = useRef(false);

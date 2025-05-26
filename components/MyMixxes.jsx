@@ -1,7 +1,7 @@
 "use client";
 
 import MixCard from "@/app/(components)/MixCard";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Bars } from "react-loader-spinner";
 import { useInView } from "react-intersection-observer";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -63,46 +63,49 @@ const MyMixxes = ({ username }) => {
     threshold: 0.1,
     rootMargin: "200px",
   });
-  const fetchMixes = async (page, isLoadMore = false) => {
-    if (isLoadMore) {
-      setLoadingMore(true);
-    } else {
-      setLoadingMixes(true);
-    }
-
-    try {
-      const mixResponse = await fetch(
-        `/api/mixes?username=${username}&page=${page}`
-      );
-
-      if (!mixResponse.ok) {
-        throw new Error(`Error: ${mixResponse.statusText}`);
-      }
-
-      const mixData = await mixResponse.json();
-      const newMixes = mixData.mixes || [];
-
+  const fetchMixes = useCallback(
+    async (page, isLoadMore = false) => {
       if (isLoadMore) {
-        // Append new mixes to existing ones
-        setMixes((prev) => [...prev, ...newMixes]);
+        setLoadingMore(true);
       } else {
-        // Replace mixes for initial load or filter change
-        setMixes(newMixes);
+        setLoadingMixes(true);
       }
 
-      setPageCount(mixData.pagination.totalPages);
-      setHasMore(mixData.pagination.hasNextPage);
-    } catch (error) {
-      console.error("Error fetching mixes:", error);
-      setHasMore(false);
-    } finally {
-      if (isLoadMore) {
-        setLoadingMore(false);
-      } else {
-        setLoadingMixes(false);
+      try {
+        const mixResponse = await fetch(
+          `/api/mixes?username=${username}&page=${page}`
+        );
+
+        if (!mixResponse.ok) {
+          throw new Error(`Error: ${mixResponse.statusText}`);
+        }
+
+        const mixData = await mixResponse.json();
+        const newMixes = mixData.mixes || [];
+
+        if (isLoadMore) {
+          // Append new mixes to existing ones
+          setMixes((prev) => [...prev, ...newMixes]);
+        } else {
+          // Replace mixes for initial load or filter change
+          setMixes(newMixes);
+        }
+
+        setPageCount(mixData.pagination.totalPages);
+        setHasMore(mixData.pagination.hasNextPage);
+      } catch (error) {
+        console.error("Error fetching mixes:", error);
+        setHasMore(false);
+      } finally {
+        if (isLoadMore) {
+          setLoadingMore(false);
+        } else {
+          setLoadingMixes(false);
+        }
       }
-    }
-  };
+    },
+    [username]
+  );
 
   // Initial load effect
   useEffect(() => {
@@ -111,7 +114,7 @@ const MyMixxes = ({ username }) => {
     setCurrentPage(1);
     setHasMore(true);
     fetchMixes(1, false);
-  }, [username]);
+  }, [username, fetchMixes]);
 
   // Infinite scroll effect
   useEffect(() => {
