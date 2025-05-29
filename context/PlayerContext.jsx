@@ -28,7 +28,7 @@ export function PlayerProvider({ children }) {
       //check if audio is compressed
 
       if (mixData.compressed) {
-        url = mixData.compressedurl;
+        url = mixData.compressedUrl;
       } else {
         url = mixData.audio;
       }
