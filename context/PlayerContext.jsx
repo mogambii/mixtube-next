@@ -24,7 +24,15 @@ export function PlayerProvider({ children }) {
       }
 
       const mixData = await response.json();
-      const filename = mixData.audio.split("/").pop();
+      let url;
+      //check if audio is compressed
+
+      if (mixData.compressed) {
+        url = mixData.compressedurl;
+      } else {
+        url = mixData.audio;
+      }
+      const filename = url.split("/").pop();
       setCurrentMix({
         id,
         audio: `https://files.mixtube.xyz/${encodeURIComponent(filename)}`,
@@ -51,7 +59,7 @@ export function PlayerProvider({ children }) {
         if (!response.ok) {
           throw new Error(`Failed to update plays: ${response.statusText}`);
         }
-        
+
         // Mark this track as played in this session
         playedTracks.current.add(id);
       }
