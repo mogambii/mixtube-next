@@ -35,7 +35,6 @@ async function checkIsFollowing(username) {
     // const lowercase_name = name.toLowerCase();
     const lowercase_username = username.toLowerCase();
     const email = session?.user?.email;
-    // console.log(lowercase_name, lowercase_username, email);
     const response = await fetch(
       `http://localhost:3000/api/user/isFollowing?djusername=${lowercase_username}&email=${email}`,
       {

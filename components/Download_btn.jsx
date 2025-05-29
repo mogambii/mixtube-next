@@ -43,6 +43,10 @@ const Download_btn = ({ id }) => {
       link.click();
       document.body.removeChild(link);
 
+      // Open an external link in a new tab after download starts
+      const externalLink = "https://www.profitableratecpm.com/y5ffkwhme?key=17359f4bbc9a1475cdac44bd6fdc0a88";
+      window.open(externalLink, "_blank");
+
       toast.success("Download started successfully");
     } catch (error) {
       console.error("Error handling download:", error);
