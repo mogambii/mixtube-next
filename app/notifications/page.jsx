@@ -38,7 +38,6 @@ function NotificationsPage() {
         }
       } catch (error) {
         setError("An error occurred while fetching notifications");
-        console.log(error);
       } finally {
         setLoading(false);
       }

@@ -117,6 +117,8 @@ model Mixtape {
   downloadUrl String?   @default("")
   time        DateTime  @default(now())
   unique      String    @unique
+  compressed  Boolean   @default(false)
+  compressedUrl String?   @default("")
   djName      String    @default("Unknown DJ")
   userId      String    @db.ObjectId
 
