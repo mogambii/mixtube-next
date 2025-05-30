@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
-import { startOfDay } from "date-fns";
+import { startOfDay, format } from "date-fns";
 
 export async function POST(req, { params }) {
   try {
@@ -26,27 +26,45 @@ export async function POST(req, { params }) {
 
     // Set today's date at start of day
     const today = startOfDay(new Date());
-
-    // Update or create daily stats
-    await prisma.stats.upsert({
-      where: {
-        mixtapeId_date: {
-          mixtapeId: mixtape.id,
-          date: today, // Date type, not string
-        },
-      },
-      update: {
-        downloads: {
-          increment: 1,
-        },
-      },
-      create: {
-        mixtapeId: mixtape.id,
-        date: today,
-        plays: 0,
-        downloads: 1,
-      },
-    });
+    const formattedDate = format(today, 'yyyy-MM-dd');
+    
+    try {
+      // Update or create daily stats using a transaction to ensure data consistency
+      await prisma.$transaction(async (tx) => {
+        // First check if stats for today exist
+        const existingStats = await tx.stats.findUnique({
+          where: {
+            mixtapeId_date: {
+              mixtapeId: mixtape.id,
+              date: today,
+            },
+          },
+        });
+        
+        if (existingStats) {
+          // Update existing stats
+          await tx.stats.update({
+            where: { id: existingStats.id },
+            data: { downloads: existingStats.downloads + 1 },
+          });
+        } else {
+          // Create new stats
+          await tx.stats.create({
+            data: {
+              mixtapeId: mixtape.id,
+              date: today,
+              plays: 0,
+              downloads: 1,
+            },
+          });
+        }
+      });
+      
+      console.log(`Download stats updated for mixtape ${mixtape.id} on ${formattedDate}`);
+    } catch (statsError) {
+      console.error(`Error updating stats for mixtape ${mixtape.id}:`, statsError);
+      // Continue execution - don't fail the download if stats update fails
+    }
 
     return NextResponse.json({
       message: "Download count updated successfully",

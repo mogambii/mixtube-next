@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
+import { startOfDay, format } from "date-fns";
 
 export async function POST(req) {
   try {
@@ -28,36 +29,46 @@ export async function POST(req) {
       data: { totalPlays: mixtape.totalPlays + 1 },
     });
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of day
-
-    // Update play count in stats
-    const existingStats = await prisma.stats.findFirst({
-      where: {
-        mixtapeId: mixtape.id,
-        date: {
-          gte: today,
-          lt: new Date(today.getTime() + 24 * 60 * 60 * 1000), // Next day
-        },
-      },
-    });
-
-    if (existingStats) {
-      await prisma.stats.update({
-        where: { id: existingStats.id },
-        data: {
-          plays: { increment: 1 },
-        },
+    // Set today's date at start of day
+    const today = startOfDay(new Date());
+    const formattedDate = format(today, 'yyyy-MM-dd');
+    
+    try {
+      // Update or create daily stats using a transaction to ensure data consistency
+      await prisma.$transaction(async (tx) => {
+        // First check if stats for today exist
+        const existingStats = await tx.stats.findUnique({
+          where: {
+            mixtapeId_date: {
+              mixtapeId: mixtape.id,
+              date: today,
+            },
+          },
+        });
+        
+        if (existingStats) {
+          // Update existing stats
+          await tx.stats.update({
+            where: { id: existingStats.id },
+            data: { plays: existingStats.plays + 1 },
+          });
+        } else {
+          // Create new stats
+          await tx.stats.create({
+            data: {
+              mixtapeId: mixtape.id,
+              date: today,
+              plays: 1,
+              downloads: 0,
+            },
+          });
+        }
       });
-    } else {
-      await prisma.stats.create({
-        data: {
-          mixtapeId: mixtape.id,
-          date: today,
-          plays: 1,
-          downloads: 0,
-        },
-      });
+      
+      console.log(`Play stats updated for mixtape ${mixtape.id} on ${formattedDate}`);
+    } catch (statsError) {
+      console.error(`Error updating stats for mixtape ${mixtape.id}:`, statsError);
+      // Continue execution - don't fail the play count if stats update fails
     }
 
     return NextResponse.json({ message: "Play count updated successfully" });
