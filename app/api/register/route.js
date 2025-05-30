@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prismadb";
-import { sendEmail } from "@/lib/email";
+import { sendEmailResend } from "@/lib/resend";
 
 export async function POST(request) {
   try {
@@ -47,10 +47,11 @@ export async function POST(request) {
       },
     });
 
-    await sendEmail({
-      to: email,
-      subject: "Welcome to MixTube!",
-      html: `
+    await sendEmailResend(
+      {
+        to: email,
+        subject: "Welcome to MixTube!",
+        html: `
         <!DOCTYPE html>
         <html>
           <head>
@@ -135,7 +136,9 @@ export async function POST(request) {
           </body>
         </html>
       `,
-    });
+      },
+      "register@mixtube.xyz"
+    );
 
     return NextResponse.json(user);
   } catch (error) {

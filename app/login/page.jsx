@@ -1,16 +1,17 @@
 import Login from "../../components/LoginForm";
 
 export const metadata = {
-  title: "Login - MixTube",
-  description: "Login to MixTube",
-  keywords: "login, mixtape, music, dj mix, dj, dj mixtape, dj mixtapes, dj mixtapes, dj mixtape, dj mixtapes",
+  title: "Sign In - MixTube",
+  description: "Sign in to your MixTube account and access your personalized music experience",
+  keywords: "login, sign in, mixtube, music streaming, dj mix, mixtape, music platform",
 }
-export default function Home() {
+
+export default function LoginPage() {
   return (
-    <>
-      <main className="">
-      <Login />
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
+      <main className="container mx-auto py-10 px-4">
+        <Login />
       </main>
-    </>
+    </div>
   );
 }

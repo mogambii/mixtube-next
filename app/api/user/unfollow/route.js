@@ -1,22 +1,37 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 export async function POST(request) {
   try {
-    const { email, djusername } = await request.json();
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { djusername } = await request.json();
+    const useremail = session.user.email;
 
-    const lowercase_djusername = djusername.toLowerCase();
-    if (!email || !djusername) {
+    const lowercase_djemail = await prisma.user
+      .findUnique({ where: { username: djusername } })
+      .then((user) => {
+        if (!user) {
+          console.error("User not found");
+          return null;
+        }
+        return user.email.toLowerCase();
+      });
+    if (!djusername) {
       return NextResponse.json(
-        { error: "Both username and djusername are required" },
+        { error: "djusername is required" },
         { status: 400 }
       );
     }
 
     // Get both users
     const [follower, following] = await Promise.all([
-      prisma.user.findUnique({ where: { email } }),
-      prisma.user.findUnique({ where: { username: lowercase_djusername } }),
+      prisma.user.findUnique({ where: { email: useremail } }),
+      prisma.user.findUnique({ where: { email: lowercase_djemail } }),
     ]);
 
     if (!follower || !following) {
@@ -43,7 +58,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: `${email} has unfollowed ${djusername}`,
+      message: `${follower.username} has unfollowed ${following.username}`,
     });
   } catch (error) {
     console.error("Unfollow error:", error);

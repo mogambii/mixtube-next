@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 import crypto from "crypto";
-import { sendEmail } from "@/lib/email";
+import { sendEmailResend } from "@/lib/resend";
 
 export async function POST(request) {
   try {
@@ -41,10 +41,11 @@ export async function POST(request) {
 
     // Send reset email
     const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`;
-    await sendEmail({
-      to: email,
-      subject: "Reset Your MixTube Password",
-      html: `
+    await sendEmailResend(
+      {
+        to: email,
+        subject: "Reset Your MixTube Password",
+        html: `
         <!DOCTYPE html>
         <html>
           <head>
@@ -111,7 +112,9 @@ export async function POST(request) {
           </body>
         </html>
       `,
-    });
+      },
+      "forgot-password@mixtube.xyz"
+    );
 
     return NextResponse.json({ message: "Password reset email sent" });
   } catch (error) {

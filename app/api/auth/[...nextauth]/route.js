@@ -4,7 +4,7 @@ import prisma from "@/lib/prismadb";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { sendEmail } from "@/lib/email";
+import { sendEmailResend } from "@/lib/resend";
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -57,7 +57,9 @@ export const authOptions = {
           }
 
           if (!user.password) {
-            throw new Error("This account uses Google sign-in. Please log in with Google.");
+            throw new Error(
+              "This account uses Google sign-in. Please log in with Google."
+            );
           }
 
           const isValidPassword = await bcrypt.compare(password, user.password);
@@ -109,10 +111,11 @@ export const authOptions = {
             });
 
             // Send welcome email for new Google sign-ups
-            await sendEmail({
-              to: profile.email,
-              subject: "Welcome to MixTube!",
-              html: `
+            await sendEmailResend(
+              {
+                to: profile.email,
+                subject: "Welcome to MixTube!",
+                html: `
                 <!DOCTYPE html>
                 <html>
                   <head>
@@ -189,7 +192,9 @@ export const authOptions = {
                   </body>
                 </html>
               `,
-            });
+              },
+              "welcome@mixtube.xyz"
+            );
           }
         } catch (error) {
           console.error("Error during Google sign in:", error);

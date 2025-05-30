@@ -31,12 +31,9 @@ async function fetchProfile(username) {
 async function checkIsFollowing(username) {
   try {
     const session = await getServerSession(authOptions);
-    const name = session?.user?.name;
-    // const lowercase_name = name.toLowerCase();
-    const lowercase_username = username.toLowerCase();
     const email = session?.user?.email;
     const response = await fetch(
-      `http://localhost:3000/api/user/isFollowing?djusername=${lowercase_username}&email=${email}`,
+      `http://localhost:3000/api/user/isFollowing?djusername=${username}&email=${email}`,
       {
         method: "GET",
         cache: "no-store",

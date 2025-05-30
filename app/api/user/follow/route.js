@@ -9,36 +9,36 @@ export async function POST(request) {
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const { email, djusername } = await request.json();
-    const lowercase_username = await prisma.user
+    const { djusername } = await request.json();
+    const lowercase_email = await prisma.user
       .findUnique({ where: { email: session.user.email } })
       .then((user) => {
         if (!user) {
           console.error("User not found");
           return null;
         }
-        return user.username.toLowerCase();
+        return user.email.toLowerCase();
       });
-    const lowercase_djusername = await prisma.user
+    const djemail = await prisma.user
       .findUnique({ where: { username: djusername } })
       .then((user) => {
         if (!user) {
           console.error("User not found");
           return null;
         }
-        return user.username.toLowerCase();
+        return user.email.toLowerCase();
       });
-    if (!email || !djusername) {
+    if (!djusername) {
       return NextResponse.json(
-        { error: "Both email and djusername are required" },
+        { error: "djusername is required" },
         { status: 400 }
       );
     }
 
     // Get both users
     const [follower, following] = await Promise.all([
-      prisma.user.findUnique({ where: { username: lowercase_username } }),
-      prisma.user.findUnique({ where: { username: lowercase_djusername } }),
+      prisma.user.findUnique({ where: { email: lowercase_email } }),
+      prisma.user.findUnique({ where: { email: djemail } }),
     ]);
 
     if (!follower || !following) {
@@ -74,7 +74,7 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       follow,
-      message: `${email} is now following ${djusername}`,
+      message: `${follower.username} is now following ${following.username}`,
     });
   } catch (error) {
     console.error("Follow error:", error);
