@@ -15,6 +15,12 @@ const Download_btn = ({ id }) => {
     }
 
     setIsDownloading(true);
+
+    // Open the popup BEFORE the async operation
+    const externalLink =
+      "https://www.profitableratecpm.com/y5ffkwhme?key=17359f4bbc9a1475cdac44bd6fdc0a88";
+    const popup = window.open(externalLink, "_blank");
+
     try {
       // Update the download count in the database
       const response = await fetch(`/api/mixtape/download/${id}`, {
@@ -26,6 +32,8 @@ const Download_btn = ({ id }) => {
 
       if (!response.ok) {
         const error = await response.json();
+        // Close the popup if there's an error
+        if (popup) popup.close();
         throw new Error(error.message || "Failed to update download count");
       }
 
@@ -37,15 +45,11 @@ const Download_btn = ({ id }) => {
       // Create a hidden anchor tag and force a download
       const link = document.createElement("a");
       link.href = downloadUrl;
-      link.download = `mixtape-${id}.mp3`; // Set a default filename
+      link.download = `mixtape-${id}.mp3`;
       link.style.display = "none";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      // Open an external link in a new tab after download starts
-      const externalLink = "https://www.profitableratecpm.com/y5ffkwhme?key=17359f4bbc9a1475cdac44bd6fdc0a88";
-      window.open(externalLink, "_blank");
 
       toast.success("Download started successfully");
     } catch (error) {
