@@ -263,7 +263,7 @@ function NotificationsPage() {
               No notifications yet
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              When you receive notifications about follows, likes, or comments, they'll appear here.
+              When you receive notifications about follows, likes, or comments, they&apos;l appear here.
             </p>
           </div>
         </div>

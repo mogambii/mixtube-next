@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { FaBell } from "react-icons/fa6";
 import { useSession } from "next-auth/react";
@@ -10,7 +10,7 @@ export default function NotificationIcon() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchUnreadCount = async () => {
+  const fetchUnreadCount = useCallback(async () => {
     if (!session) return;
     
     try {
@@ -25,7 +25,7 @@ export default function NotificationIcon() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session]);
 
   useEffect(() => {
     if (session) {
@@ -36,7 +36,7 @@ export default function NotificationIcon() {
     } else {
       setUnreadCount(0);
     }
-  }, [session]);
+  }, [session, fetchUnreadCount]);
 
   // Listen for custom events to update count (e.g., when user follows/likes)
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function NotificationIcon() {
 
     window.addEventListener('notification-update', handleNotificationUpdate);
     return () => window.removeEventListener('notification-update', handleNotificationUpdate);
-  }, [session]);
+  }, [fetchUnreadCount]);
 
   return (
     <div className="flex items-center gap-4">

@@ -294,7 +294,7 @@ const Signup = () => {
                   </div>
                   {usernameStatus.formattedUsername && usernameStatus.formattedUsername !== watchedUsername && (
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      (will be saved as "{usernameStatus.formattedUsername}")
+                      (will be saved as &quot;{usernameStatus.formattedUsername}&quot;)
                     </span>
                   )}
                 </div>

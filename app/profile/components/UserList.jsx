@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,7 +21,7 @@ export default function UserList({ email }) {
     threshold: 1,
   });
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     if (isLoading || !hasMore) return;
 
     setIsLoading(true);
@@ -44,7 +44,7 @@ export default function UserList({ email }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isLoading, hasMore, email, page]);
 
   useEffect(() => {
     if (isIntersecting) {
