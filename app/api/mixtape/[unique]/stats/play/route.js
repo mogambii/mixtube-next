@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
+import { checkAndCreateMilestoneNotification } from "@/lib/notifications";
 
 export async function POST(req, { params }) {
   try {
@@ -19,10 +20,17 @@ export async function POST(req, { params }) {
     }
 
     // Increment totalPlays
-    await prisma.mixtape.update({
+    const updatedMixtape = await prisma.mixtape.update({
       where: { id: mixtape.id },
       data: { totalPlays: mixtape.totalPlays + 1 },
     });
+
+    // Check for milestone notifications
+    await checkAndCreateMilestoneNotification(
+      mixtape.id, 
+      'plays', 
+      updatedMixtape.totalPlays
+    );
 
     // Get today's date, but set time to 00:00:00 to match the unique index on date
     const today = new Date();

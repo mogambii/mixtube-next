@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prismadb";
+import { createCommentNotification } from "@/lib/notifications";
 
 // Add a comment
 export async function POST(req, { params }) {
@@ -43,6 +44,9 @@ export async function POST(req, { params }) {
         }
       }
     });
+
+    // Create notification for the mixtape owner
+    await createCommentNotification(session.user.id, mixtape.id, content);
 
     return NextResponse.json(comment);
   } catch (error) {

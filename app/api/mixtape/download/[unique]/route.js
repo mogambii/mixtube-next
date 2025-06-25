@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 import { startOfDay, format } from "date-fns";
+import { checkAndCreateMilestoneNotification } from "@/lib/notifications";
 
 export async function POST(req, { params }) {
   try {
@@ -19,10 +20,17 @@ export async function POST(req, { params }) {
     }
 
     // Increment totalDownloads
-    await prisma.mixtape.update({
+    const updatedMixtape = await prisma.mixtape.update({
       where: { id: mixtape.id },
       data: { totalDownloads: mixtape.totalDownloads + 1 },
     });
+
+    // Check for milestone notifications
+    await checkAndCreateMilestoneNotification(
+      mixtape.id, 
+      'downloads', 
+      updatedMixtape.totalDownloads
+    );
 
     // Set today's date at start of day
     const today = startOfDay(new Date());

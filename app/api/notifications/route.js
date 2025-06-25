@@ -2,86 +2,101 @@ import prisma from "@/lib/prismadb";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getUnreadNotificationCount } from "@/lib/notifications";
 
 export async function GET(request) {
-  const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
-  const limit = 15;
-  const skip = (page - 1) * limit;
-
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-      });
-    }
-    const email = session?.user?.email;
-    const userId = await prisma.user
-      .findUnique({ where: { email } })
-      .then((user) => {
-        if (!user) {
-          console.error("User not found");
-          return null;
-        }
-        return user.id;
-      });
-
-    // Get notifications with valid senders
-    const notifications = await prisma.notification.findMany({
-      where: {
-        userId,
-      },
-      include: {
-        sender: {
-          select: {
-            username: true,
-            djName: true,
-            profilep: true,
-          },
-        },
-        mixtape: {
-          select: {
-            title: true,
-            unique: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: limit,
-      skip,
-    });
-    // console.log(notifications);
-    // Get total count of valid notifications
-    const totalCount = await prisma.notification.count({
-      where: {
-        userId,
-      },
-    });
-
-    // Mark fetched notifications as read
-    if (notifications.length > 0) {
-      await prisma.notification.updateMany({
-        where: {
-          id: { in: notifications.map((n) => n.id) },
-          read: false,
-        },
-        data: { read: true },
-      });
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    return new NextResponse(
-      JSON.stringify({
-        notifications,
-        totalPages: Math.ceil(totalCount / limit),
-        currentPage: page,
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page")) || 1;
+    const limit = parseInt(searchParams.get("limit")) || 20;
+    const unreadOnly = searchParams.get("unread") === "true";
+    const type = searchParams.get("type"); // Filter by notification type
+
+    // Get user ID
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const skip = (page - 1) * limit;
+
+    // Build where clause
+    const whereClause = {
+      userId: user.id,
+      ...(unreadOnly && { read: false }),
+      ...(type && { type }),
+    };
+
+    // Get notifications with sender and mixtape info
+    const [notifications, totalCount, unreadCount] = await Promise.all([
+      prisma.notification.findMany({
+        where: whereClause,
+        include: {
+          sender: {
+            select: {
+              username: true,
+              profilep: true,
+            },
+          },
+          mixtape: {
+            select: {
+              title: true,
+              unique: true,
+              imgthumb: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take: limit,
       }),
-      { status: 200 }
-    );
-  } catch (error) {
-    console.log(error);
-    return new NextResponse(JSON.stringify({ error: error.message }), {
-      status: 500,
+      prisma.notification.count({
+        where: whereClause,
+      }),
+      getUnreadNotificationCount(user.id),
+    ]);
+
+    // Format notifications for response
+    const formattedNotifications = notifications.map((notification) => ({
+      id: notification.id,
+      type: notification.type,
+      message: notification.message,
+      read: notification.read,
+      createdAt: notification.createdAt,
+      sender: notification.sender,
+      mixtape: notification.mixtape,
+    }));
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return NextResponse.json({
+      notifications: formattedNotifications,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+      unreadCount,
     });
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch notifications" },
+      { status: 500 }
+    );
   }
 }
 
@@ -122,33 +137,51 @@ export async function HEAD(request) {
   }
 }
 
-// Mark notification as read/unread
+// Mark notifications as read
 export async function PATCH(request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-      });
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = session.user.id;
-    const { id, read } = await request.json();
+    const { notificationIds } = await request.json();
 
-    const notification = await prisma.notification.update({
+    if (!notificationIds || !Array.isArray(notificationIds)) {
+      return NextResponse.json(
+        { error: "Notification IDs array is required" },
+        { status: 400 }
+      );
+    }
+
+    // Get user ID
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Mark notifications as read
+    await prisma.notification.updateMany({
       where: {
-        id,
-        userId,
+        id: { in: notificationIds },
+        userId: user.id,
       },
-      data: { read },
+      data: {
+        read: true,
+      },
     });
 
-    return new NextResponse(JSON.stringify(notification), { status: 200 });
+    return NextResponse.json({ message: "Notifications marked as read" });
   } catch (error) {
-    console.log(error);
-    return new NextResponse(JSON.stringify({ error: error.message }), {
-      status: 500,
-    });
+    console.error("Error marking notifications as read:", error);
+    return NextResponse.json(
+      { error: "Failed to mark notifications as read" },
+      { status: 500 }
+    );
   }
 }
 

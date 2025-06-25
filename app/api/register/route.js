@@ -15,10 +15,40 @@ export async function POST(request) {
       );
     }
 
+    // Format username: lowercase, no spaces, only allowed characters
+    const formattedUsername = username
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "") // Remove all spaces
+      .replace(/[^a-z0-9._]/g, ""); // Only allow lowercase letters, numbers, dots, and underscores
+
+    // Validate username format
+    if (formattedUsername.length < 3) {
+      return NextResponse.json(
+        { error: "Username must be at least 3 characters long" },
+        { status: 400 }
+      );
+    }
+
+    if (formattedUsername.length > 30) {
+      return NextResponse.json(
+        { error: "Username must be less than 30 characters" },
+        { status: 400 }
+      );
+    }
+
+    // Check if username starts with a letter or number
+    if (!/^[a-z0-9]/.test(formattedUsername)) {
+      return NextResponse.json(
+        { error: "Username must start with a letter or number" },
+        { status: 400 }
+      );
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [{ email: email }, { username: username }],
+        OR: [{ email: email }, { username: formattedUsername }],
       },
     });
 
@@ -41,110 +71,44 @@ export async function POST(request) {
     const user = await prisma.user.create({
       data: {
         email,
-        username,
+        username: formattedUsername,
         password: hashedPassword,
         type: "user",
       },
     });
 
-    await sendEmailResend(
-      {
-        to: email,
-        subject: "Welcome to MixTube!",
-        html: `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <style>
-              .email-container {
-                max-width: 600px;
-                margin: 0 auto;
-                font-family: Arial, sans-serif;
-                color: #333;
-                padding: 20px;
-              }
-              .header {
-                background-color: #4F46E5;
-                color: white;
-                padding: 20px;
-                text-align: center;
-                border-radius: 8px 8px 0 0;
-              }
-              .content {
-                background-color: #ffffff;
-                padding: 20px;
-                border: 1px solid #e5e7eb;
-                border-radius: 0 0 8px 8px;
-              }
-              .button {
-                display: inline-block;
-                background-color: #4F46E5;
-                color: white;
-                text-decoration: none;
-                padding: 12px 24px;
-                border-radius: 6px;
-                margin: 20px 0;
-              }
-              .footer {
-                text-align: center;
-                color: #6B7280;
-                font-size: 0.875rem;
-                margin-top: 20px;
-              }
-              .feature-list {
-                margin: 20px 0;
-                padding-left: 20px;
-              }
-              .feature-list li {
-                margin: 10px 0;
-                color: #4B5563;
-              }
-              .welcome-message {
-                font-size: 1.1rem;
-                color: #1F2937;
-                margin: 20px 0;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="email-container">
-              <div class="header">
-                <h1>Welcome to MixTube! 🎵</h1>
-              </div>
-              <div class="content">
-                <p>Hi ${username},</p>
-                <p class="welcome-message">Thank you for joining MixTube! We're thrilled to have you as part of our community.</p>
-                <p>Here's what you can do with your new account:</p>
-                <ul class="feature-list">
-                  <li>Create and customize your DJ profile</li>
-                  <li>Upload and share your favorite mixtapes</li>
-                  <li>Follow other DJs and music enthusiasts</li>
-                  <li>Build your own music community</li>
-                </ul>
-                <a href="${process.env.NEXTAUTH_URL}/login" class="button">Login to Your Account</a>
-                <p style="color: #6B7280; font-size: 0.875rem;">
-                  Ready to start your musical journey? Click the button above to begin!
-                </p>
-              </div>
-              <div class="footer">
-                <p>This email was sent by MixTube. Please do not reply to this email.</p>
-                <p style="font-size: 0.75rem; color: #9CA3AF;">
-                  You're receiving this email because you recently created a new MixTube account.
-                </p>
-              </div>
-            </div>
-          </body>
-        </html>
+    // Send welcome email
+    await sendEmailResend({
+      to: email,
+      subject: "Welcome to MixTube!",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #4f46e5;">Welcome to MixTube!</h1>
+          <p>Hi there!</p>
+          <p>Thank you for joining MixTube! We're excited to have you as part of our community.</p>
+          <p>Your account has been successfully created with the username: <strong>${formattedUsername}</strong></p>
+          <p>You can now:</p>
+          <ul>
+            <li>Discover amazing mixtapes from talented DJs</li>
+            <li>Create playlists of your favorite tracks</li>
+            <li>Follow your favorite artists</li>
+            <li>Share music with friends</li>
+          </ul>
+          <p>If you have any questions or need help getting started, feel free to reach out to our support team.</p>
+          <p>Happy listening!</p>
+          <p>The MixTube Team</p>
+        </div>
       `,
-      },
-      "register@mixtube.xyz"
-    );
+    });
 
-    return NextResponse.json(user);
-  } catch (error) {
-    console.error(error);
     return NextResponse.json(
-      { error: "Failed to create account. Please try again later." },
+      { message: "User created successfully", user: { id: user.id, email: user.email, username: user.username } },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Registration error:", error);
+    return NextResponse.json(
+      { error: "Failed to create account" },
       { status: 500 }
     );
   }

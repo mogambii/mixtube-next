@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { createLikeNotification } from "@/lib/notifications";
 
 // Add like
 export async function POST(req, { params }) {
@@ -64,6 +65,9 @@ export async function POST(req, { params }) {
         userId: userId,
       },
     });
+
+    // Create notification for the mixtape owner
+    await createLikeNotification(userId, mixtapeId);
 
     return NextResponse.json({ message: "Added to favorites" });
   } catch (error) {
