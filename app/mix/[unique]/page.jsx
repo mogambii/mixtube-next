@@ -298,7 +298,7 @@ export default async function MixTape({ params }) {
                 </div>
 
                 {/* Main cover art with effects */}
-                <div className="relative aspect-square rounded-lg overflow-hidden shadow-2xl ring-2 ring-black/10 dark:ring-white/10 transform transition-all duration-500 ease-out group-hover:shadow-indigo-500/30 group-hover:scale-[1.02] before:absolute before:inset-0 before:z-10 before:bg-gradient-to-br before:from-black/0 before:via-black/0 before:to-black/30 before:opacity-60 group-hover:before:opacity-80 before:transition-opacity">
+                <div className="relative aspect-square rounded-xl overflow-hidden shadow-2xl ring-4 ring-indigo-400/20 dark:ring-white/10 transform transition-all duration-500 ease-out group-hover:shadow-indigo-500/30 group-hover:scale-[1.02] before:absolute before:inset-0 before:z-10 before:bg-gradient-to-br before:from-black/0 before:via-black/0 before:to-black/30 before:opacity-60 group-hover:before:opacity-80 before:transition-opacity">
                   {/* Shine effect */}
                   <div
                     className="absolute inset-0 z-20 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out transform translate-x-full group-hover:translate-x-[-180%] pointer-events-none"
@@ -322,19 +322,17 @@ export default async function MixTape({ params }) {
                   />
 
                   {/* Overlay effects */}
-                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-80 transition-opacity duration-500"></div>
 
-                  {/* Play indicator on hover */}
-
-                  {/* Play button overlay on hover */}
-                  <div className="absolute inset-0 z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <div className="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center">
+                  {/* Play button always visible, centered */}
+                  <div className="absolute inset-0 z-20 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-indigo-600/90 shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-300 border-4 border-white/30">
                       <AudioAdd id={mix.unique} />
                     </div>
                   </div>
 
                   {/* Bottom info bar */}
-                  <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent p-3 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                  <div className="absolute bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-black/80 to-transparent p-3 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <div className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center">
