@@ -9,35 +9,35 @@ const MpNav = dynamic(() => import("./(components)/MpNav"));
 const NavMenu = dynamic(() => import("@/components/NavMenu"));
 
 export const metadata = {
-  title: "Stream & Download the Best DJ Mixtapes | MixTube Music",
+  title: "Stream & Download the Best DJ Mixtapes | MixTapped Music",
   description:
-    "Discover the top DJ mixtapes on MixTube. Stream, download, and share trending mixtapes. Explore new DJs, exclusive mixes, and your favorite music daily.",
+    "Discover the top DJ mixtapes on MixTapped. Stream, download, and share trending mixtapes. Explore new DJs, exclusive mixes, and your favorite music daily.",
   keywords:
-    "DJ mixtapes, free mixtape downloads, trending mixtapes, new DJ mixes, mixtape streaming, music downloads, share mixtapes, top mixtapes, MixTube music",
+    "DJ mixtapes, free mixtape downloads, trending mixtapes, new DJ mixes, mixtape streaming, music downloads, share mixtapes, top mixtapes, MixTapped music",
   openGraph: {
     type: "website",
-    url: "https://mixtube.xyz/",
-    title: "Stream & Download Trending DJ Mixtapes | MixTube",
+    url: "https://mixtapped.com/",
+    title: "Stream & Download Trending DJ Mixtapes | MixTapped",
     description:
-      "Get the latest DJ mixtapes on MixTube. Stream music, download exclusive mixes, and discover trending DJs. Share and enjoy top mixtapes daily.",
+      "Get the latest DJ mixtapes on MixTapped. Stream music, download exclusive mixes, and discover trending DJs. Share and enjoy top mixtapes daily.",
     images: [
       {
-        url: "https://mixtube.xyz/og.jpg",
+        url: "https://mixtapped.com/og.jpg",
         width: 800,
         height: 600,
-        alt: "MixTube - Discover and stream the best DJ mixtapes",
+        alt: "MixTapped - Discover and stream the best DJ mixtapes",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Stream & Download Top DJ Mixtapes | MixTube",
+    title: "Stream & Download Top DJ Mixtapes | MixTapped",
     description:
-      "Find trending DJ mixtapes on MixTube. Stream, download, and share your favorite mixes anytime. Explore exclusive music and new DJs daily.",
-    images: ["https://mixtube.xyz/og.jpg"],
+      "Find trending DJ mixtapes on MixTapped. Stream, download, and share your favorite mixes anytime. Explore exclusive music and new DJs daily.",
+    images: ["https://mixtapped.com/og.jpg"],
   },
   alternates: {
-    canonical: "https://mixtube.xyz/",
+    canonical: "https://mixtapped.com/",
   },
 };
 
@@ -155,7 +155,7 @@ export default function Mainpage() {
                   <span>Search Mixtapes</span>
                 </Link>
                 <a
-                  href="https://dj.mixtube.xyz"
+                  href="https://dj.mixtapped.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group px-6 py-3 bg-purple-600/90 hover:bg-purple-700 text-white rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
@@ -415,7 +415,7 @@ export default function Mainpage() {
                 </p>
                 <div className="flex justify-center mt-auto">
                   <a
-                    href="https://dj.mixtube.xyz"
+                    href="https://dj.mixtapped.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group inline-flex items-center px-5 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
@@ -446,10 +446,10 @@ export default function Mainpage() {
         <section className="mb-10 bg-white dark:bg-gray-800/90 rounded-xl p-8 shadow-md border border-slate-100 dark:border-gray-700">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              How MixTube Works
+              How MixTapped Works
             </h2>
             <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              MixTube connects music fans with talented DJs from around the
+              MixTapped connects music fans with talented DJs from around the
               world through our dedicated platform.
             </p>
           </div>
@@ -503,7 +503,7 @@ export default function Mainpage() {
                   mixtapes, track plays, and grow your audience.
                 </p>
                 <Link
-                  href="https://dj.mixtube.xyz"
+                  href="https://dj.mixtapped.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors inline-flex items-center"

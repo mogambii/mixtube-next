@@ -3,9 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata = {
-  title: "MixTube Guide & Support | Help Center",
+  title: "MixTapped Guide & Support | Help Center",
   description:
-    "Find answers to common questions, learn how to use MixTube, and get support for any issues you may encounter.",
+    "Find answers to common questions, learn how to use MixTapped, and get support for any issues you may encounter.",
 };
 
 export default function GuidePage() {
@@ -20,7 +20,7 @@ export default function GuidePage() {
           <div className="relative w-full h-64 md:h-80 mb-8 rounded-xl overflow-hidden">
             <Image
               src="/images/support-hero.jpg"
-              alt="MixTube Support"
+              alt="MixTapped Support"
               fill
               style={{ objectFit: "cover" }}
               className="rounded-xl"
@@ -98,17 +98,17 @@ export default function GuidePage() {
 
             <div className="bg-white dark:bg-gray-800/50 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
-                How do I become a DJ on MixTube?
+                How do I become a DJ on MixTapped?
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                To become a DJ on MixTube, visit our DJ Portal at{" "}
+                To become a DJ on MixTapped, visit our DJ Portal at{" "}
                 <Link
-                  href="https://dj.mixtube.xyz"
+                  href="https://dj.mixtapped.com"
                   className="text-indigo-600 dark:text-indigo-400 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  dj.mixtube.xyz
+                  dj.mixtapped.com
                 </Link>
                 . Create a DJ account, complete your profile with your bio,
                 social media links, and profile picture. Once approved, you can
@@ -243,10 +243,10 @@ export default function GuidePage() {
             <p className="text-gray-600 dark:text-gray-300 mb-2">
               Email:{" "}
               <a
-                href="mailto:support@mixtube.xyz"
+                href="mailto:support@mixtapped.com"
                 className="text-indigo-600 dark:text-indigo-400 hover:underline"
               >
-                support@mixtube.xyz
+                support@mixtapped.com
               </a>
             </p>
             <p className="text-gray-600 dark:text-gray-300">

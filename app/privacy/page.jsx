@@ -2,9 +2,9 @@ import React from "react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Privacy Policy | MixTube",
+  title: "Privacy Policy | MixTapped",
   description:
-    "Learn how MixTube collects, uses, and protects your personal information and data.",
+    "Learn how MixTapped collects, uses, and protects your personal information and data.",
 };
 
 export default function PrivacyPage() {
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
           1. Introduction
         </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
-          MixTube (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is
+          MixTapped (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is
           committed to protecting your privacy. This Privacy Policy explains how
           we collect, use, disclose, and safeguard your information when you
           visit our website and use our services. Please read this privacy
@@ -115,7 +115,7 @@ export default function PrivacyPage() {
           <li>
             If we believe your actions are inconsistent with our user agreements
             or policies, or to protect the rights, property, and safety of
-            MixTube or others
+            MixTapped or others
           </li>
           <li>
             In connection with, or during negotiations of, any merger, sale of
@@ -163,7 +163,7 @@ export default function PrivacyPage() {
         </ul>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
           To exercise any of these rights, please contact us at
-          privacy@mixtube.xyz.
+          privacy@mixtapped.com.
         </p>
 
         <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mt-8 mb-4">
@@ -182,7 +182,7 @@ export default function PrivacyPage() {
         </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
           If you have any questions about this privacy policy, please contact us
-          at privacy@mixtube.xyz.
+          at privacy@mixtapped.com.
         </p>
       </div>
 

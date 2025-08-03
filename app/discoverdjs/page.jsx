@@ -75,7 +75,7 @@ const ProfileCardSkeleton = () => (
 
 const DiscoverDjs = () => {
   if (typeof window !== "undefined") {
-    document.title = "MixTube - Discover DJs";
+    document.title = "MixTapped - Discover DJs";
   }
 
   // State for modal

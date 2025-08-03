@@ -5,7 +5,7 @@ import { BiShare } from "react-icons/bi";
 
 const Share = ({ id }) => {
   const [show, setShow] = useState(false);
-  
+
   return (
     <div>
       <button
@@ -19,7 +19,7 @@ const Share = ({ id }) => {
         <ShareModal
           show={show}
           onClose={() => setShow(false)}
-          url={`https://mixtube.xyz/mix/${id}`}
+          url={`https://mixtapped.com/mix/${id}`}
         />
       )}
     </div>

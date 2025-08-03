@@ -60,10 +60,12 @@ const Signup = () => {
         return;
       }
 
-      setUsernameStatus(prev => ({ ...prev, checking: true }));
+      setUsernameStatus((prev) => ({ ...prev, checking: true }));
 
       try {
-        const response = await fetch(`/api/check-username?username=${encodeURIComponent(username)}`);
+        const response = await fetch(
+          `/api/check-username?username=${encodeURIComponent(username)}`
+        );
         const data = await response.json();
 
         if (response.ok) {
@@ -174,7 +176,7 @@ const Signup = () => {
             <FaMusic className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-3">
-            Join MixTube
+            Join MixTapped
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
             Discover and share amazing music mixes with the world
@@ -197,7 +199,7 @@ const Signup = () => {
               Want to upload and share your mixes with the community?
             </p>
             <Link
-              href="https://dj.mixtube.xyz"
+              href="https://dj.mixtapped.com"
               className="inline-flex items-center justify-center font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-300 dark:hover:text-indigo-200 underline transition-colors text-sm"
             >
               Sign up as a DJ here <FaArrowRight className="ml-2 h-3 w-3" />
@@ -246,19 +248,35 @@ const Signup = () => {
                     usernameStatus.available === true
                       ? "border-green-300 dark:border-green-600 focus:ring-green-500 dark:focus:ring-green-400"
                       : usernameStatus.available === false
-                      ? "border-red-300 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-400"
-                      : "border-gray-200 dark:border-gray-600"
+                        ? "border-red-300 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-400"
+                        : "border-gray-200 dark:border-gray-600"
                   }`}
                   placeholder="Choose your username"
                 />
                 <FaUser className="absolute left-4 top-4 text-gray-400 dark:text-gray-500 text-sm" />
-                
+
                 {/* Status indicator icon */}
                 <div className="absolute right-4 top-4">
                   {usernameStatus.checking && (
-                    <svg className="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin h-5 w-5 text-blue-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                   )}
                   {usernameStatus.available === true && (
@@ -269,21 +287,27 @@ const Signup = () => {
                   )}
                 </div>
               </div>
-              
+
               {/* Status message */}
               {usernameStatus.checking && (
                 <div className="mt-3 flex items-center space-x-2">
                   <div className="flex space-x-1">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.1s" }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.2s" }}
+                    ></div>
                   </div>
                   <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
                     Checking availability...
                   </span>
                 </div>
               )}
-              
+
               {usernameStatus.available === true && (
                 <div className="mt-3 flex items-center space-x-2">
                   <div className="flex items-center space-x-1">
@@ -292,14 +316,16 @@ const Signup = () => {
                       Username available
                     </span>
                   </div>
-                  {usernameStatus.formattedUsername && usernameStatus.formattedUsername !== watchedUsername && (
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      (will be saved as &quot;{usernameStatus.formattedUsername}&quot;)
-                    </span>
-                  )}
+                  {usernameStatus.formattedUsername &&
+                    usernameStatus.formattedUsername !== watchedUsername && (
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        (will be saved as &quot;
+                        {usernameStatus.formattedUsername}&quot;)
+                      </span>
+                    )}
                 </div>
               )}
-              
+
               {usernameStatus.available === false && (
                 <div className="mt-3 flex items-center space-x-2">
                   <div className="flex items-center space-x-1">
@@ -310,17 +336,18 @@ const Signup = () => {
                   </div>
                 </div>
               )}
-              
+
               {errors.username && (
                 <p className="mt-2 text-xs text-red-500 dark:text-red-400 flex items-center">
                   <FaExclamationCircle className="mr-1" />
                   {errors.username.message}
                 </p>
               )}
-              
+
               <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-3 border-blue-200 dark:border-blue-800">
                 <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
-                  💡 Username will be converted to lowercase with no spaces. Only letters, numbers, dots, and underscores are allowed.
+                  💡 Username will be converted to lowercase with no spaces.
+                  Only letters, numbers, dots, and underscores are allowed.
                 </p>
               </div>
             </div>
@@ -471,11 +498,17 @@ const Signup = () => {
         <div className="text-center mt-8">
           <p className="text-xs text-gray-500 dark:text-gray-400">
             By creating an account, you agree to our{" "}
-            <Link href="/terms" className="underline hover:text-gray-700 dark:hover:text-gray-300">
+            <Link
+              href="/terms"
+              className="underline hover:text-gray-700 dark:hover:text-gray-300"
+            >
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="underline hover:text-gray-700 dark:hover:text-gray-300">
+            <Link
+              href="/privacy"
+              className="underline hover:text-gray-700 dark:hover:text-gray-300"
+            >
               Privacy Policy
             </Link>
           </p>

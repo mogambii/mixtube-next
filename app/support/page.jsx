@@ -3,9 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata = {
-  title: "MixTube Support | Get Help",
+  title: "MixTapped Support | Get Help",
   description:
-    "Get support for MixTube. Contact our team, troubleshoot common issues, and find answers to your questions.",
+    "Get support for MixTapped. Contact our team, troubleshoot common issues, and find answers to your questions.",
 };
 
 export default function SupportPage() {
@@ -20,7 +20,7 @@ export default function SupportPage() {
           <div className="relative w-full h-96 md:h-[600px] mb-8 rounded-xl overflow-hidden">
             <Image
               src="/images/support-hero.jpg"
-              alt="MixTube Support"
+              alt="MixTapped Support"
               fill
               style={{ objectFit: "cover" }}
               className="rounded-xl"
@@ -52,10 +52,10 @@ export default function SupportPage() {
             <p className="text-gray-600 dark:text-gray-300 mb-2">
               Email:{" "}
               <a
-                href="mailto:support@mixtube.xyz"
+                href="mailto:support@mixtapped.com"
                 className="text-indigo-600 dark:text-indigo-400 hover:underline"
               >
-                support@mixtube.xyz
+                support@mixtapped.com
               </a>
             </p>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
@@ -67,7 +67,7 @@ export default function SupportPage() {
             </h4>
             <div className="flex space-x-4">
               <a
-                href="https://twitter.com/mixtubexyz"
+                href="https://twitter.com/mixtappedxyz"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
@@ -83,7 +83,7 @@ export default function SupportPage() {
                 </svg>
               </a>
               <a
-                href="https://instagram.com/mixtubexyz"
+                href="https://instagram.com/mixtappedxyz"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
@@ -103,7 +103,7 @@ export default function SupportPage() {
                 </svg>
               </a>
               <a
-                href="https://facebook.com/mixtubexyz"
+                href="https://facebook.com/mixtappedxyz"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
@@ -123,7 +123,7 @@ export default function SupportPage() {
                 </svg>
               </a>
               <a
-                href="https://youtube.com/mixtubexyz"
+                href="https://youtube.com/mixtappedxyz"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
@@ -314,7 +314,7 @@ export default function SupportPage() {
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
                 Comprehensive guides for both listeners and DJs on how to use
-                MixTube effectively.
+                MixTapped effectively.
               </p>
             </Link>
 
@@ -323,10 +323,10 @@ export default function SupportPage() {
               className="bg-white dark:bg-gray-800/50 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
             >
               <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
-                About MixTube
+                About MixTapped
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Learn more about MixTube, our mission, and the team behind the
+                Learn more about MixTapped, our mission, and the team behind the
                 platform.
               </p>
             </Link>

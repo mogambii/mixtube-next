@@ -1,10 +1,12 @@
 import Login from "../../components/LoginForm";
 
 export const metadata = {
-  title: "Sign In - MixTube",
-  description: "Sign in to your MixTube account and access your personalized music experience",
-  keywords: "login, sign in, mixtube, music streaming, dj mix, mixtape, music platform",
-}
+  title: "Sign In - MixTapped",
+  description:
+    "Sign in to your MixTapped account and access your personalized music experience",
+  keywords:
+    "login, sign in, mixtapped, music streaming, dj mix, mixtape, music platform",
+};
 
 export default function LoginPage() {
   return (

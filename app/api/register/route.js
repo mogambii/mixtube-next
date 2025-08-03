@@ -80,12 +80,12 @@ export async function POST(request) {
     // Send welcome email
     await sendEmailResend({
       to: email,
-      subject: "Welcome to MixTube!",
+      subject: "Welcome to MixTapped!",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #4f46e5;">Welcome to MixTube!</h1>
+          <h1 style="color: #4f46e5;">Welcome to MixTapped!</h1>
           <p>Hi there!</p>
-          <p>Thank you for joining MixTube! We're excited to have you as part of our community.</p>
+          <p>Thank you for joining MixTapped! We're excited to have you as part of our community.</p>
           <p>Your account has been successfully created with the username: <strong>${formattedUsername}</strong></p>
           <p>You can now:</p>
           <ul>
@@ -96,13 +96,16 @@ export async function POST(request) {
           </ul>
           <p>If you have any questions or need help getting started, feel free to reach out to our support team.</p>
           <p>Happy listening!</p>
-          <p>The MixTube Team</p>
+          <p>The MixTapped Team</p>
         </div>
       `,
     });
 
     return NextResponse.json(
-      { message: "User created successfully", user: { id: user.id, email: user.email, username: user.username } },
+      {
+        message: "User created successfully",
+        user: { id: user.id, email: user.email, username: user.username },
+      },
       { status: 201 }
     );
   } catch (error) {

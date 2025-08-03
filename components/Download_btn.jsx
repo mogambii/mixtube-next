@@ -38,7 +38,7 @@ const Download_btn = ({ id }) => {
       }
 
       // Construct download URL with proper encoding
-      const downloadUrl = `https://storage.mixtube.xyz/download/${encodeURIComponent(
+      const downloadUrl = `https://storage.mixtapped.com/download/${encodeURIComponent(
         id
       )}`;
 

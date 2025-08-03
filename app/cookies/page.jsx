@@ -2,9 +2,9 @@ import React from "react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Cookie Policy | MixTube",
+  title: "Cookie Policy | MixTapped",
   description:
-    "Information about how MixTube uses cookies and similar technologies to enhance your browsing experience.",
+    "Information about how MixTapped uses cookies and similar technologies to enhance your browsing experience.",
 };
 
 export default function CookiePolicyPage() {
@@ -23,10 +23,10 @@ export default function CookiePolicyPage() {
           1. Introduction
         </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
-          MixTube uses cookies and similar technologies to enhance your browsing
-          experience, analyze site traffic, personalize content, and serve
-          targeted advertisements. This Cookie Policy explains how we use these
-          technologies and the choices you have regarding their use.
+          MixTapped uses cookies and similar technologies to enhance your
+          browsing experience, analyze site traffic, personalize content, and
+          serve targeted advertisements. This Cookie Policy explains how we use
+          these technologies and the choices you have regarding their use.
         </p>
 
         <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mt-8 mb-4">
@@ -79,7 +79,7 @@ export default function CookiePolicyPage() {
           4. Specific Cookies We Use
         </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
-          Here are some of the key cookies we use on MixTube:
+          Here are some of the key cookies we use on MixTapped:
         </p>
         <table className="min-w-full border border-gray-300 dark:border-gray-700 mb-6">
           <thead>
@@ -214,7 +214,7 @@ export default function CookiePolicyPage() {
         </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
           If you have any questions about our Cookie Policy, please contact us
-          at privacy@mixtube.xyz.
+          at privacy@mixtapped.com.
         </p>
       </div>
 

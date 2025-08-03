@@ -193,7 +193,7 @@ export default async function ProfilePage() {
 
               {isDJ && (
                 <Link
-                  href="https://dj.mixtube.xyz"
+                  href="https://dj.mixtapped.com"
                   target="_blank"
                   className="w-full md:w-auto"
                 >

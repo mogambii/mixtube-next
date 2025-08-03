@@ -44,7 +44,7 @@ export async function POST(request) {
     await sendEmailResend(
       {
         to: email,
-        subject: "Reset Your MixTube Password",
+        subject: "Reset Your MixTapped Password",
         html: `
         <!DOCTYPE html>
         <html>
@@ -94,7 +94,7 @@ export async function POST(request) {
               </div>
               <div class="content">
                 <p>Hello,</p>
-                <p>We received a request to reset your MixTube password. If you didn't make this request, you can safely ignore this email.</p>
+                <p>We received a request to reset your MixTapped password. If you didn't make this request, you can safely ignore this email.</p>
                 <p>To reset your password, click the button below:</p>
                 <a href="${resetUrl}" class="button">Reset My Password</a>
                 <p style="color: #6B7280; font-size: 0.875rem;">
@@ -106,14 +106,14 @@ export async function POST(request) {
                 </p>
               </div>
               <div class="footer">
-                <p>This email was sent by MixTube. Please do not reply to this email.</p>
+                <p>This email was sent by MixTapped. Please do not reply to this email.</p>
               </div>
             </div>
           </body>
         </html>
       `,
       },
-      "forgot-password@mixtube.xyz"
+      "forgot-password@mixtapped.com"
     );
 
     return NextResponse.json({ message: "Password reset email sent" });

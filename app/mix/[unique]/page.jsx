@@ -62,7 +62,7 @@ export async function generateMetadata({ params }) {
   return {
     title: mix ? `${mix.title} | Mixtube` : "Mixtape Not Found",
     description:
-      `${mix?.desc} mix on mixtube | stream, play and download| by  ${
+      `${mix?.desc} mix on mixtapped | stream, play and download| by  ${
         mix?.djName || mix?.name
       }` || `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtube.`,
     keywords: [
@@ -98,7 +98,7 @@ export async function generateMetadata({ params }) {
       images: [imageUrl],
     },
     alternates: {
-      canonical: `https://mixtube.com/mixtape/${unique}`,
+      canonical: `https://mixtapped.com/mixtape/${unique}`,
     },
   };
 }
@@ -191,7 +191,7 @@ export default async function MixTape({ params }) {
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "MusicAlbum",
-          "@id": `https://mixtube.com/mixtape/${unique}`,
+          "@id": `https://mixtapped.com/mixtape/${unique}`,
           name: mix.title,
           description: mix.desc,
           byArtist: {

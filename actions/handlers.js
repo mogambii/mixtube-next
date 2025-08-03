@@ -1,26 +1,22 @@
-"use server"
+"use server";
 import { cookies } from "next/headers";
 export async function handleLogin(data) {
   try {
-    const response = await fetch(
-      "https://api.mixtube.xyz/api/user/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    );
+    const response = await fetch("https://api.mixtapped.com/api/user/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
     const result = await response.json();
     if (response.ok) {
-
-      cookies().set("mixtube-token", result.token);
+      cookies().set("mixtapped-token", result.token);
 
       // Fetch user profile after login
       const profileResponse = await fetch(
-        "https://api.mixtube.xyz/api/user/profile",
+        "https://api.mixtapped.com/api/user/profile",
         {
           headers: {
             Authorization: `Bearer ${result.token}`,
@@ -29,11 +25,11 @@ export async function handleLogin(data) {
       );
 
       const profile = await profileResponse.json();
-      cookies().set("mixtube-tokenname", profile.username);
+      cookies().set("mixtapped-tokenname", profile.username);
       if (profile.Djname) {
-        cookies().set("mixtube-Djname", profile.Djname);
+        cookies().set("mixtapped-Djname", profile.Djname);
       }
-      cookies().set("mixtube-type", profile.type);
+      cookies().set("mixtapped-type", profile.type);
 
       // Return successful login data
       return {
@@ -58,44 +54,39 @@ export async function handleLogin(data) {
 
 export async function LogOut() {
   try {
-    cookies().delete("mixtube-username")
-    await cookies().delete("mixtube-tokenname")
-    await cookies().delete("mixtube-Djname")
-    await cookies().delete("mixtube-type")
-   cookies().delete("mixtube-token")
+    cookies().delete("mixtapped-username");
+    await cookies().delete("mixtapped-tokenname");
+    await cookies().delete("mixtapped-Djname");
+    await cookies().delete("mixtapped-type");
+    cookies().delete("mixtapped-token");
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-  
 }
 
-
 export async function handleCommentSubmit(data) {
-  const token = cookies().get("mixtube-token")?.value
+  const token = cookies().get("mixtapped-token")?.value;
   try {
-    const response = await fetch(
-      `https://api.mixtube.xyz/api/comment`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      }
-    );
+    const response = await fetch(`https://api.mixtapped.com/api/comment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
     const res = await response.json();
     return res;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 
 export async function handleFollowToggle(data) {
-  const token = cookies().get("mixtube-token")?.value
+  const token = cookies().get("mixtapped-token")?.value;
   try {
     const response = await fetch(
-      `https://api.mixtube.xyz/api/user/engage/${data.action}?username=${data.username}`,
+      `https://api.mixtapped.com/api/user/engage/${data.action}?username=${data.username}`,
       {
         method: "POST",
         headers: {
@@ -107,14 +98,14 @@ export async function handleFollowToggle(data) {
     const res = await response.json();
     return res;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 
 export async function handleUpdateDownloads(id) {
   try {
     const response = await fetch(
-      `https://api.mixtube.xyz/api/download/${id}`,
+      `https://api.mixtapped.com/api/download/${id}`,
       {
         method: "PUT",
         headers: {
@@ -124,8 +115,7 @@ export async function handleUpdateDownloads(id) {
     );
     const res = await response.json();
     return res;
-  }
-  catch (error) {
-    console.log(error)
+  } catch (error) {
+    console.log(error);
   }
 }

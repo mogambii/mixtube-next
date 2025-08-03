@@ -5,16 +5,16 @@ import { BsWhatsapp } from "react-icons/bs";
 import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 
 export const metadata = {
-  title: "About MixTube | Our Story and Mission",
+  title: "About MixTapped | Our Story and Mission",
   description:
-    "Learn about MixTube, our mission to connect music fans with talented DJs, and the team behind the platform.",
+    "Learn about MixTapped, our mission to connect music fans with talented DJs, and the team behind the platform.",
 };
 
 export default function AboutPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-8">
-        About MixTube
+        About MixTapped
       </h1>
 
       <div className="prose dark:prose-invert max-w-none">
@@ -22,7 +22,7 @@ export default function AboutPage() {
           <div className="relative w-full h-64 md:h-80 mb-8 rounded-xl overflow-hidden">
             <Image
               src="/og.jpg"
-              alt="MixTube Team"
+              alt="MixTapped Team"
               fill
               style={{ objectFit: "cover" }}
               className="rounded-xl"
@@ -41,7 +41,7 @@ export default function AboutPage() {
             Our Story
           </h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
-            MixTube was born from a simple idea: to create a platform where
+            MixTapped was born from a simple idea: to create a platform where
             music enthusiasts could discover and enjoy mixtapes from talented
             DJs around the world. What started as a small project in Nairobi,
             Kenya has grown into a global community connecting music lovers and
@@ -50,8 +50,8 @@ export default function AboutPage() {
           <p className="text-gray-600 dark:text-gray-300 mb-4">
             Our founder, Nezz Mogambi, Software Developer, noticed a gap in the
             market for a dedicated platform that would showcase African DJs and
-            their unique sounds to the world. MixTube was created to bridge this
-            gap, providing a space where DJs could share their craft and
+            their unique sounds to the world. MixTapped was created to bridge
+            this gap, providing a space where DJs could share their craft and
             listeners could discover new music.
           </p>
         </section>
@@ -61,7 +61,7 @@ export default function AboutPage() {
             Our Mission
           </h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
-            At MixTube, our mission is to democratize music discovery by
+            At MixTapped, our mission is to democratize music discovery by
             connecting listeners with talented DJs from diverse backgrounds. We
             believe in:
           </p>
@@ -205,8 +205,8 @@ export default function AboutPage() {
           </h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
             Whether you&apos;re a music enthusiast looking to discover new
-            sounds or a DJ wanting to share your craft, MixTube welcomes you to
-            our growing community.
+            sounds or a DJ wanting to share your craft, MixTapped welcomes you
+            to our growing community.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 mt-6">
             <Link
@@ -216,7 +216,7 @@ export default function AboutPage() {
               Sign Up as Listener
             </Link>
             <a
-              href="https://dj.mixtube.xyz"
+              href="https://dj.mixtapped.com"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-indigo-100 hover:bg-indigo-200 dark:text-indigo-400 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 md:py-3 md:text-lg md:px-8 transition-colors"
@@ -258,10 +258,10 @@ export default function AboutPage() {
                 <span>
                   <strong>Email:</strong>{" "}
                   <a
-                    href="mailto:info@mixtube.xyz"
+                    href="mailto:info@mixtapped.com"
                     className="text-indigo-600 dark:text-indigo-400 hover:underline"
                   >
-                    info@mixtube.xyz
+                    info@mixtapped.com
                   </a>
                 </span>
               </p>
@@ -284,10 +284,10 @@ export default function AboutPage() {
                 <span>
                   <strong>Support:</strong>{" "}
                   <a
-                    href="mailto:support@mixtube.xyz"
+                    href="mailto:support@mixtapped.com"
                     className="text-indigo-600 dark:text-indigo-400 hover:underline"
                   >
-                    support@mixtube.xyz
+                    support@mixtapped.com
                   </a>
                 </span>
               </p>
@@ -342,7 +342,7 @@ export default function AboutPage() {
             </a>
 
             <a
-              href="https://facebook.com/mixtubexyz"
+              href="https://facebook.com/mixtappedxyz"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
@@ -362,7 +362,7 @@ export default function AboutPage() {
             </a>
 
             <a
-              href="https://youtube.com/mixtubexyz"
+              href="https://youtube.com/mixtappedxyz"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
@@ -402,7 +402,7 @@ export default function AboutPage() {
               >
                 User Guide
               </Link>{" "}
-              for detailed instructions on using MixTube.
+              for detailed instructions on using MixTapped.
             </p>
           </div>
         </section>

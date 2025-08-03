@@ -10,7 +10,7 @@ import { useInView } from "react-intersection-observer";
 
 const Discovermixxes = () => {
   useEffect(() => {
-    document.title = "MixTube - Discover Mixtapes";
+    document.title = "MixTapped - Discover Mixtapes";
   }, []);
 
   const [loading, setLoading] = useState(true);

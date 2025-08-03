@@ -114,7 +114,7 @@ export const authOptions = {
             await sendEmailResend(
               {
                 to: profile.email,
-                subject: "Welcome to MixTube!",
+                subject: "Welcome to MixTapped!",
                 html: `
                 <!DOCTYPE html>
                 <html>
@@ -168,11 +168,11 @@ export const authOptions = {
                   <body>
                     <div class="email-container">
                       <div class="header">
-                        <h1>Welcome to MixTube! 🎵</h1>
+                        <h1>Welcome to MixTapped! 🎵</h1>
                       </div>
                       <div class="content">
                         <p>Hi ${profile.name || profile.email.split("@")[0]},</p>
-                        <p>Welcome to the MixTube community! We're excited to have you on board.</p>
+                        <p>Welcome to the MixTapped community! We're excited to have you on board.</p>
                         <p>You've successfully signed up using your Google account. Here's what you can do next:</p>
                         <ul class="feature-list">
                           <li>Discover amazing mixtapes from talented DJs</li>
@@ -186,14 +186,14 @@ export const authOptions = {
                         </p>
                       </div>
                       <div class="footer">
-                        <p>This email was sent by MixTube. Please do not reply to this email.</p>
+                        <p>This email was sent by MixTapped. Please do not reply to this email.</p>
                       </div>
                     </div>
                   </body>
                 </html>
               `,
               },
-              "welcome@mixtube.xyz"
+              "welcome@mixtapped.com"
             );
           }
         } catch (error) {

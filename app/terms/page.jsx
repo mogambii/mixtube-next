@@ -2,9 +2,9 @@ import React from "react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Terms and Conditions | MixTube",
+  title: "Terms and Conditions | MixTapped",
   description:
-    "Terms and conditions for using the MixTube platform. Read about your rights and responsibilities as a MixTube user.",
+    "Terms and conditions for using the MixTapped platform. Read about your rights and responsibilities as a MixTapped user.",
 };
 
 export default function TermsPage() {
@@ -23,10 +23,10 @@ export default function TermsPage() {
           1. Introduction
         </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
-          Welcome to MixTube. These Terms and Conditions govern your use of the
-          MixTube website and services. By accessing or using MixTube, you agree
-          to be bound by these Terms. If you disagree with any part of the
-          terms, you may not access the service.
+          Welcome to MixTapped. These Terms and Conditions govern your use of
+          the MixTapped website and services. By accessing or using MixTapped,
+          you agree to be bound by these Terms. If you disagree with any part of
+          the terms, you may not access the service.
         </p>
 
         <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mt-8 mb-4">
@@ -65,8 +65,8 @@ export default function TermsPage() {
           4. DJ Portal
         </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
-          DJs and artists who use our DJ Portal at dj.mixtube.xyz are subject to
-          additional terms and conditions specific to content creators. By
+          DJs and artists who use our DJ Portal at dj.mixtapped.com are subject
+          to additional terms and conditions specific to content creators. By
           uploading mixtapes and creating DJ profiles, you warrant that you have
           all necessary rights to the content you share.
         </p>
@@ -84,7 +84,7 @@ export default function TermsPage() {
           If you are a copyright owner, or authorized on behalf of one, and you
           believe that the copyrighted work has been copied in a way that
           constitutes copyright infringement, please submit your claim via email
-          to copyright@mixtube.xyz, with the subject line: &quot;Copyright
+          to copyright@mixtapped.com, with the subject line: &quot;Copyright
           Infringement&quot;.
         </p>
 
@@ -102,7 +102,7 @@ export default function TermsPage() {
           7. Limitation of Liability
         </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
-          In no event shall MixTube, nor its directors, employees, partners,
+          In no event shall MixTapped, nor its directors, employees, partners,
           agents, suppliers, or affiliates, be liable for any indirect,
           incidental, special, consequential or punitive damages, including
           without limitation, loss of profits, data, use, goodwill, or other
@@ -126,7 +126,7 @@ export default function TermsPage() {
         </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
           If you have any questions about these Terms, please contact us at
-          legal@mixtube.xyz.
+          legal@mixtapped.com.
         </p>
       </div>
 

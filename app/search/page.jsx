@@ -52,7 +52,7 @@ function useDebounce(value, delay) {
 
 const SearchPage = () => {
   useEffect(() => {
-    document.title = "MixTube - Search";
+    document.title = "MixTapped - Search";
   }, []);
 
   const [searching, setSearching] = useState(false);

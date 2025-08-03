@@ -11,7 +11,7 @@ export default function Footer() {
           <div className="space-y-4">
             <div className="flex items-center">
               <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-blue-600">
-                MixTube
+                MixTapped
               </h2>
             </div>
             <p className="text-gray-600 dark:text-gray-400 max-w-xs">
@@ -303,7 +303,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <a
-                  href="https://dj.mixtube.xyz"
+                  href="https://dj.mixtapped.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors flex items-center"
@@ -327,7 +327,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://dj.mixtube.xyz/signup"
+                  href="https://dj.mixtapped.com/signup"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors flex items-center"
@@ -351,7 +351,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://dj.mixtube.xyz/upload"
+                  href="https://dj.mixtapped.com/upload"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors flex items-center"
@@ -375,7 +375,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://dj.mixtube.xyz/analytics"
+                  href="https://dj.mixtapped.com/analytics"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-600 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors flex items-center"
@@ -440,7 +440,7 @@ export default function Footer() {
         <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              &copy; {new Date().getFullYear()} MixTube. All rights reserved.
+              &copy; {new Date().getFullYear()} MixTapped. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link

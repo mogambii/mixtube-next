@@ -36,7 +36,7 @@ export default function ShareProfileDialog({ username }) {
       if (navigator.share) {
         await navigator.share({
           title: "Check out this DJ profile",
-          text: "Listen to their mixtapes on MixTube",
+          text: "Listen to their mixtapes on MixTapped",
           url: shareUrl,
         });
       } else {

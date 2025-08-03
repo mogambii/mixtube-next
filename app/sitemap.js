@@ -1,4 +1,4 @@
-const baseUrl = "https://mixtube.xyz";
+const baseUrl = "https://mixtapped.com";
 
 /**
  * Generate sitemap for the application
