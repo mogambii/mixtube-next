@@ -10,6 +10,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import RegisterSW from "./register-sw";
+import PwaInstallPrompt from "./(components)/PwaInstallPrompt";
 import { Orbitron } from "next/font/google";
 import { Righteous } from "next/font/google";
 
@@ -60,6 +61,7 @@ export default async function RootLayout({ children }) {
           <PlayerProvider>
             <div className="dark:bg-gray-900 min-h-screen">
               <RegisterSW />
+              <PwaInstallPrompt />
               <Toaster position="top-center" />
               <header className="p-3">
                 <Navbar />
