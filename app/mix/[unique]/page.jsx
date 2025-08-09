@@ -281,7 +281,7 @@ export default async function MixTape({ params }) {
         </div>
       </div>
 
-      <div className="relative max-w-6xl mx-auto -mt-16 sm:-mt-20 z-20 px-4 sm:px-6">
+      <div className="relative max-w-6xl mx-auto mt-4 md:-mt-16 lg:-mt-20 z-10 md:z-20 px-4 sm:px-6">
         {/* Mixtape Information */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden">
           <div className="flex flex-col md:flex-row">
