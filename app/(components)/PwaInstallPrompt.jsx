@@ -13,10 +13,18 @@ export default function PwaInstallPrompt() {
   const [isIosSafari, setIsIosSafari] = useState(false);
 
   const shouldShow = useMemo(() => {
+    if (typeof window === "undefined") return false;
     if (isStandalone) return false;
-    const dismissedAt = Number(globalThis?.localStorage?.getItem(DISMISS_KEY) || 0);
+    let dismissedAt = 0;
+    try {
+      dismissedAt = Number(window.localStorage.getItem(DISMISS_KEY) || 0);
+    } catch {}
     if (dismissedAt && Date.now() - dismissedAt < SNOOZE_MS) return false;
-    if (localStorage.getItem(INSTALLED_KEY) === "1") return false;
+    let installed = "0";
+    try {
+      installed = window.localStorage.getItem(INSTALLED_KEY) || "0";
+    } catch {}
+    if (installed === "1") return false;
     return true;
   }, [isStandalone]);
 
@@ -96,7 +104,7 @@ export default function PwaInstallPrompt() {
             <p className="font-semibold text-gray-900 dark:text-white">Install Mixtapped</p>
             {isIosSafari && !promptEvent ? (
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                To install, tap the Share icon in Safari and choose "Add to Home Screen".
+                To install, tap the Share icon in Safari and choose &quot;Add to Home Screen&quot;.
               </p>
             ) : (
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
