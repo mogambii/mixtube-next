@@ -60,25 +60,25 @@ export async function generateMetadata({ params }) {
   const imageUrl = mix?.cover || defaultImageUrl;
 
   return {
-    title: mix ? `${mix.title} | Mixtube` : "Mixtape Not Found",
+    title: mix ? `${mix.title} | mixtapped` : "Mixtape Not Found",
     description:
       `${mix?.desc} mix on mixtapped | stream, play and download| by  ${
         mix?.djName || mix?.name
-      }` || `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtube.`,
+      }` || `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtapped.`,
     keywords: [
       "mixtape",
       "music",
       "dj mix",
       mix?.genre || "genre",
       mix?.title || "mixtape",
-      "Mixtube",
+      "Mixtapped",
       mix?.djName || mix?.name,
     ],
     openGraph: {
-      title: `${mix?.title || "Mixtape"} | Mixtube`,
+      title: `${mix?.title || "Mixtape"} | mixtapped`,
       description:
         mix?.desc ||
-        `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtube.`,
+        `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtapped.`,
       images: [
         {
           url: imageUrl,
@@ -91,10 +91,10 @@ export async function generateMetadata({ params }) {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${mix?.title || "Mixtape"} | Mixtube`,
+      title: `${mix?.title || "Mixtape"} | Mixtapped`,
       description:
         mix?.desc ||
-        `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtube.`,
+        `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtapped.`,
       images: [imageUrl],
     },
     alternates: {

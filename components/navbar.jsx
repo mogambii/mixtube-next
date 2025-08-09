@@ -15,7 +15,7 @@ async function Navbar() {
           <Image
             className="h-10 hidden md:block"
             src="https://i.ibb.co/17dxyfD/a5282d7a00d9ec58056a5.png"
-            alt="Mixtube Logo"
+            alt="mixtapped Logo"
             width={40}
             height={40}
           />

@@ -53,9 +53,9 @@ export async function generateMetadata({ params: { username } }) {
 
   if (!profile) {
     return {
-      title: "DJ Profile Not Found | Mixtube",
+      title: "DJ Profile Not Found | mixtapped",
       description:
-        "The DJ profile you are looking for does not exist on Mixtube.",
+        "The DJ profile you are looking for does not exist on mixtapped.",
       alternates: {
         canonical: `/dj/${username}`,
       },
@@ -64,31 +64,31 @@ export async function generateMetadata({ params: { username } }) {
 
   const imageUrl = profile.profilep || "/images/default-avatar.png";
   const name = profile.djName || username;
-  const description = `Discover ${name}'s mixtapes, biography, and social contacts on Mixtube. ${
+  const description = `Discover ${name}'s mixtapes, biography, and social contacts on mixtapped. ${
     profile.bio || ""
   }`;
 
   return {
-    title: `${name} | DJ Profile on Mixtube`,
+    title: `${name} | DJ Profile on mixtapped`,
     description,
     keywords: [
       "DJ",
       name,
-      "Mixtube",
+      "mixtapped",
       "DJ Profile",
       "Mixtape",
       "Music",
       "Mixes",
-      `${name}'s Mixtube Profile`,
+      `${name}'s mixtapped Profile`,
     ],
     openGraph: {
-      title: `${name} | DJ Profile on Mixtube`,
+      title: `${name} | DJ Profile on mixtapped`,
       description,
       images: [{ url: imageUrl, alt: `${name}'s profile picture` }],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${name} | DJ Profile on Mixtube`,
+      title: `${name} | DJ Profile on mixtapped`,
       description,
       images: [imageUrl],
     },
