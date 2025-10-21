@@ -2,105 +2,172 @@ import prisma from "@/lib/prismadb";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
-    const { searchParams } = request.nextUrl;
-    const query = searchParams.get("query") || "";
-    const sort = searchParams.get("sort") || "name"; // Default to name if not provided
-    const filter = searchParams.get("filter") || "all"; // Get filter parameter
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "12", 10);
+  const { searchParams } = request.nextUrl;
+  const query = searchParams.get("query") || "";
+  const sort = searchParams.get("sort") || "name";
+  const filter = searchParams.get("filter") || "all";
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "12", 10);
 
-    // Process API request parameters
+  // Validate pagination parameters
+  const validatedPage = Math.max(1, page);
+  const validatedLimit = Math.min(Math.max(1, limit), 100); // Cap at 100
+  const skip = (validatedPage - 1) * validatedLimit;
 
-    const skip = (page - 1) * limit;
+  try {
+    // Build where clause based on filter
+    let whereClause = {
+      type: "DJ", // Filter for DJ users only
+    };
 
-    try {
-        // Build where clause based on filter
-        let whereClause = {
-            type: "DJ", // Filter for DJ users only
-        };
-
-        // Add search query if provided
-        if (query) {
-            whereClause.OR = [
-                {
-                    username: {
-                        contains: query.toLowerCase(),
-                    },
-                },
-                {
-                    djName: {  
-                        contains: query.toLowerCase(),
-                    },
-                },
-            ];
-        }
-
-        // Determine sort order based on the actual schema
-        let orderBy = {};
-        
-        // Add filter conditions
-        if (filter === "new") {
-            // For new DJs, sort by createdAt (most recent first)
-            orderBy = {
-                createdAt: 'desc'
-            };
-        }
-        // Note: verified and trending filters have been removed
-        
-        // If filter didn't set orderBy, use the sort parameter
-        if (Object.keys(orderBy).length === 0) {
-            if (sort === "name") {
-                // Sort by DJ name alphabetically
-                orderBy = { djName: 'asc' };
-            } else if (sort === "followers") {
-                // Looking at the schema, we need to count the followedBy relation
-                orderBy = { followedBy: { _count: 'desc' } };
-            } else if (sort === "popular") {
-                // Sort by mixtapes count as a measure of popularity
-                orderBy = { mixtapes: { _count: 'desc' } };
-            } else {
-                // Default sort by DJ name
-                orderBy = { djName: 'asc' };
-            }
-        }
-
-        // Execute Prisma query with the configured parameters
-
-        const results = await prisma.user.findMany({
-            where: whereClause,
-            select: {
-                username: true,
-                profilep: true,
-                djName: true,
-                createdAt: true, // Include createdAt for "new" sorting
-                _count: {
-                    select: { followedBy: true, mixtapes: true }
-                }
-            },
-            skip: skip,
-            take: limit,
-            orderBy: orderBy
-        });
-
-        const totalResults = await prisma.user.count({
-            where: whereClause,
-        });
-
-        const totalPages = Math.ceil(totalResults / limit);
-
-        const response = {
-            results,
-            pagination: {
-                currentPage: page,
-                totalPages,
-                totalResults,
-                limit
-            }
-        };
-
-        // Return the formatted response
-        return new NextResponse(JSON.stringify(response), { status: 200 });
-    } catch (error) {
-        return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
+    // Enhanced search query with case-insensitive matching
+    if (query && query.trim()) {
+      const searchTerm = query.trim();
+      whereClause.OR = [
+        {
+          username: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        },
+        {
+          djName: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        },
+        {
+          name: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        },
+        {
+          bio: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        },
+      ];
     }
+
+    // Determine sort order
+    let orderBy = {};
+
+    // Apply filter-based sorting
+    if (filter === "new") {
+      orderBy = { createdAt: "desc" };
+    } else if (filter === "popular") {
+      // Use sort parameter for popular filter
+      orderBy = getOrderByClause(sort);
+    } else {
+      // Default: use sort parameter
+      orderBy = getOrderByClause(sort);
+    }
+
+    // Execute Prisma query with optimized selection
+    const results = await prisma.user.findMany({
+      where: whereClause,
+      select: {
+        id: true,
+        username: true,
+        profilep: true,
+        djName: true,
+        name: true,
+        bio: true,
+        createdAt: true,
+        _count: {
+          select: {
+            followedBy: true,
+            mixtapes: true,
+            likedMixtapes: true,
+          },
+        },
+      },
+      skip: skip,
+      take: validatedLimit,
+      orderBy: orderBy,
+    });
+
+    // Get total count for pagination
+    const totalResults = await prisma.user.count({
+      where: whereClause,
+    });
+
+    const totalPages = Math.ceil(totalResults / validatedLimit);
+
+    // Transform results to include computed fields
+    const transformedResults = results.map((dj) => ({
+      id: dj.id,
+      username: dj.username,
+      profilep: dj.profilep,
+      djName: dj.djName || dj.name || "Unknown DJ",
+      bio: dj.bio,
+      createdAt: dj.createdAt,
+      followers: dj._count.followedBy,
+      mixtapesCount: dj._count.mixtapes,
+      likesReceived: dj._count.likedMixtapes,
+      // Popularity score (can be used for trending)
+      popularityScore: calculatePopularityScore(dj._count),
+    }));
+
+    const response = {
+      success: true,
+      results: transformedResults,
+      pagination: {
+        currentPage: validatedPage,
+        totalPages,
+        totalResults,
+        limit: validatedLimit,
+        hasNextPage: validatedPage < totalPages,
+        hasPreviousPage: validatedPage > 1,
+      },
+      filters: {
+        query: query.trim(),
+        sort,
+        filter,
+      },
+    };
+
+    return NextResponse.json(response, { status: 200 });
+  } catch (error) {
+    console.error("DJ Search Error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to search DJs",
+        message: error.message,
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// Helper function to determine order by clause
+function getOrderByClause(sort) {
+  switch (sort) {
+    case "name":
+      return { djName: "asc" };
+    case "followers":
+      return { followedBy: { _count: "desc" } };
+    case "popular":
+      // Sort by total mixtapes count
+      return { mixtapes: { _count: "desc" } };
+    case "recent":
+      return { createdAt: "desc" };
+    case "active":
+      // Most recently updated profiles
+      return { updatedAt: "desc" };
+    default:
+      return { djName: "asc" };
+  }
+}
+
+// Calculate popularity score based on engagement metrics
+function calculatePopularityScore(counts) {
+  const { followedBy = 0, mixtapes = 0, likedMixtapes = 0 } = counts;
+
+  // Weighted popularity score
+  // Followers: 3x weight, Mixtapes: 2x weight, Likes: 1x weight
+  return followedBy * 3 + mixtapes * 2 + likedMixtapes * 1;
 }
