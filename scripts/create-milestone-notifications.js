@@ -1,6 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
-
+import prisma from "@/lib/prismadb.js";
 function formatMilestone(milestone) {
   if (milestone >= 1000000) {
     return `${(milestone / 1000000).toFixed(1)}M`;
@@ -68,7 +66,7 @@ async function checkAndCreateMilestones(mixtape) {
 
   // Check play milestones
   for (const milestone of milestones) {
-    if (mixtape.totalPlays >= milestone) {
+    if (mixtape.totalPlays === milestone) {
       const notification = await createMilestoneNotification(
         mixtape,
         "plays",
@@ -80,7 +78,7 @@ async function checkAndCreateMilestones(mixtape) {
 
   // Check download milestones
   for (const milestone of milestones) {
-    if (mixtape.totalDownloads >= milestone) {
+    if (mixtape.totalDownloads === milestone) {
       const notification = await createMilestoneNotification(
         mixtape,
         "downloads",
@@ -93,61 +91,4 @@ async function checkAndCreateMilestones(mixtape) {
   return notificationsCreated;
 }
 
-/**
- * Main function to process all mixtapes
- */
-async function main() {
-  try {
-    console.log(
-      "🚀 Starting milestone notification creation for existing mixtapes...\n"
-    );
-
-    // Get all mixtapes with their stats
-    const mixtapes = await prisma.mixtape.findMany({
-      select: {
-        id: true,
-        title: true,
-        totalPlays: true,
-        totalDownloads: true,
-        userId: true,
-      },
-      where: {
-        OR: [{ totalPlays: { gt: 0 } }, { totalDownloads: { gt: 0 } }],
-      },
-      orderBy: [{ totalPlays: "desc" }, { totalDownloads: "desc" }],
-    });
-
-    console.log(
-      `📊 Found ${mixtapes.length} mixtapes with plays or downloads\n`
-    );
-
-    let totalNotificationsCreated = 0;
-    let processedCount = 0;
-
-    for (const mixtape of mixtapes) {
-      const notificationsCreated = await checkAndCreateMilestones(mixtape);
-      totalNotificationsCreated += notificationsCreated;
-      processedCount++;
-
-      // Progress indicator
-      if (processedCount % 10 === 0) {
-        console.log(
-          `\n📈 Progress: ${processedCount}/${mixtapes.length} mixtapes processed`
-        );
-      }
-    }
-
-    console.log("\n🎉 Script completed successfully!");
-    console.log(`📊 Summary:`);
-    console.log(`   - Mixtapes processed: ${processedCount}`);
-    console.log(`   - Notifications created: ${totalNotificationsCreated}`);
-    console.log(
-      `   - Average notifications per mixtape: ${(totalNotificationsCreated / processedCount).toFixed(2)}`
-    );
-  } catch (error) {
-    console.error("❌ Script failed:", error);
-    process.exit(1);
-  } finally {
-    await prisma.$disconnect();
-  }
-}
+export default checkAndCreateMilestones;

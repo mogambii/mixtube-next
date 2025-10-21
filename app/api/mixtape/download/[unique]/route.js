@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 import { startOfDay, format } from "date-fns";
-import { checkAndCreateMilestoneNotification } from "@/lib/notifications";
+import checkAndCreateMilestones from "@/scripts/create-milestone-notifications";
 
 export async function POST(req, { params }) {
   try {
@@ -26,16 +26,12 @@ export async function POST(req, { params }) {
     });
 
     // Check for milestone notifications
-    await checkAndCreateMilestoneNotification(
-      mixtape.id, 
-      'downloads', 
-      updatedMixtape.totalDownloads
-    );
+    await checkAndCreateMilestones(mixtape);
 
     // Set today's date at start of day
     const today = startOfDay(new Date());
-    const formattedDate = format(today, 'yyyy-MM-dd');
-    
+    const formattedDate = format(today, "yyyy-MM-dd");
+
     try {
       // Update or create daily stats using a transaction to ensure data consistency
       await prisma.$transaction(async (tx) => {
@@ -48,7 +44,7 @@ export async function POST(req, { params }) {
             },
           },
         });
-        
+
         if (existingStats) {
           // Update existing stats
           await tx.stats.update({
@@ -67,10 +63,15 @@ export async function POST(req, { params }) {
           });
         }
       });
-      
-      console.log(`Download stats updated for mixtape ${mixtape.id} on ${formattedDate}`);
+
+      console.log(
+        `Download stats updated for mixtape ${mixtape.id} on ${formattedDate}`
+      );
     } catch (statsError) {
-      console.error(`Error updating stats for mixtape ${mixtape.id}:`, statsError);
+      console.error(
+        `Error updating stats for mixtape ${mixtape.id}:`,
+        statsError
+      );
       // Continue execution - don't fail the download if stats update fails
     }
 

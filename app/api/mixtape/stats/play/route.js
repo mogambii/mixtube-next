@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
 import { startOfDay, format } from "date-fns";
-import { checkAndCreateMilestoneNotification } from "@/lib/notifications";
+import checkAndCreateMilestones from "@/scripts/create-milestone-notifications";
 
 export async function POST(req) {
   try {
@@ -25,23 +25,18 @@ export async function POST(req) {
         { status: 404 }
       );
     }
-    
+
     const updatedMixtape = await prisma.mixtape.update({
       where: { id: mixtape.id },
       data: { totalPlays: mixtape.totalPlays + 1 },
     });
 
-    // Check for milestone notifications
-    await checkAndCreateMilestoneNotification(
-      mixtape.id, 
-      'plays', 
-      updatedMixtape.totalPlays
-    );
+    await checkAndCreateMilestones(mixtape);
 
     // Set today's date at start of day
     const today = startOfDay(new Date());
-    const formattedDate = format(today, 'yyyy-MM-dd');
-    
+    const formattedDate = format(today, "yyyy-MM-dd");
+
     try {
       // Update or create daily stats using a transaction to ensure data consistency
       await prisma.$transaction(async (tx) => {
@@ -54,7 +49,7 @@ export async function POST(req) {
             },
           },
         });
-        
+
         if (existingStats) {
           // Update existing stats
           await tx.stats.update({
@@ -73,10 +68,15 @@ export async function POST(req) {
           });
         }
       });
-      
-      console.log(`Play stats updated for mixtape ${mixtape.id} on ${formattedDate}`);
+
+      console.log(
+        `Play stats updated for mixtape ${mixtape.id} on ${formattedDate}`
+      );
     } catch (statsError) {
-      console.error(`Error updating stats for mixtape ${mixtape.id}:`, statsError);
+      console.error(
+        `Error updating stats for mixtape ${mixtape.id}:`,
+        statsError
+      );
       // Continue execution - don't fail the play count if stats update fails
     }
 
