@@ -15,7 +15,7 @@ export async function POST(req, { params }) {
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
     const userId = session.user.id;
 
     const mixtapeId = await prisma.mixtape
@@ -90,7 +90,7 @@ export async function DELETE(req, { params }) {
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
     const userId = session.user.id;
 
     const mixtapeId = await prisma.mixtape

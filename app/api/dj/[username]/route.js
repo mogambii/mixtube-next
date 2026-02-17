@@ -3,7 +3,7 @@ import prisma from "@/lib/prismadb";
 
 export async function GET(req, { params }) {
   try {
-    const { username } = params;
+    const { username } = await params;
 
     // Get the DJ's profile with counts
     const djProfile = await prisma.user.findUnique({

@@ -1,32 +1,27 @@
 import React from "react";
 import MixCard from "./MixCard";
+import prisma from "@/lib/prismadb";
 
 // Force dynamic rendering for this component
 export const dynamic = "force-dynamic";
 
 async function getRecords() {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/home/newmixtapes`,
-      {
-        cache: "no-store", // Disable caching completely
-      }
-    );
+    const response = await prisma.mixtape.findMany({
+      orderBy: {
+        time: "desc",
+      },
+      take: 18,
+    });
 
-    if (!response.ok) {
-      console.error(`Error fetching mixtapes: ${response.statusText}`);
-      return [];
-    }
-
-    const records = await response.json();
-    return records.mixtapes;
+    return response;
   } catch (error) {
     console.error("Failed to fetch new mixtapes:", error);
     return [];
   }
 }
 
-export default async function TopMixList() {
+export default async function NewMixList() {
   const newMix = await getRecords();
 
   if (!newMix || newMix.length === 0) {

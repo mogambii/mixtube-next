@@ -12,7 +12,7 @@ export async function POST(req, { params }) {
       return NextResponse.json({ message: "Please login to comment" }, { status: 401 });
     }
 
-    const { unique } = params;
+    const { unique } = await params;
     const { content } = await req.json();
 
     if (!content) {
@@ -58,7 +58,7 @@ export async function POST(req, { params }) {
 // Get comments for a mixtape
 export async function GET(req, { params }) {
   try {
-    const { unique } = params;
+    const { unique } = await params;
 
     // Get mixtape ID from unique identifier
     const mixtape = await prisma.mixtape.findUnique({

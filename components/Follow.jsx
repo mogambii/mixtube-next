@@ -83,7 +83,7 @@ const Follow = ({ username, following }) => {
           initial={{ opacity: 0.9 }}
           animate={{ opacity: 1 }}
           className={`
-            flex items-center justify-center gap-2 px-5 py-2.5 rounded-full 
+            flex items-center justify-center gap-2 px-2 py-2 rounded-full 
             font-medium text-sm transition-all duration-200 ease-out
             ${
               isFollowing

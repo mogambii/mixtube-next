@@ -11,7 +11,7 @@ export async function POST(req, { params }) {
       return NextResponse.json({ message: "Please login to comment" }, { status: 401 });
     }
 
-    const { unique } = params;
+    const { unique } = await params;
     const { content } = await req.json();
 
     if (!content?.trim()) {

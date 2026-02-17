@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Disc2, Music } from "lucide-react";
 
 const NavMenu = () => {
   const [open, setOpen] = useState(false);
@@ -48,8 +49,8 @@ const NavMenu = () => {
   }, [open]);
 
   const menuItems = [
-    { href: "/discover", label: "Discover Mixes", icon: "🎵" },
-    { href: "/discoverdjs", label: "Discover DJs", icon: "🎧" },
+    { href: "/discover", label: "All Mixxes", icon: <Music size={16} /> },
+    { href: "/discoverdjs", label: "All DJs", icon: <Disc2 size={16} /> },
   ];
 
   const isActive = (href) => pathname === href;

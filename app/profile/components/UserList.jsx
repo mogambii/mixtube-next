@@ -3,12 +3,98 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIntersection } from "@/hooks/use-intersection";
 import Follow from "@/components/Follow";
-import { Loader2, Users } from "lucide-react";
+import { Loader2, Users, Mic2, Compass } from "lucide-react";
 import Link from "next/link";
+
+// ─── skeleton row ─────────────────────────────────────────────────────────────
+
+const UserRowSkeleton = () => (
+  <div className="flex items-center justify-between px-4 py-3">
+    <div className="flex items-center gap-3">
+      <Skeleton className="h-11 w-11 rounded-full flex-shrink-0" />
+      <div className="space-y-1.5">
+        <Skeleton className="h-3.5 w-28" />
+        <Skeleton className="h-3 w-20" />
+      </div>
+    </div>
+    <Skeleton className="h-8 w-20 rounded-xl" />
+  </div>
+);
+
+
+const EmptyState = () => (
+  <div className="flex flex-col items-center justify-center py-14 px-6 text-center">
+    <div className="bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-full p-6 mb-5">
+      <Users className="h-10 w-10 text-indigo-500 dark:text-indigo-400" />
+    </div>
+    <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1.5">
+      Not following anyone yet
+    </h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs leading-relaxed mb-6">
+      Start following your favourite DJs to see their latest mixtapes and
+      updates in your feed.
+    </p>
+    <Link href="/discoverdjs">
+      <Button
+        size="sm"
+        className="rounded-xl gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/25"
+      >
+        <Compass className="h-4 w-4" />
+        Discover DJs
+      </Button>
+    </Link>
+  </div>
+);
+
+// ─── user row ─────────────────────────────────────────────────────────────────
+
+const UserRow = ({ user, index }) => (
+  <div
+    className="group flex items-center justify-between px-4 py-3 rounded-2xl transition-colors duration-150 hover:bg-gray-50 dark:hover:bg-gray-800/60"
+    style={{ animationDelay: `${index * 40}ms` }}
+  >
+    <Link
+      href={`/dj/${user.name}`}
+      className="flex items-center gap-3 min-w-0 flex-1"
+    >
+      <div className="relative flex-shrink-0">
+        <Avatar className="h-11 w-11 ring-2 ring-transparent group-hover:ring-indigo-200 dark:group-hover:ring-indigo-800 transition-all duration-200">
+          <AvatarImage src={user.image || user.profilep} alt={user.name} />
+          <AvatarFallback className="text-sm font-bold bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+            {user.name?.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+      </div>
+
+      <div className="min-w-0">
+        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">
+          {user.name}
+        </p>
+        {user.djName ? (
+          <div className="flex items-center gap-1 mt-0.5">
+            <Mic2 className="h-3 w-3 text-indigo-400 flex-shrink-0" />
+            <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+              {user.djName}
+            </span>
+          </div>
+        ) : (
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+            Listener
+          </p>
+        )}
+      </div>
+    </Link>
+
+    <div className="flex-shrink-0 ml-3">
+      <Follow username={user.name} following={true} />
+    </div>
+  </div>
+);
+
+// ─── main component ───────────────────────────────────────────────────────────
 
 export default function UserList({ email }) {
   const [users, setUsers] = useState([]);
@@ -17,128 +103,89 @@ export default function UserList({ email }) {
   const [isLoading, setIsLoading] = useState(false);
   const loadMoreRef = useRef(null);
 
-  const isIntersecting = useIntersection(loadMoreRef, {
-    threshold: 1,
-  });
+  const isIntersecting = useIntersection(loadMoreRef, { threshold: 1 });
 
   const fetchUsers = useCallback(async () => {
     if (isLoading || !hasMore) return;
-
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `/api/user/following?email=${encodeURIComponent(
-          email
-        )}&page=${page}&limit=8`
+      const res = await fetch(
+        `/api/user/following?email=${encodeURIComponent(email)}&page=${page}&limit=8`,
       );
-      const data = await response.json();
-
-      if (data.users.length < 8) {
-        setHasMore(false);
-      }
-
+      const data = await res.json();
+      if (data.users.length < 8) setHasMore(false);
       setUsers((prev) => [...prev, ...data.users]);
       setPage((p) => p + 1);
-    } catch (error) {
-      console.error("Error fetching users:", error);
+    } catch (err) {
+      console.error("Error fetching users:", err);
     } finally {
       setIsLoading(false);
     }
   }, [isLoading, hasMore, email, page]);
 
   useEffect(() => {
-    if (isIntersecting) {
-      fetchUsers();
-    }
+    if (isIntersecting) fetchUsers();
   }, [isIntersecting, fetchUsers]);
 
+  const isInitialLoad = users.length === 0 && isLoading;
+  const isEmpty = users.length === 0 && !isLoading && !hasMore;
+
   return (
-    <div className="space-y-4">
-      {users.map((user) => (
-        <Card key={user.id} className="hover:bg-accent/50 transition-colors">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Avatar>
-                  <AvatarImage
-                    src={user.image || user.profilep}
-                    alt={user.name}
-                  />
-                  <AvatarFallback>
-                    {user.name?.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold">{user.name}</h3>
-                  </div>
-                  {user.djName && (
-                    <p className="text-sm text-muted-foreground">
-                      {user.djName}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Follow username={user.name} following={true} />
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-      {users.length === 0 && isLoading ? (
-        // Initial loading state with skeletons
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className="hover:bg-accent/50 transition-colors">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <Skeleton className="h-12 w-12 rounded-full" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-[120px]" />
-                      <Skeleton className="h-3 w-[80px]" />
-                    </div>
-                  </div>
-                  <Skeleton className="h-8 w-[80px]" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+    <div className="rounded-2xl border border-gray-100 dark:border-gray-700/50 bg-white dark:bg-gray-900 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700/50">
+        <div className="flex items-center gap-2">
+          <Users className="h-4 w-4 text-indigo-500" />
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">
+            Following
+          </span>
         </div>
-      ) : hasMore ? (
-        <div
-          ref={loadMoreRef}
-          className="h-16 flex items-center justify-center"
-        >
-          {isLoading && (
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          )}
-        </div>
-      ) : users.length > 0 ? (
-        <p className="text-center text-sm text-muted-foreground py-4">
-          You&apos;ve reached the end of the list
-        </p>
-      ) : (
-        <Card className="p-6">
-          <div className="text-center space-y-4 gap-4">
-            <div className="flex justify-center">
-              <Users className="h-12 w-12 text-muted-foreground" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">No Following Yet</h3>
-              <p className="text-sm mb-3 text-muted-foreground max-w-sm mx-auto">
-                Start following your favorite DJs to see their latest mixtapes
-                and updates in your feed.
-              </p>
-            </div>
-            <Link href="/discoverdjs" className="p-2 my-2 mt-3">
-              <Button className=" p-2 m-2">
-                <Users className="mr-2 h-4 w-4" />
-                Explore DJs
-              </Button>
-            </Link>
+        {users.length > 0 && (
+          <span className="text-xs font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
+            {users.length}
+            {hasMore ? "+" : ""}
+          </span>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="divide-y divide-gray-50 dark:divide-gray-800/60">
+        {isInitialLoad ? (
+          // Initial skeleton
+          <div className="divide-y divide-gray-50 dark:divide-gray-800/60">
+            {[...Array(4)].map((_, i) => (
+              <UserRowSkeleton key={i} />
+            ))}
           </div>
-        </Card>
-      )}
+        ) : isEmpty ? (
+          <EmptyState />
+        ) : (
+          <>
+            {users.map((user, index) => (
+              <UserRow key={user.id} user={user} index={index} />
+            ))}
+
+            {/* Infinite scroll sentinel */}
+            {hasMore && (
+              <div
+                ref={loadMoreRef}
+                className="flex items-center justify-center py-4"
+              >
+                {isLoading && (
+                  <Loader2 className="h-4 w-4 animate-spin text-indigo-400" />
+                )}
+              </div>
+            )}
+
+            {/* End of list */}
+            {!hasMore && users.length > 0 && (
+              <p className="text-center text-xs text-gray-400 dark:text-gray-600 py-4">
+                — {users.length} people followed —
+              </p>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

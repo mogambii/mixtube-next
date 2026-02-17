@@ -9,7 +9,7 @@ export function PlayerProvider({ children }) {
     audio: null,
     thumbnail: null,
   });
-  const playedTracks = useRef(new Set()); // Track played tracks in this session
+  const playedTracks = useRef(new Set());
 
   const playMix = async (id) => {
     try {

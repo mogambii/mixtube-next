@@ -11,7 +11,7 @@ export async function DELETE(req, { params }) {
       return NextResponse.json({ message: "Please login to delete comment" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Get the comment
     const comment = await prisma.comment.findUnique({

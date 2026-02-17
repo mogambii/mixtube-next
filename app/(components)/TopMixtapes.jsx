@@ -1,34 +1,74 @@
 import React from "react";
 import MixCard from "./MixCard";
-
-// Force dynamic rendering for this component
+import prisma from "@/lib/prismadb";
 export const dynamic = "force-dynamic";
 
 export default async function TopMixList() {
   const getRecords = async () => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/home/topmixtapes`,
-        {
-          cache: "no-store", // Disable caching completely
-        }
-      );
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      // Aggregate stats from the last 3 months per mixtape
+      const trendingStats = await prisma.stats.groupBy({
+        by: ["mixtapeId"],
+        where: {
+          date: {
+            gte: threeMonthsAgo,
+          },
+        },
+        _sum: {
+          plays: true,
+          downloads: true,
+        },
+        orderBy: [
+          {
+            _sum: {
+              plays: "desc",
+            },
+          },
+        ],
+        take: 40,
+      });
 
-      const records = await response.json();
-      return records.mixtapes;
+      if (!trendingStats.length) return [];
+
+      // Re-sort by weighted trending score (plays + downloads * 2)
+      const sortedStats = trendingStats.sort((a, b) => {
+        const scoreA = (a._sum.plays ?? 0) + (a._sum.downloads ?? 0) * 2;
+        const scoreB = (b._sum.plays ?? 0) + (b._sum.downloads ?? 0) * 2;
+        return scoreB - scoreA;
+      });
+
+      const topMixtapeIds = sortedStats.slice(0, 18).map((s) => s.mixtapeId);
+
+      // Fetch full mixtape details for the top IDs
+      const mixtapes = await prisma.mixtape.findMany({
+        where: {
+          id: { in: topMixtapeIds },
+        },
+        select: {
+          id: true,
+          title: true,
+          djName: true,
+          imgthumb: true,
+          unique: true,
+          totalPlays: true,
+          totalDownloads: true,
+        },
+      });
+
+      // Preserve the trending order from sortedStats
+      const mixtapeMap = new Map(mixtapes.map((m) => [m.id, m]));
+      return topMixtapeIds.map((id) => mixtapeMap.get(id)).filter(Boolean);
     } catch (error) {
       console.error("Failed to fetch top mixtapes:", error);
-      return []; // Return empty array on error
+      return [];
     }
   };
 
   const topMix = await getRecords();
 
-  // Handle case where topMix is undefined or null
   if (!topMix || topMix.length === 0) {
     return (
       <section className="py-8 px-4">
@@ -36,7 +76,7 @@ export default async function TopMixList() {
           <div className="flex items-center mb-6">
             <div className="w-1.5 h-8 bg-indigo-600 rounded-full mr-3"></div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              TOP{" "}
+              TRENDING{" "}
               <span className="text-indigo-600 dark:text-indigo-400">
                 MIXTAPES
               </span>
@@ -58,7 +98,7 @@ export default async function TopMixList() {
         <div className="flex items-center mb-6">
           <div className="w-1.5 h-8 bg-indigo-600 rounded-full mr-3"></div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            TOP{" "}
+            TRENDING{" "}
             <span className="text-indigo-600 dark:text-indigo-400">
               MIXTAPES
             </span>

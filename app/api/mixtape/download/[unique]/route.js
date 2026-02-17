@@ -5,7 +5,7 @@ import checkAndCreateMilestones from "@/scripts/create-milestone-notifications";
 
 export async function POST(req, { params }) {
   try {
-    const { unique } = params;
+    const { unique } = await params;
 
     // Get mixtape by unique identifier
     const mixtape = await prisma.mixtape.findUnique({

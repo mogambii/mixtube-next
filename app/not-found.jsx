@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Notfound() {
   return (
     <>
-      <main className="grid min-h-full place-items-center bg-white  dark:bg-gray-950  px-4 py-24 sm:py-32 lg:px-8 rounded-lg mb-6">
+      <main className="grid min-h-svh place-items-center bg-white  dark:bg-gray-950  px-4 py-24 sm:py-32 lg:px-8 rounded-lg mb-6">
         <div className="text-center">
           <p className="text-base font-semibold text-indigo-600">404</p>
           <h1 className="mt-4 text-3xl font-bold tracking-tight dark:text-slate-50 sm:text-5xl">
