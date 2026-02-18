@@ -1,233 +1,81 @@
-"use client";
+import { getServerSession } from "next-auth";
+import FavoritesClient from "./FavoritesClient";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+import prisma from "@/lib/prismadb";
 
-import { useEffect, useState } from "react";
-import { useInView } from "react-intersection-observer";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { FaHeart, FaSpinner } from "react-icons/fa";
-import Image from "next/image";
-import { Skeleton } from "@/components/ui/skeleton";
+const LIMIT = 9;
 
-const MixtapeCardSkeleton = () => (
-  <div className="block rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-300 h-full">
-    <Skeleton className="w-full h-52 object-cover" />
-    <div className="p-5">
-      <Skeleton className="h-6 w-3/4 mb-3" />
-      <Skeleton className="h-4 w-1/2 mb-2" />
-      <div className="flex justify-between items-center mt-3">
-        <Skeleton className="h-4 w-1/4" />
-        <Skeleton className="h-8 w-8 rounded-full" />
-      </div>
-    </div>
-  </div>
-);
-
-const MixtapeCard = ({ mixtape }) => (
-  <Link
-    href={`/mix/${mixtape.unique}`}
-    className="group block rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-300 h-full"
-  >
-    <div className="relative">
-      <Image
-        width={500}
-        height={500}
-        src={mixtape.imgthumb}
-        alt={mixtape.title}
-        className="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-500"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-    </div>
-    <div className="p-5">
-      <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
-        {mixtape.title}
-      </h2>
-      <p className="text-gray-600 dark:text-gray-300 text-sm font-medium">
-        {mixtape.djName.toUpperCase()}
-      </p>
-      <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          {new Date(mixtape.createdAt).toLocaleDateString()}
-        </span>
-        <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-full">
-          <FaHeart className="text-red-500 h-4 w-4" />
-        </div>
-      </div>
-    </div>
-  </Link>
-);
-
-export default function FavoritesPage() {
-  const { data: session } = useSession();
-  const [favorites, setFavorites] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const limit = 9;
-
-  const fetchFavorites = async (page, isLoadMore = false) => {
-    try {
-      if (isLoadMore) {
-        setLoadingMore(true);
-      } else {
-        setLoading(true);
-      }
-      const response = await fetch(
-        `/api/favorites?page=${page}&limit=${limit}`
-      );
-      if (!response.ok) throw new Error("Failed to fetch favorites");
-      const data = await response.json();
-      if (isLoadMore) {
-        setFavorites((prevFavorites) => [...prevFavorites, ...data.favorites]);
-      } else {
-        setFavorites(data.favorites);
-      }
-      setCurrentPage(data.pagination.currentPage);
-      setHasMore(data.pagination.currentPage < data.pagination.pages);
-    } catch (error) {
-      console.error("Error fetching favorites:", error);
-    } finally {
-      if (isLoadMore) {
-        setLoadingMore(false);
-      } else {
-        setLoading(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (session?.user) {
-      fetchFavorites(1); // Fetch initial page
-    }
-  }, [session]);
-
-  const { ref, inView } = useInView({
-    threshold: 0,
-    triggerOnce: false,
-  });
-
-  useEffect(() => {
-    if (inView && hasMore && !loading && !loadingMore && session?.user) {
-      fetchFavorites(currentPage + 1, true);
-    }
-  }, [inView, hasMore, loading, loadingMore, session, currentPage]);
+export default async function FavoritesPage() {
+  const session = await getServerSession(authOptions);
 
   if (!session?.user) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center px-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 max-w-md w-full text-center">
-          <div className="bg-indigo-100 dark:bg-indigo-900/30 p-4 rounded-full inline-block mb-4">
-            <FaHeart className="text-indigo-500 h-8 w-8" />
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-            Sign in required
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Please sign in to view and manage your favorite mixtapes
+      <Link
+        href="/login"
+        className="flex flex-col items-center justify-center h-screen gap-4"
+      >
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Please Log In to View Your Favorites
+          </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            You need to be logged in to access your favorite mixtapes.
           </p>
-          <Link
-            href="/signin"
-            className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            Sign In
+        </div>
+        <div className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-full">
+          Go to Login
+        </div>
+        <div className="text-gray-500 dark:text-gray-400 mt-4">
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" className="text-blue-500 hover:underline">
+            Sign Up
           </Link>
         </div>
-      </div>
+      </Link>
     );
   }
 
-  if (loading && favorites.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 rounded-md to-gray-100 dark:from-gray-950 dark:to-gray-900">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col items-center mb-10">
-            <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-full mb-4">
-              <FaHeart className="text-red-500 h-6 w-6" />
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center">
-              Your Favorite Mixes
-            </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400 max-w-2xl text-center">
-              Your personal collection of mixtapes that you&apos;ve loved and
-              saved for easy access
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Array.from({ length: limit }).map((_, index) => (
-              <MixtapeCardSkeleton key={index} />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Fetch first page on the server
+  const [totalCount, favorites] = await Promise.all([
+    prisma.mixtapeLike.count({
+      where: { userId: session.user.id },
+    }),
+    prisma.mixtapeLike.findMany({
+      where: { userId: session.user.id },
+      select: {
+        mixtape: {
+          select: {
+            id: true,
+            djName: true,
+            imgthumb: true,
+            unique: true,
+            title: true,
+          },
+        },
+        createdAt: true,
+      },
+      skip: 0,
+      take: LIMIT,
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+
+  const initialFavorites = favorites.map((fav) => ({
+    id: fav.mixtape.id,
+    title: fav.mixtape.title,
+    imgthumb: fav.mixtape.imgthumb,
+    unique: fav.mixtape.unique,
+    djName: fav.mixtape.djName || "Unknown DJ",
+    createdAt: fav.createdAt.toISOString(), // serialize for client
+  }));
+
+  const totalPages = Math.ceil(totalCount / LIMIT);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-col items-center mb-10">
-          <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-full mb-4">
-            <FaHeart className="text-red-500 h-6 w-6" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center">
-            Your Favorite Mixes
-          </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400 max-w-2xl text-center">
-            Your personal collection of mixtapes that you&apos;ve loved and
-            saved for easy access
-          </p>
-        </div>
-
-        {favorites.length === 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 max-w-md mx-auto text-center">
-            <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-full inline-block mb-4">
-              <FaHeart className="text-gray-400 dark:text-gray-500 h-8 w-8" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No favorites yet
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              You haven&apos;t added any mixes to your favorites yet. Browse
-              mixtapes and click the heart icon to add them here.
-            </p>
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-            >
-              Discover Mixtapes
-            </Link>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {favorites.map((mix) => (
-                <MixtapeCard key={mix.id} mixtape={mix} />
-              ))}
-            </div>
-
-            {/* Infinite scroll loader */}
-            {(loadingMore || (hasMore && favorites.length > 0)) && (
-              <div
-                ref={ref}
-                className="flex justify-center items-center py-8 mt-6"
-              >
-                {loadingMore && (
-                  <div className="bg-white dark:bg-gray-800 p-3 rounded-full shadow-lg">
-                    <FaSpinner className="animate-spin text-indigo-500 h-6 w-6" />
-                  </div>
-                )}
-              </div>
-            )}
-            {!hasMore && favorites.length > 0 && (
-              <div className="text-center py-8 mt-4 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-xl shadow-sm px-6 max-w-md mx-auto">
-                <p className="font-medium">
-                  You&apos;ve reached the end of your favorites!
-                </p>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+    <FavoritesClient
+      initialFavorites={initialFavorites}
+      initialHasMore={totalPages > 1}
+      limit={LIMIT}
+    />
   );
 }

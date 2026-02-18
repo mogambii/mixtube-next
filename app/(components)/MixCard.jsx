@@ -27,8 +27,8 @@ const MixCard = ({
               src={img ? img : "https://placehold.co/210x210"}
               className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
               alt={title}
-              height={128}
-              width={128}
+              height={280}
+              width={280}
               loading={loading ? "lazy" : "eager"}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
