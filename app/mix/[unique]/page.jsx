@@ -233,10 +233,12 @@ export default async function MixTape({ params }) {
         {/* Centered title overlay */}
         <div className="absolute inset-0 z-20 flex flex-col justify-center items-center p-4 sm:p-6 md:p-8">
           <div className="max-w-3xl w-full mx-auto bg-black/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10 shadow-2xl transform translate-y-0 transition-all duration-700 group-hover:scale-105">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <span className="px-3 py-1 bg-indigo-600/80 rounded-full text-xs text-white font-medium">
-                {mix.genre}
-              </span>
+            <div className="flex items-center justify-center flex-wrap gap-1.5 mb-1">
+              {(mix.genre || "Unknown").split(",").map((g) => g.trim()).filter(Boolean).map((g) => (
+                <span key={g} className="px-3 py-1 bg-indigo-600/80 rounded-full text-xs text-white font-medium">
+                  {g}
+                </span>
+              ))}
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg text-center">
               {mix.title}
@@ -570,7 +572,7 @@ export default async function MixTape({ params }) {
               {/* FaMusic replaces the music-staff SVG */}
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center">
                 <FaMusic className="h-5 w-5 mr-2 text-indigo-500" />
-                More {mix.genre} Mixtapes
+                More {(mix.genre || "").split(",")[0].trim()} Mixtapes
               </h3>
             </div>
 

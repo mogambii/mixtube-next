@@ -16,10 +16,13 @@ export async function GET(request) {
       );
     }
 
-    // Find related mixtapes by genre, excluding the current mixtape
+    // Support comma-separated multi-genre: match any of the genres
+    const genreList = genre.split(",").map((g) => g.trim()).filter(Boolean);
+
+    // Find related mixtapes by any matching genre, excluding the current mixtape
     const relatedMixtapes = await prisma.mixtape.findMany({
       where: {
-        genre: genre,
+        OR: genreList.map((g) => ({ genre: { contains: g, mode: "insensitive" } })),
         ...(excludeId && { unique: { not: excludeId } }),
       },
       include: {
