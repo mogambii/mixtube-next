@@ -3,16 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { LiaStepBackwardSolid, LiaStepForwardSolid } from "react-icons/lia";
-import { RiPauseLine, RiPlayFill } from "react-icons/ri";
+import { RiPauseLine, RiPlayFill, RiVolumeUpFill, RiVolumeMuteFill } from "react-icons/ri";
 import {
   ListMusic,
   ChevronDown,
-  ChevronUp,
   X,
   Music2,
   Shuffle,
   Repeat,
   Repeat1,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { usePlayerContext } from "@/context/PlayerContext";
 import { FaSpinner } from "react-icons/fa6";
@@ -31,11 +32,12 @@ function AudioPlayer() {
   const [isBuffering, setIsBuffering] = useState(true);
   const [tooltipTime, setTooltipTime] = useState(null);
   const [wasPaused, setWasPaused] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
 
   // ── Layout state ───────────────────────────────────────────────────────────
-  const [isMiniPlayer, setIsMiniPlayer] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showPlaylist, setShowPlaylist] = useState(false);
+  const [showPlaylist, setShowPlaylist] = useState(true);
 
   // ── Playlist state ─────────────────────────────────────────────────────────
   const [playlist, setPlaylist] = useState([]);
@@ -47,6 +49,7 @@ function AudioPlayer() {
 
   const audioPlayer = useRef(null);
   const progressRef = useRef(null);
+  const expandedProgressRef = useRef(null);
   const dotRef = useRef(null);
   const playlistRef = useRef(null);
   const activeTrackRef = useRef(null);
@@ -80,7 +83,6 @@ function AudioPlayer() {
     const fetchRelated = async () => {
       setIsLoadingPlaylist(true);
       try {
-        // Try genre-based related first
         const res = await fetch(
           `/api/mixtape/related?genre=${encodeURIComponent(currentMix.genre || "")}&excludeId=${currentMix.id}&limit=10`,
         );
@@ -92,7 +94,6 @@ function AudioPlayer() {
           items = data.mixtapes || [];
         }
 
-        // Fallback to recent if not enough
         if (items.length < 5) {
           const recentRes = await fetch(`/api/mixtape/recent?limit=10`);
           if (recentRes.ok) {
@@ -105,7 +106,6 @@ function AudioPlayer() {
           }
         }
 
-        // Put current mix at the front so the playlist is self-contained
         const full = [
           {
             id: currentMix.id,
@@ -122,7 +122,6 @@ function AudioPlayer() {
         setPlaylist(full);
         setPlaylistIndex(0);
 
-        // Build a shuffled order (excludes index 0 since that's current)
         const indices = Array.from({ length: full.length }, (_, i) => i);
         setShuffledOrder(indices.sort(() => Math.random() - 0.5));
       } catch (err) {
@@ -154,6 +153,7 @@ function AudioPlayer() {
 
     const el = audioPlayer.current;
     el.src = currentMix.audio;
+    el.volume = isMuted ? 0 : volume;
     el.load();
 
     const handleLoadedData = async () => {
@@ -212,16 +212,14 @@ function AudioPlayer() {
     shuffledOrder,
   ]);
 
-  // ── Responsive layout ──────────────────────────────────────────────────────
+  // ── Close expanded on Escape ───────────────────────────────────────────────
   useEffect(() => {
-    const onResize = () => {
-      setIsMiniPlayer(window.innerWidth < 640);
-      if (window.innerWidth >= 640) setIsExpanded(false);
+    const handler = (e) => {
+      if (e.key === "Escape" && isExpanded) setIsExpanded(false);
     };
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [isExpanded]);
 
   // ── Track end / auto-advance ───────────────────────────────────────────────
   const handleTrackEnd = useCallback(() => {
@@ -233,7 +231,7 @@ function AudioPlayer() {
     }
 
     const nextIdx = getNextIndex(playlistIndex);
-    if (nextIdx === null) return; // end of playlist, no repeat
+    if (nextIdx === null) return;
 
     playFromIndex(nextIdx);
   }, [playlistIndex, playlist, repeat, isShuffle, shuffledOrder]);
@@ -243,7 +241,6 @@ function AudioPlayer() {
       if (!playlist.length) return null;
 
       if (isShuffle) {
-        // Find current position in shuffled order and advance
         const pos = shuffledOrder.indexOf(current);
         const nextPos = pos + 1;
         if (nextPos >= shuffledOrder.length) {
@@ -323,7 +320,6 @@ function AudioPlayer() {
 
   const handleRewind = useCallback(() => {
     if (!audioPlayer.current) return;
-    // If more than 3s in, restart track; else go to previous
     if (audioPlayer.current.currentTime > 3) {
       audioPlayer.current.currentTime = 0;
     } else {
@@ -337,25 +333,39 @@ function AudioPlayer() {
     if (next !== null) playFromIndex(next);
   }, [playlistIndex, getNextIndex, playFromIndex]);
 
-  const handleSeek = useCallback((e) => {
-    if (!audioPlayer.current || !progressRef.current) return;
-    const seekPosition =
-      (e.nativeEvent.offsetX / progressRef.current.clientWidth) *
-      audioPlayer.current.duration;
-    audioPlayer.current.currentTime = seekPosition;
+  const handleSeek = useCallback((e, ref) => {
+    if (!audioPlayer.current || !ref?.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, x / rect.width));
+    audioPlayer.current.currentTime = ratio * audioPlayer.current.duration;
   }, []);
 
   const handleMouseMove = useCallback(
-    (e) => {
-      if (progressRef.current && audioPlayer.current?.duration) {
-        const x = e.nativeEvent.offsetX;
-        const time =
-          (x / progressRef.current.clientWidth) * audioPlayer.current.duration;
+    (e, ref) => {
+      if (ref?.current && audioPlayer.current?.duration) {
+        const rect = ref.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const time = (x / rect.width) * audioPlayer.current.duration;
         setTooltipTime(formatTime(time));
       }
     },
     [formatTime],
   );
+
+  const handleVolumeChange = useCallback((e) => {
+    const v = parseFloat(e.target.value);
+    setVolume(v);
+    setIsMuted(v === 0);
+    if (audioPlayer.current) audioPlayer.current.volume = v;
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    if (!audioPlayer.current) return;
+    const next = !isMuted;
+    setIsMuted(next);
+    audioPlayer.current.volume = next ? 0 : volume;
+  }, [isMuted, volume]);
 
   const cycleRepeat = () =>
     setRepeat((r) =>
@@ -368,175 +378,516 @@ function AudioPlayer() {
 
   const toggleShuffle = () => {
     setIsShuffle((s) => !s);
-    // Re-randomise order on toggle
     const indices = Array.from({ length: playlist.length }, (_, i) => i);
     setShuffledOrder(indices.sort(() => Math.random() - 0.5));
   };
 
-  const toggleExpanded = useCallback(() => {
-    if (isMiniPlayer) setIsExpanded((p) => !p);
-  }, [isMiniPlayer]);
-
   if (!currentMix?.audio) return null;
+
+  // Parse genres
+  const genres = (currentMix.genre || "")
+    .split(",")
+    .map((g) => g.trim())
+    .filter(Boolean);
+
+  // ── EQ Bars ────────────────────────────────────────────────────────────────
+  const EqBars = ({ count = 5, className = "" }) => (
+    <div className={`flex items-end gap-[3px] ${className}`}>
+      {Array.from({ length: count }).map((_, i) => (
+        <span
+          key={i}
+          className={`w-[3px] rounded-full ${isPlaying ? "bg-current" : "bg-current opacity-40"}`}
+          style={{
+            height: isPlaying ? undefined : "30%",
+            animation: isPlaying
+              ? `music-bar${(i % 3) + 1} ${0.6 + i * 0.1}s ease-in-out infinite`
+              : "none",
+            minHeight: "4px",
+            maxHeight: "100%",
+          }}
+        />
+      ))}
+    </div>
+  );
 
   return (
     <>
-      {/* ── Playlist Drawer ──────────────────────────────────────────────── */}
-      {showPlaylist && (
-        <div className="fixed bottom-[72px] sm:bottom-[76px] right-0 sm:right-4 w-full sm:w-80 z-50 shadow-2xl rounded-t-2xl sm:rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 animate-slide-up">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-700">
-            <div className="flex items-center gap-2">
-              <ListMusic className="h-4 w-4 text-white/80" />
-              <span className="text-sm font-semibold text-white tracking-wide">
-                Up Next
-              </span>
-              <span className="text-xs text-white/60 ml-1">
-                ({playlist.length} tracks)
-              </span>
-            </div>
+      {/* ── Expanded Full-Screen Player ──────────────────────────────────── */}
+      <div
+        className={`fixed inset-0 z-[60] transition-all duration-500 ease-in-out ${
+          isExpanded
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "translate-y-full opacity-0 pointer-events-none"
+        }`}
+        style={{ willChange: "transform" }}
+        aria-modal="true"
+        role="dialog"
+        aria-label="Music player"
+      >
+        {/* Blurred album art background */}
+        <div className="absolute inset-0 overflow-hidden">
+          {currentMix.imgthumb && (
+            <Image
+              src={currentMix.imgthumb}
+              alt=""
+              fill
+              className="object-cover scale-110 blur-3xl opacity-40"
+              sizes="100vw"
+              aria-hidden="true"
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/80 via-gray-950/70 to-gray-950/95" />
+        </div>
+
+        {/* Content */}
+        <div className="relative h-full flex flex-col overflow-hidden">
+          {/* Header bar */}
+          <div className="flex items-center justify-between px-5 pt-6 pb-3 flex-shrink-0">
             <button
-              onClick={() => setShowPlaylist(false)}
-              className="text-white/70 hover:text-white transition-colors"
+              onClick={() => setIsExpanded(false)}
+              className="flex items-center gap-1.5 text-white/70 hover:text-white transition-colors"
+              aria-label="Collapse player"
             >
-              <X className="h-4 w-4" />
+              <ChevronDown className="h-5 w-5" />
+              <span className="text-xs font-medium">Now Playing</span>
+            </button>
+
+            <button
+              onClick={() => setShowPlaylist((p) => !p)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                showPlaylist
+                  ? "bg-white/20 text-white border-white/30"
+                  : "text-white/60 border-white/20 hover:border-white/40 hover:text-white"
+              }`}
+              aria-label="Toggle queue"
+            >
+              <ListMusic className="h-3.5 w-3.5" />
+              Queue
+              {playlist.length > 0 && (
+                <span className="text-[10px] bg-indigo-500 text-white rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                  {playlist.length}
+                </span>
+              )}
             </button>
           </div>
 
-          {/* Track list */}
-          <div
-            ref={playlistRef}
-            className="max-h-72 overflow-y-auto bg-white dark:bg-gray-900 divide-y divide-gray-100 dark:divide-gray-800 scrollbar-thin scrollbar-thumb-indigo-300 dark:scrollbar-thumb-indigo-700"
-          >
-            {isLoadingPlaylist ? (
-              <div className="flex items-center justify-center py-8">
-                <FaSpinner className="h-6 w-6 text-indigo-500 animate-spin" />
-              </div>
-            ) : playlist.length === 0 ? (
-              <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
-                No tracks found
-              </p>
-            ) : (
-              playlist.map((track, idx) => {
-                const isActive = idx === playlistIndex;
-                return (
-                  <button
-                    key={track.unique || track.id || idx}
-                    ref={isActive ? activeTrackRef : null}
-                    onClick={() => playFromIndex(idx)}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-all duration-200 group ${
-                      isActive
-                        ? "bg-indigo-50 dark:bg-indigo-900/30"
-                        : "hover:bg-gray-50 dark:hover:bg-gray-800/60"
-                    }`}
-                  >
-                    {/* Thumbnail */}
-                    <div className="relative w-10 h-10 flex-shrink-0 rounded-md overflow-hidden">
-                      {track.cover || track.imgthumb ? (
-                        <Image
-                          src={track.cover || track.imgthumb}
-                          alt={track.title}
-                          fill
-                          className="object-cover"
-                          sizes="40px"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center">
-                          <Music2 className="h-4 w-4 text-indigo-500" />
-                        </div>
-                      )}
-                      {/* Playing indicator overlay */}
-                      {isActive && isPlaying && (
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                          <div className="flex gap-[2px] items-end h-4">
-                            <span
-                              className="w-[3px] bg-white rounded-full animate-music-bar1"
-                              style={{ height: "60%" }}
-                            />
-                            <span
-                              className="w-[3px] bg-white rounded-full animate-music-bar2"
-                              style={{ height: "100%" }}
-                            />
-                            <span
-                              className="w-[3px] bg-white rounded-full animate-music-bar3"
-                              style={{ height: "75%" }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-xs font-semibold truncate ${
-                          isActive
-                            ? "text-indigo-600 dark:text-indigo-400"
-                            : "text-gray-800 dark:text-gray-200"
-                        }`}
-                      >
-                        {track.title}
-                      </p>
-                      <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
-                        {track.djName}
-                      </p>
-                    </div>
-
-                    {/* Track number / active indicator */}
-                    <span
-                      className={`text-[10px] font-mono flex-shrink-0 ${
-                        isActive
-                          ? "text-indigo-500"
-                          : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"
+          {/* Main area — split when playlist open */}
+          <div className="flex flex-1 min-h-0 overflow-hidden">
+            {/* Player panel */}
+            <div
+              className={`flex flex-col transition-all duration-300 h-full overflow-y-auto sm:overflow-hidden ${
+                showPlaylist ? "w-full sm:w-1/2 lg:w-[55%]" : "w-full"
+              }`}
+            >
+              {/* Album Art */}
+              <div className="flex-1 min-h-[150px] w-full flex items-center justify-center px-8 sm:px-16 pt-2 pb-4">
+                <div
+                  className={`relative aspect-square w-full max-w-[280px] sm:max-w-[320px] mx-auto rounded-2xl overflow-hidden shadow-2xl transition-all duration-700 ${
+                    isPlaying
+                      ? "shadow-indigo-500/40 scale-100"
+                      : "shadow-black/50 scale-95"
+                  }`}
+                >
+                  {currentMix.imgthumb ? (
+                    <Image
+                      src={currentMix.imgthumb}
+                      alt={currentMix.title || "Now Playing"}
+                      fill
+                      className={`object-cover transition-all duration-700 ${
+                        isPlaying ? "scale-100" : "scale-110 brightness-75"
                       }`}
+                      sizes="(max-width: 640px) 280px, 320px"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-indigo-800 to-purple-900 flex items-center justify-center">
+                      <Music2 className="h-20 w-20 text-white/30" />
+                    </div>
+                  )}
+
+                  {/* Vinyl overlay */}
+                  <div
+                    className={`absolute inset-0 rounded-full m-[30%] border-[1px] border-white/20 transition-opacity ${
+                      isPlaying ? "opacity-100" : "opacity-0"
+                    }`}
+                    style={{
+                      animation: isPlaying ? "spin 8s linear infinite" : "none",
+                    }}
+                  />
+
+                  {/* Playing overlay */}
+                  {isPlaying && (
+                    <div className="absolute inset-0 bg-black/10 flex items-end justify-start p-3">
+                      <div
+                        className="flex items-end gap-[3px] h-6 text-white/80"
+                        aria-hidden="true"
+                      >
+                        {[1, 2, 3, 4].map((i) => (
+                          <span
+                            key={i}
+                            className="w-[3px] rounded-full bg-white"
+                            style={{
+                              animation: `music-bar${(i % 3) + 1} ${0.5 + i * 0.1}s ease-in-out infinite`,
+                              height: "60%",
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Track info */}
+              <div className="px-6 sm:px-12 pb-3 text-center flex-shrink-0">
+                <div className="flex flex-wrap justify-center gap-1 mb-2">
+                  {genres.length > 0 ? (
+                    genres.map((g) => (
+                      <span
+                        key={g}
+                        className="px-2 py-0.5 bg-white/10 text-white/70 text-[10px] font-medium rounded-full border border-white/15"
+                      >
+                        {g}
+                      </span>
+                    ))
+                  ) : null}
+                </div>
+
+                <Link
+                  href={`/mix/${currentMix.id}`}
+                  onClick={() => setIsExpanded(false)}
+                  className="block text-xl sm:text-2xl font-bold text-white truncate hover:text-indigo-300 transition-colors"
+                >
+                  {currentMix.title}
+                </Link>
+
+                {currentMix.djName && (
+                  <p className="text-white/60 text-sm mt-0.5">
+                    {currentMix.djName}
+                  </p>
+                )}
+              </div>
+
+              {/* Progress bar — expanded */}
+              <div className="px-6 sm:px-12 pb-4 flex-shrink-0">
+                <div
+                  ref={expandedProgressRef}
+                  className="relative w-full h-1.5 bg-white/20 rounded-full cursor-pointer group"
+                  onClick={(e) => handleSeek(e, expandedProgressRef)}
+                  onMouseMove={(e) => handleMouseMove(e, expandedProgressRef)}
+                  onMouseLeave={() => setTooltipTime(null)}
+                >
+                  {/* Shimmer glow when playing */}
+                  {isPlaying && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/30 via-purple-500/30 to-indigo-500/30 rounded-full bg-[length:200%_100%] animate-gradient-x" />
+                  )}
+                  <div
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full transition-all duration-100"
+                    style={{ width: `${progress}%` }}
+                  />
+                  {/* Thumb */}
+                  <div
+                    className="absolute h-4 w-4 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity -mt-[5px]"
+                    style={{ left: `${progress}%`, transform: "translateX(-50%)" }}
+                  />
+                  {tooltipTime && (
+                    <div
+                      className="absolute -top-8 text-[10px] bg-indigo-600 text-white rounded px-1.5 py-0.5 pointer-events-none -translate-x-1/2 shadow"
+                      style={{ left: `${progress}%` }}
                     >
-                      {isActive ? (
-                        <span className="text-indigo-500">▶</span>
-                      ) : (
-                        String(idx + 1).padStart(2, "0")
-                      )}
+                      {tooltipTime}
+                    </div>
+                  )}
+                </div>
+                <div className="flex justify-between text-[10px] text-white/50 mt-1.5">
+                  <span>{currentTimeDisplay}</span>
+                  <span>{durationDisplay}</span>
+                </div>
+              </div>
+
+              {/* Controls row */}
+              <div className="flex items-center justify-center gap-4 sm:gap-6 px-6 pb-5 flex-shrink-0">
+                <button
+                  onClick={toggleShuffle}
+                  className={`p-2 rounded-full transition-all ${
+                    isShuffle
+                      ? "text-indigo-400 bg-indigo-500/20"
+                      : "text-white/40 hover:text-white/80"
+                  }`}
+                  aria-label="Shuffle"
+                >
+                  <Shuffle className="h-4 w-4 sm:h-5 sm:w-5" />
+                </button>
+
+                <button
+                  onClick={handleRewind}
+                  className="p-2.5 text-white/70 hover:text-white transition-colors hover:scale-110 active:scale-95"
+                  aria-label="Previous"
+                >
+                  <LiaStepBackwardSolid size={26} />
+                </button>
+
+                {/* Play / Pause — large */}
+                <button
+                  onClick={togglePlay}
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 ${
+                    isPlaying
+                      ? "bg-gradient-to-br from-indigo-500 to-purple-600 shadow-indigo-500/40"
+                      : "bg-white shadow-white/20"
+                  }`}
+                  aria-label={isPlaying ? "Pause" : "Play"}
+                >
+                  {isBuffering ? (
+                    <FaSpinner
+                      className={`h-6 w-6 animate-spin ${isPlaying ? "text-white" : "text-indigo-600"}`}
+                    />
+                  ) : isPlaying ? (
+                    <RiPauseLine size={26} className="text-white" />
+                  ) : (
+                    <RiPlayFill size={26} className="text-indigo-700 ml-0.5" />
+                  )}
+                </button>
+
+                <button
+                  onClick={handleNext}
+                  disabled={getNextIndex(playlistIndex) === null}
+                  className="p-2.5 text-white/70 hover:text-white transition-colors hover:scale-110 active:scale-95 disabled:opacity-30"
+                  aria-label="Next"
+                >
+                  <LiaStepForwardSolid size={26} />
+                </button>
+
+                <button
+                  onClick={cycleRepeat}
+                  className={`p-2 rounded-full transition-all ${
+                    repeat !== REPEAT.NONE
+                      ? "text-indigo-400 bg-indigo-500/20"
+                      : "text-white/40 hover:text-white/80"
+                  }`}
+                  aria-label={`Repeat: ${repeat}`}
+                >
+                  {repeat === REPEAT.ONE ? (
+                    <Repeat1 className="h-4 w-4 sm:h-5 sm:w-5" />
+                  ) : (
+                    <Repeat className="h-4 w-4 sm:h-5 sm:w-5" />
+                  )}
+                </button>
+              </div>
+
+              {/* Volume control */}
+              <div className="flex items-center justify-center gap-3 pb-6 flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity">
+                <button
+                  onClick={toggleMute}
+                  className="text-white/80 hover:text-white transition-colors flex-shrink-0"
+                  aria-label={isMuted ? "Unmute" : "Mute"}
+                >
+                  {isMuted || volume === 0 ? (
+                    <VolumeX className="h-4 w-4" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" />
+                  )}
+                </button>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={isMuted ? 0 : volume}
+                  onChange={handleVolumeChange}
+                  className="w-24 sm:w-32 h-1 appearance-none rounded-full cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, rgb(99 102 241) ${(isMuted ? 0 : volume) * 100}%, rgba(255,255,255,0.2) ${(isMuted ? 0 : volume) * 100}%)`,
+                  }}
+                  aria-label="Volume"
+                />
+              </div>
+
+              {/* Playlist position */}
+              {playlist.length > 1 && (
+                <p className="text-center text-[10px] text-white/30 pb-4 flex-shrink-0">
+                  {playlistIndex + 1} of {playlist.length}
+                </p>
+              )}
+            </div>
+
+            {/* Playlist panel */}
+            {showPlaylist && (
+              <div className="hidden sm:flex sm:w-1/2 lg:w-[45%] flex-col border-l border-white/10">
+                <div className="px-4 py-3 border-b border-white/10 flex-shrink-0">
+                  <h3 className="text-sm font-semibold text-white/80 flex items-center gap-2">
+                    <ListMusic className="h-4 w-4 text-indigo-400" />
+                    Up Next
+                    <span className="text-white/40 text-xs font-normal">
+                      ({playlist.length} tracks)
                     </span>
-                  </button>
-                );
-              })
+                  </h3>
+                </div>
+                <div
+                  ref={playlistRef}
+                  className="flex-1 overflow-y-auto divide-y divide-white/5"
+                >
+                  {isLoadingPlaylist ? (
+                    <div className="flex items-center justify-center py-12">
+                      <FaSpinner className="h-6 w-6 text-indigo-400 animate-spin" />
+                    </div>
+                  ) : (
+                    playlist.map((track, idx) => {
+                      const isActive = idx === playlistIndex;
+                      return (
+                        <button
+                          key={track.unique || track.id || idx}
+                          ref={isActive ? activeTrackRef : null}
+                          onClick={() => playFromIndex(idx)}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-all ${
+                            isActive
+                              ? "bg-indigo-500/20"
+                              : "hover:bg-white/5"
+                          }`}
+                        >
+                          <div className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden">
+                            {track.cover || track.imgthumb ? (
+                              <Image
+                                src={track.cover || track.imgthumb}
+                                alt={track.title}
+                                fill
+                                className="object-cover"
+                                sizes="40px"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-indigo-900/60 flex items-center justify-center">
+                                <Music2 className="h-4 w-4 text-indigo-400" />
+                              </div>
+                            )}
+                            {isActive && isPlaying && (
+                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <div className="flex gap-[2px] items-end h-3 text-white">
+                                  {[1, 2, 3].map((i) => (
+                                    <span
+                                      key={i}
+                                      className="w-[2px] rounded-full bg-white"
+                                      style={{
+                                        animation: `music-bar${i} ${0.5 + i * 0.1}s ease-in-out infinite`,
+                                        height: "60%",
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p
+                              className={`text-xs font-semibold truncate ${
+                                isActive
+                                  ? "text-indigo-300"
+                                  : "text-white/80"
+                              }`}
+                            >
+                              {track.title}
+                            </p>
+                            <p className="text-[10px] text-white/40 truncate">
+                              {track.djName}
+                            </p>
+                          </div>
+                          <span
+                            className={`text-[10px] font-mono flex-shrink-0 ${
+                              isActive ? "text-indigo-400" : "text-white/30"
+                            }`}
+                          >
+                            {isActive ? "▶" : String(idx + 1).padStart(2, "0")}
+                          </span>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
             )}
           </div>
-        </div>
-      )}
 
-      {/* ── Player Bar ──────────────────────────────────────────────────── */}
+          {/* Mobile queue (below controls, scrollable) */}
+          {showPlaylist && (
+            <div className="sm:hidden flex-shrink-0 border-t border-white/10 max-h-[220px] overflow-y-auto">
+              <div className="px-4 py-2 border-b border-white/5">
+                <p className="text-xs font-semibold text-white/60 flex items-center gap-2">
+                  <ListMusic className="h-3.5 w-3.5 text-indigo-400" /> Queue
+                </p>
+              </div>
+              {isLoadingPlaylist ? (
+                <div className="flex justify-center py-6">
+                  <FaSpinner className="h-5 w-5 animate-spin text-indigo-400" />
+                </div>
+              ) : (
+                playlist.map((track, idx) => {
+                  const isActive = idx === playlistIndex;
+                  return (
+                    <button
+                      key={track.unique || track.id || idx}
+                      onClick={() => playFromIndex(idx)}
+                      className={`w-full flex items-center gap-3 px-4 py-2 text-left ${
+                        isActive ? "bg-indigo-500/20" : "hover:bg-white/5"
+                      }`}
+                    >
+                      <div className="relative w-8 h-8 flex-shrink-0 rounded-md overflow-hidden">
+                        {track.cover || track.imgthumb ? (
+                          <Image
+                            src={track.cover || track.imgthumb}
+                            alt={track.title}
+                            fill
+                            className="object-cover"
+                            sizes="32px"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-indigo-900/60 flex items-center justify-center">
+                            <Music2 className="h-3 w-3 text-indigo-400" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[11px] font-semibold truncate ${isActive ? "text-indigo-300" : "text-white/70"}`}>
+                          {track.title}
+                        </p>
+                        <p className="text-[9px] text-white/40 truncate">{track.djName}</p>
+                      </div>
+                      {isActive && <span className="text-[10px] text-indigo-400">▶</span>}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Mini Player Bar (always at bottom) ───────────────────────────── */}
       <div
-        className={`fixed bottom-0 left-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md text-gray-200 shadow-xl z-50 border-t border-gray-200 dark:border-gray-800 transition-all duration-500 ${
-          isExpanded ? "h-auto rounded-t-xl" : "rounded-t-xl"
+        className={`fixed bottom-0 left-0 w-full z-50 transition-all duration-300 ${
+          isExpanded ? "opacity-0 pointer-events-none translate-y-2" : "opacity-100 translate-y-0"
         }`}
       >
-        {/* ── Progress bar ──────────────────────────────────────────────── */}
+        {/* Thin progress line at very top of bar */}
         <div
           ref={progressRef}
-          className="relative w-full h-1.5 bg-gray-200 dark:bg-gray-700 cursor-pointer group overflow-visible rounded-t-xl"
-          onClick={handleSeek}
-          onMouseMove={handleMouseMove}
+          className="relative w-full h-1 bg-white/10 cursor-pointer group"
+          style={{ background: "rgba(255,255,255,0.08)" }}
+          onClick={(e) => handleSeek(e, progressRef)}
+          onMouseMove={(e) => handleMouseMove(e, progressRef)}
           onMouseLeave={() => setTooltipTime(null)}
         >
           {isPlaying && (
             <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-indigo-500/20 bg-[length:200%_100%] animate-gradient-x" />
           )}
           <div
-            className="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full transition-all duration-100"
+            className="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-100"
             style={{ width: `${progress}%` }}
           />
           <div
             ref={dotRef}
-            className="absolute h-3.5 w-3.5 bg-white border-2 border-indigo-600 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300"
-            style={{
-              left: `${progress}%`,
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
+            className="absolute h-3 w-3 bg-white border-2 border-indigo-500 rounded-full shadow opacity-0 group-hover:opacity-100 -mt-1 transition-opacity"
+            style={{ left: `${progress}%`, transform: "translateX(-50%)" }}
           />
           {tooltipTime && (
             <div
-              className="absolute -top-8 text-xs bg-indigo-600 text-white rounded-md px-2 py-1 transform -translate-x-1/2 shadow-lg z-10 pointer-events-none"
+              className="absolute -top-7 text-[10px] bg-indigo-600 text-white rounded px-1.5 py-0.5 -translate-x-1/2 pointer-events-none shadow"
               style={{ left: `${progress}%` }}
             >
               {tooltipTime}
@@ -544,296 +895,174 @@ function AudioPlayer() {
           )}
         </div>
 
-        {/* ── Mini Player (mobile, collapsed) ───────────────────────────── */}
-        {isMiniPlayer && !isExpanded && (
-          <div
-            className="px-3 py-2 flex items-center gap-2"
-            onClick={toggleExpanded}
-          >
-            {/* Thumbnail */}
-            <div className="relative w-9 h-9 flex-shrink-0 rounded-md overflow-hidden">
+        {/* Bar body */}
+        <div className="bg-gray-950/95 backdrop-blur-xl border-t border-white/10 px-3 sm:px-5 py-2 sm:py-2.5">
+          <div className="max-w-7xl mx-auto flex items-center gap-3">
+            {/* Album art — click to expand */}
+            <button
+              onClick={() => setIsExpanded(true)}
+              className="relative w-10 h-10 sm:w-11 sm:h-11 flex-shrink-0 rounded-lg overflow-hidden shadow-lg hover:scale-105 transition-transform group"
+              aria-label="Open full player"
+            >
               {currentMix.imgthumb ? (
                 <Image
                   src={currentMix.imgthumb}
                   alt="Now playing"
                   fill
                   className="object-cover"
-                  sizes="36px"
+                  sizes="44px"
                 />
               ) : (
-                <div className="w-full h-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center">
-                  <Music2 className="h-4 w-4 text-indigo-500" />
+                <div className="w-full h-full bg-indigo-900/60 flex items-center justify-center">
+                  <Music2 className="h-4 w-4 text-indigo-400" />
                 </div>
               )}
               {isPlaying && (
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="flex gap-[2px] items-end h-3">
-                    <span
-                      className="w-[2px] bg-white rounded-full animate-music-bar1"
-                      style={{ height: "60%" }}
-                    />
-                    <span
-                      className="w-[2px] bg-white rounded-full animate-music-bar2"
-                      style={{ height: "100%" }}
-                    />
-                    <span
-                      className="w-[2px] bg-white rounded-full animate-music-bar3"
-                      style={{ height: "70%" }}
-                    />
+                    {[1, 2, 3].map((i) => (
+                      <span
+                        key={i}
+                        className="w-[2px] rounded-full bg-white"
+                        style={{
+                          animation: `music-bar${i} ${0.5 + i * 0.1}s ease-in-out infinite`,
+                          height: "60%",
+                        }}
+                      />
+                    ))}
                   </div>
                 </div>
               )}
-            </div>
+            </button>
 
-            {/* Title */}
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">
+            {/* Track info — click to expand */}
+            <button
+              onClick={() => setIsExpanded(true)}
+              className="flex-1 min-w-0 text-left"
+              aria-label="Open full player"
+            >
+              <p className="text-xs sm:text-sm font-semibold text-white truncate leading-tight">
                 {currentMix.title}
               </p>
-              <p className="text-[10px] text-gray-500 dark:text-gray-400">
-                {currentTimeDisplay} / {durationDisplay}
-              </p>
-            </div>
+              <div className="flex items-center gap-2 mt-0.5">
+                {isPlaying && !isBuffering && (
+                  <div className="flex items-end gap-[2px] h-3 text-indigo-400" aria-hidden="true">
+                    {[1, 2, 3].map((i) => (
+                      <span
+                        key={i}
+                        className="w-[2px] rounded-full bg-indigo-400"
+                        style={{
+                          animation: `music-bar${i} ${0.6 + i * 0.1}s ease-in-out infinite`,
+                          height: "60%",
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+                <span className="text-[10px] text-white/40">
+                  {currentTimeDisplay} / {durationDisplay}
+                </span>
+              </div>
+            </button>
 
-            {/* Mini controls */}
-            <div
-              className="flex items-center gap-1.5"
-              onClick={(e) => e.stopPropagation()}
-            >
+            {/* Controls */}
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+              {/* Prev — hidden on very small screens */}
               <button
-                onClick={handleNext}
-                disabled={getNextIndex(playlistIndex) === null}
-                className="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 disabled:opacity-30 transition-colors"
-                aria-label="Next track"
+                onClick={handleRewind}
+                className="hidden xs:flex p-1.5 text-white/50 hover:text-white transition-colors rounded-full hover:bg-white/10"
+                aria-label="Previous"
               >
-                <LiaStepForwardSolid size={16} />
+                <LiaStepBackwardSolid size={18} />
               </button>
+
+              {/* Play / Pause */}
               <button
                 onClick={togglePlay}
-                className={`p-2 rounded-full ${isPlaying ? "bg-indigo-600" : "bg-purple-600"} text-white`}
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg ${
+                  isPlaying
+                    ? "bg-gradient-to-br from-indigo-500 to-purple-600"
+                    : "bg-white"
+                }`}
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
                 {isBuffering ? (
-                  <FaSpinner className="h-4 w-4 animate-spin text-white" />
+                  <FaSpinner
+                    className={`h-4 w-4 animate-spin ${isPlaying ? "text-white" : "text-indigo-600"}`}
+                  />
                 ) : isPlaying ? (
-                  <RiPauseLine size={14} />
+                  <RiPauseLine size={16} className="text-white" />
                 ) : (
-                  <RiPlayFill size={14} />
+                  <RiPlayFill size={16} className="text-indigo-700 ml-0.5" />
                 )}
               </button>
-            </div>
 
-            <ChevronUp className="h-4 w-4 text-gray-400 flex-shrink-0" />
-          </div>
-        )}
+              {/* Next */}
+              <button
+                onClick={handleNext}
+                disabled={getNextIndex(playlistIndex) === null}
+                className="p-1.5 text-white/50 hover:text-white transition-colors rounded-full hover:bg-white/10 disabled:opacity-30"
+                aria-label="Next"
+              >
+                <LiaStepForwardSolid size={18} />
+              </button>
 
-        {/* ── Full Player (desktop, or mobile expanded) ──────────────────── */}
-        {(!isMiniPlayer || isExpanded) && (
-          <div className="px-3 py-2 sm:px-4 sm:py-2.5">
-            {/* Mobile drag handle */}
-            {isMiniPlayer && (
-              <div className="flex justify-center mb-2">
-                <button
-                  onClick={toggleExpanded}
-                  className="w-10 h-1 bg-gray-300 dark:bg-gray-700 rounded-full hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
-                  aria-label="Collapse player"
-                />
-              </div>
-            )}
+              {/* Queue toggle — desktop only */}
+              <button
+                onClick={() => {
+                  setIsExpanded(true);
+                  setShowPlaylist(true);
+                }}
+                className="hidden sm:flex p-1.5 text-white/40 hover:text-white/80 transition-colors rounded-full hover:bg-white/10"
+                aria-label="Open queue"
+              >
+                <ListMusic className="h-4 w-4" />
+              </button>
 
-            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-              {/* ── Track info ───────────────────────────────────────────── */}
-              <div className="flex items-center gap-3 w-full sm:w-auto sm:min-w-[240px] order-1">
-                {currentMix.imgthumb && (
-                  <Link
-                    href={`/mix/${currentMix.id}`}
-                    className="relative group w-12 h-12 sm:w-13 sm:h-13 flex-shrink-0 overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:scale-105"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/40 to-indigo-500/40 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
-                    <Image
-                      src={currentMix.imgthumb}
-                      alt="Now playing"
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      width={52}
-                      height={52}
-                    />
-                    {isPlaying && (
-                      <div className="absolute inset-0 flex items-center justify-center z-20">
-                        <div className="relative w-6 h-6">
-                          <div className="absolute inset-0 bg-white/30 rounded-full animate-ping" />
-                          <div className="absolute inset-0 bg-white/80 rounded-full flex items-center justify-center">
-                            <div className="flex gap-[2px] items-end h-3">
-                              <span
-                                className="w-[3px] bg-purple-600 rounded-full animate-music-bar1"
-                                style={{ height: "60%" }}
-                              />
-                              <span
-                                className="w-[3px] bg-indigo-600 rounded-full animate-music-bar2"
-                                style={{ height: "100%" }}
-                              />
-                              <span
-                                className="w-[3px] bg-purple-600 rounded-full animate-music-bar3"
-                                style={{ height: "75%" }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </Link>
-                )}
-
-                <div className="flex flex-col min-w-0">
-                  <Link
-                    href={`/mix/${currentMix.id}`}
-                    className="font-bold text-sm text-slate-700 dark:text-slate-200 truncate max-w-[160px] sm:max-w-[200px] hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                  >
-                    {currentMix.title}
-                  </Link>
-                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
-                      Now Playing
-                    </span>
-                    <span className="text-[11px] text-gray-500 dark:text-gray-400">
-                      {currentTimeDisplay} / {durationDisplay}
-                    </span>
-                  </div>
-                  {/* Track position in playlist */}
-                  {playlist.length > 1 && (
-                    <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
-                      {playlistIndex + 1} / {playlist.length}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* ── Playback controls ─────────────────────────────────────── */}
-              <div className="flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto order-2 sm:mx-auto">
-                {/* Shuffle */}
-                <button
-                  onClick={toggleShuffle}
-                  className={`p-1.5 rounded-full transition-all duration-200 hover:scale-110 ${
-                    isShuffle
-                      ? "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/30"
-                      : "text-gray-400 dark:text-gray-500 hover:text-indigo-500"
-                  }`}
-                  aria-label="Shuffle"
-                >
-                  <Shuffle className="h-4 w-4" />
-                </button>
-
-                {/* Rewind / Prev */}
-                <button
-                  onClick={handleRewind}
-                  className="p-1.5 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 rounded-full transition-all hover:bg-indigo-100 dark:hover:bg-indigo-900/30 hover:scale-110 active:scale-95"
-                  aria-label="Previous / Rewind"
-                >
-                  <LiaStepBackwardSolid size={20} />
-                </button>
-
-                {/* Play / Pause */}
-                <button
-                  onClick={togglePlay}
-                  className={`p-2.5 sm:p-3 rounded-full transition-all duration-300 transform hover:scale-110 active:scale-95 ${
-                    isPlaying
-                      ? "bg-indigo-600 hover:bg-indigo-700 hover:shadow-indigo-500/30"
-                      : "bg-purple-600 hover:bg-purple-700 hover:shadow-purple-500/30"
-                  } text-white shadow-md`}
-                  aria-label={isPlaying ? "Pause" : "Play"}
-                >
-                  {isBuffering ? (
-                    <FaSpinner className="h-5 w-5 animate-spin text-white" />
-                  ) : isPlaying ? (
-                    <RiPauseLine size={22} />
-                  ) : (
-                    <RiPlayFill size={22} />
-                  )}
-                </button>
-
-                {/* Forward / Next */}
-                <button
-                  onClick={handleForward}
-                  className="p-1.5 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 rounded-full transition-all hover:bg-indigo-100 dark:hover:bg-indigo-900/30 hover:scale-110 active:scale-95"
-                  aria-label="Forward / Next"
-                >
-                  <LiaStepForwardSolid size={20} />
-                </button>
-
-                {/* Repeat */}
-                <button
-                  onClick={cycleRepeat}
-                  className={`p-1.5 rounded-full transition-all duration-200 hover:scale-110 ${
-                    repeat !== REPEAT.NONE
-                      ? "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/30"
-                      : "text-gray-400 dark:text-gray-500 hover:text-indigo-500"
-                  }`}
-                  aria-label={`Repeat: ${repeat}`}
-                >
-                  {repeat === REPEAT.ONE ? (
-                    <Repeat1 className="h-4 w-4" />
-                  ) : (
-                    <Repeat className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-
-              {/* ── Right: playlist toggle ─────────────────────────────────── */}
-              <div className="flex items-center gap-2 sm:ml-auto order-3">
-                <button
-                  onClick={() => setShowPlaylist((p) => !p)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
-                    showPlaylist
-                      ? "bg-indigo-600 text-white border-indigo-600"
-                      : "bg-transparent text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-indigo-400 hover:text-indigo-500"
-                  }`}
-                  aria-label="Toggle playlist"
-                >
-                  <ListMusic className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Queue</span>
-                  {playlist.length > 0 && (
-                    <span
-                      className={`text-[10px] rounded-full px-1 font-bold ${
-                        showPlaylist
-                          ? "bg-white/20 text-white"
-                          : "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400"
-                      }`}
-                    >
-                      {playlist.length}
-                    </span>
-                  )}
-                </button>
-
-                {isMiniPlayer && (
-                  <button
-                    onClick={toggleExpanded}
-                    className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                    aria-label="Collapse"
-                  >
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
+              {/* Expand arrow */}
+              <button
+                onClick={() => setIsExpanded(true)}
+                className="hidden sm:flex p-1.5 text-white/30 hover:text-white/70 transition-colors"
+                aria-label="Expand player"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
             </div>
           </div>
-        )}
-
-        {/* Hidden audio element */}
-        <audio
-          ref={audioPlayer}
-          onTimeUpdate={updateProgress}
-          onEnded={() => {
-            setIsPlaying(false);
-            handleTrackEnd();
-          }}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onError={(e) => {
-            console.error("Audio error:", e);
-            setIsPlaying(false);
-            setIsBuffering(false);
-          }}
-        />
+        </div>
       </div>
+
+      {/* Hidden audio element */}
+      <audio
+        ref={audioPlayer}
+        onTimeUpdate={updateProgress}
+        onEnded={() => {
+          setIsPlaying(false);
+          handleTrackEnd();
+        }}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onError={(e) => {
+          console.error("Audio error:", e);
+          setIsPlaying(false);
+          setIsBuffering(false);
+        }}
+      />
+
+      <style jsx>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        input[type='range'] {
+          accent-color: rgb(99 102 241);
+        }
+        input[type='range']::-webkit-slider-runnable-track {
+          background: transparent;
+        }
+      `}</style>
     </>
   );
 }

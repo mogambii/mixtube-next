@@ -20,6 +20,18 @@
 }
 
 /* Custom animations for audio player and floating particles */
+.animate-music-bar1 {
+  animation: music-bar1 0.8s ease-in-out infinite;
+}
+
+.animate-music-bar2 {
+  animation: music-bar2 0.9s ease-in-out infinite;
+}
+
+.animate-music-bar3 {
+  animation: music-bar3 1.0s ease-in-out infinite;
+}
+
 @keyframes gradient-x {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -42,6 +54,36 @@
   33% { height: 100%; }
   66% { height: 40%; }
 }
+
+.animate-gradient-x {
+  animation: gradient-x 3s ease infinite;
+  background-size: 200% 200%;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.25s ease-out forwards;
+}
+
+/* Thin custom scrollbar for the playlist */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(99,102,241,0.4);
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(99,102,241,0.7);
+}
+
 @keyframes float-slow {
   0% { transform: translate(0, 0); }
   50% { transform: translate(20px, 15px); }
