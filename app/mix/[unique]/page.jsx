@@ -326,13 +326,13 @@ export default async function MixTape({ params }) {
                     {/* Primary Play CTA - Glass Circular */}
                     <div className="relative group bg-white/20 dark:bg-gray-800/40 backdrop-blur-lg border border-gray-200/50 dark:border-gray-600/50 shadow-xl hover:bg-white/30 dark:hover:bg-gray-700/60 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 rounded-full transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center w-16 h-16 sm:w-16 sm:h-16 flex-shrink-0 cursor-pointer">
                       <AudioAdd id={mix.unique} iconOnly={true} className="w-full h-full group-hover:scale-110 transition-transform" />
-                      <div className="absolute inset-0 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.2)] dark:shadow-[0_0_15px_rgba(129,140,248,0.2)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="absolute inset-0 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.2)] dark:shadow-[0_0_15px_rgba(129,140,248,0.2)] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                     </div>
                     
                     {/* Primary Download CTA - Glass Circular */}
                     <div className="relative group bg-white/20 dark:bg-gray-800/40 backdrop-blur-lg border border-gray-200/50 dark:border-gray-600/50 shadow-xl hover:bg-white/30 dark:hover:bg-gray-700/60 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 rounded-full transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center w-16 h-16 sm:w-16 sm:h-16 flex-shrink-0 cursor-pointer">
                       <DownloadBtn id={mix.unique} iconOnly={true} className="w-full h-full group-hover:scale-110 transition-transform" />
-                      <div className="absolute inset-0 rounded-full shadow-[0_0_15px_rgba(34,197,94,0.2)] dark:shadow-[0_0_15px_rgba(74,222,128,0.2)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="absolute inset-0 rounded-full shadow-[0_0_15px_rgba(34,197,94,0.2)] dark:shadow-[0_0_15px_rgba(74,222,128,0.2)] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                     </div>
                   </div>
                 </div>
