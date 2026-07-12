@@ -261,8 +261,8 @@ export default async function MixTape({ params }) {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Cover Art */}
-            <div className="w-full md:w-1/3 lg:w-1/4 p-4 sm:p-6 md:p-8">
-              <div className="relative group mx-auto max-w-[250px] md:max-w-none">
+            <div className="w-full md:w-1/3 lg:w-1/4 p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center">
+              <div className="relative group w-full max-w-[250px] md:max-w-none">
                 <div className="absolute inset-0 rounded-full bg-black shadow-xl transform scale-[0.85] group-hover:scale-[0.9] transition-transform duration-700 ease-out"></div>
                 <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-gray-900 to-gray-800 transform scale-[0.4] group-hover:scale-[0.45] transition-transform duration-700 ease-out">
                   <div className="absolute inset-0 rounded-full border-4 border-gray-700 transform scale-[0.5]"></div>
@@ -293,13 +293,6 @@ export default async function MixTape({ params }) {
 
                   <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-80 transition-opacity duration-500"></div>
 
-                  <div className="absolute inset-0 z-20 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-indigo-600/90 shadow-xl flex items-center justify-center hover:scale-105 transition-transform duration-300 border-4 border-white/30">
-                      <AudioAdd id={mix.unique} />
-                    </div>
-                  </div>
-
-                  {/* Bottom info bar — FaMusic replaces the music path SVG */}
                   <div className="absolute bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-black/80 to-transparent p-3 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
@@ -317,12 +310,33 @@ export default async function MixTape({ params }) {
                   </div>
                 </div>
               </div>
-              <div className="mt-4 md:mt-0"></div>
             </div>
 
             {/* Stats and Info Section */}
             <div className="w-full md:w-2/3 lg:w-3/4 p-6 md:p-8 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900/90">
               <div className="flex flex-col h-full">
+                {/* Primary Action Bar (Play & Download) */}
+                <div className="flex flex-col md:flex-row items-center justify-between mb-5 pb-8 border-b border-gray-200 dark:border-gray-700">
+                  <div className="text-center md:text-left w-full md:w-auto mb-6 md:mb-0">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">Ready to listen?</p>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Stream or Download</h3>
+                  </div>
+                  
+                  <div className="flex flex-row items-center justify-center sm:justify-end space-x-6 w-full md:w-auto">
+                    {/* Primary Play CTA - Glass Circular */}
+                    <div className="relative group bg-white/20 dark:bg-gray-800/40 backdrop-blur-lg border border-gray-200/50 dark:border-gray-600/50 shadow-xl hover:bg-white/30 dark:hover:bg-gray-700/60 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 rounded-full transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center w-16 h-16 sm:w-16 sm:h-16 flex-shrink-0 cursor-pointer">
+                      <AudioAdd id={mix.unique} iconOnly={true} className="w-full h-full group-hover:scale-110 transition-transform" />
+                      <div className="absolute inset-0 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.2)] dark:shadow-[0_0_15px_rgba(129,140,248,0.2)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+                    
+                    {/* Primary Download CTA - Glass Circular */}
+                    <div className="relative group bg-white/20 dark:bg-gray-800/40 backdrop-blur-lg border border-gray-200/50 dark:border-gray-600/50 shadow-xl hover:bg-white/30 dark:hover:bg-gray-700/60 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 rounded-full transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center w-16 h-16 sm:w-16 sm:h-16 flex-shrink-0 cursor-pointer">
+                      <DownloadBtn id={mix.unique} iconOnly={true} className="w-full h-full group-hover:scale-110 transition-transform" />
+                      <div className="absolute inset-0 rounded-full shadow-[0_0_15px_rgba(34,197,94,0.2)] dark:shadow-[0_0_15px_rgba(74,222,128,0.2)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Release Date */}
                 <div className="mb-8 flex items-center">
                   <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg mr-4">
@@ -398,7 +412,7 @@ export default async function MixTape({ params }) {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {/* Share Button */}
             <div className="relative group">
               <div className="bg-white dark:bg-gray-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-xl p-3 flex flex-col items-center transition-all duration-300 shadow-sm hover:shadow border border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-800 h-full">
@@ -453,47 +467,6 @@ export default async function MixTape({ params }) {
               </div>
             )}
 
-            {/* Play Button */}
-            <div className="relative group">
-              <div className="bg-white dark:bg-gray-800/80 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl p-3 flex flex-col items-center transition-all duration-300 shadow-sm hover:shadow border border-gray-100 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-800 h-full">
-                <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-2">
-                  <AudioAdd id={unique} />
-                </div>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Play
-                </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  stream the mixtape
-                </span>
-                {/* Plus replaces the "+" badge SVG */}
-                <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-white text-xs">
-                    <Plus className="h-3 w-3" strokeWidth={2.5} />
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Download Button */}
-            <div className="relative group">
-              <div className="bg-white dark:bg-gray-800/80 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-xl p-3 flex flex-col items-center transition-all duration-300 shadow-sm hover:shadow border border-gray-100 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-800 h-full">
-                <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-2">
-                  <DownloadBtn id={unique} />
-                </div>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Download
-                </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Save offline
-                </span>
-                {/* ArrowDown replaces the download badge SVG */}
-                <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white text-xs">
-                    <ArrowDown className="h-3 w-3" strokeWidth={2.5} />
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 

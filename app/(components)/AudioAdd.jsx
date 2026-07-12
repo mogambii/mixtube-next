@@ -5,16 +5,14 @@ import { usePlayerContext } from "@/context/PlayerContext";
 import { RiMusic2Fill } from "react-icons/ri";
 import { motion, AnimatePresence } from "framer-motion";
 
-const AudioAdd = ({ id }) => {
+const AudioAdd = ({ id, iconOnly = false, className = "" }) => {
   const { playMix, currentMix } = usePlayerContext();
   const [isHovering, setIsHovering] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
 
-  // Check if this is the currently playing mixtape
   const isCurrentlyPlaying = currentMix && currentMix.id === id;
 
-  // Reset animation key when playing status changes for smooth transitions
   useEffect(() => {
     setAnimationKey(prev => prev + 1);
   }, [isCurrentlyPlaying]);
@@ -22,13 +20,27 @@ const AudioAdd = ({ id }) => {
   const handlePlay = () => {
     setIsClicked(true);
     playMix(id);
-
-    // Reset the click animation after a short delay
     setTimeout(() => setIsClicked(false), 300);
   };
 
+  if (iconOnly) {
+    return (
+      <button
+        onClick={handlePlay}
+        className={`focus:outline-none flex items-center justify-center ${className}`}
+        aria-label="Play mixtape"
+      >
+        {isCurrentlyPlaying ? (
+          <RiMusic2Fill className="h-6 w-6 animate-pulse" />
+        ) : (
+          <IoPlay className="h-6 w-6" />
+        )}
+      </button>
+    );
+  }
+
   return (
-    <div className="relative group">
+    <div className="relative group w-full h-full">
       <motion.button
         onClick={handlePlay}
         onMouseEnter={() => setIsHovering(true)}
@@ -53,7 +65,6 @@ const AudioAdd = ({ id }) => {
         }}
         aria-label="Play mixtape"
       >
-        {/* Glowing ring for currently playing */}
         {isCurrentlyPlaying && (
           <motion.div 
             key={`ring-${animationKey}`}
@@ -63,7 +74,6 @@ const AudioAdd = ({ id }) => {
           />
         )}
 
-        {/* Enhanced ripple effect on hover */}
         <AnimatePresence>
           {isHovering && (
             <motion.span
@@ -76,7 +86,6 @@ const AudioAdd = ({ id }) => {
           )}
         </AnimatePresence>
 
-        {/* Icon with enhanced animations */}
         <AnimatePresence mode="wait">
           <motion.div 
             key={isCurrentlyPlaying ? "playing" : "paused"}
@@ -89,7 +98,6 @@ const AudioAdd = ({ id }) => {
             {isCurrentlyPlaying ? (
               <div className="relative flex items-center justify-center p-1">
                 <RiMusic2Fill className="text-white text-lg" />
-                {/* Multiple pulsing circles for more dynamic effect */}
                 <span className="absolute inset-0 rounded-full bg-white/40 animate-ping opacity-75 animation-delay-0"></span>
                 <span className="absolute inset-0 rounded-full bg-white/20 animate-ping opacity-50 animation-delay-300"></span>
               </div>
@@ -102,7 +110,6 @@ const AudioAdd = ({ id }) => {
         </AnimatePresence>
       </motion.button>
 
-      {/* Optional subtle glow effect */}
       {isCurrentlyPlaying && (
         <div className="absolute inset-0 -z-10 blur-md opacity-30 bg-purple-500 rounded-full scale-75"></div>
       )}

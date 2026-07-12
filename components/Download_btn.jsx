@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { FaDownload, FaSpinner } from "react-icons/fa";
 
-const Download_btn = ({ id }) => {
+const Download_btn = ({ id, iconOnly = false, className = "" }) => {
   const { data: session } = useSession();
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -16,13 +16,11 @@ const Download_btn = ({ id }) => {
 
     setIsDownloading(true);
 
-    // Open the popup BEFORE the async operation
     const externalLink =
       "https://www.profitableratecpm.com/y5ffkwhme?key=17359f4bbc9a1475cdac44bd6fdc0a88";
     const popup = window.open(externalLink, "_blank");
 
     try {
-      // Update the download count in the database
       const response = await fetch(`/api/mixtape/download/${id}`, {
         method: "POST",
         headers: {
@@ -32,17 +30,14 @@ const Download_btn = ({ id }) => {
 
       if (!response.ok) {
         const error = await response.json();
-        // Close the popup if there's an error
         if (popup) popup.close();
         throw new Error(error.message || "Failed to update download count");
       }
 
-      // Construct download URL with proper encoding
       const downloadUrl = `https://storage.mixtapped.com/download/${encodeURIComponent(
         id
       )}`;
 
-      // Create a hidden anchor tag and force a download
       const link = document.createElement("a");
       link.href = downloadUrl;
       link.download = `mixtape-${id}.mp3`;
@@ -65,7 +60,9 @@ const Download_btn = ({ id }) => {
   return (
     <button
       onClick={handleDownload}
-      className="text-green-600 dark:text-green-400 focus:outline-none"
+      className={`focus:outline-none flex items-center justify-center ${
+        iconOnly ? className : "text-green-600 dark:text-green-400"
+      }`}
       disabled={isDownloading}
       aria-label="Download mixtape"
     >
