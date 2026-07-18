@@ -35,7 +35,7 @@ export function PlayerProvider({ children }) {
       const filename = url.split("/").pop();
       setCurrentMix({
         id,
-        audio: `https://files.mixtapped.com/${encodeURIComponent(filename)}`,
+        audio: `https://cdn.mixtapped.com/${encodeURIComponent(filename)}`,
         imgthumb: mixData.imgthumb,
         title: mixData.title,
       });
