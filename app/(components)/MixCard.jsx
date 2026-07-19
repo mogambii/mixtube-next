@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { FaDownload, FaRegCirclePlay } from "react-icons/fa6";
+import { optimizeCloudinaryUrl } from "@/lib/cloudinary";
 
 const MixCard = ({
   name,
@@ -25,7 +26,7 @@ const MixCard = ({
           <div className="relative w-full sm:w-40 sm:h-40 h-48 flex-shrink-0 overflow-hidden rounded-xl shadow-sm z-10">
             <Image
               priority={loading ? false : true}
-              src={img ? img : "https://placehold.co/210x210"}
+              src={img ? optimizeCloudinaryUrl(img) : "https://placehold.co/210x210"}
               className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               alt={title}
               height={280}

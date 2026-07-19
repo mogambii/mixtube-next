@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import { optimizeCloudinaryUrl } from "@/lib/cloudinary";
 
 const ProfileCard = ({ Djname, profilep, name, className = '' }) => {
   return (
@@ -10,7 +11,7 @@ const ProfileCard = ({ Djname, profilep, name, className = '' }) => {
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 flex-shrink-0 flex items-center justify-center mb-3 sm:mb-4">
           <Image
             src={
-              profilep ||
+              optimizeCloudinaryUrl(profilep) ||
               "https://assets.practice365.co.uk/wp-content/uploads/sites/1005/2023/03/Default-Profile-Picture-Transparent.png"
             }
             className="rounded-full border-4 border-white/60 dark:border-gray-700 object-cover shadow-sm group-hover:border-indigo-100 dark:group-hover:border-indigo-900 transition-colors duration-300"

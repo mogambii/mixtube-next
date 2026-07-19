@@ -13,6 +13,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prismadb";
 import RecentMixxes from "@/components/RecentMixxes";
+import { optimizeCloudinaryUrl } from "@/lib/cloudinary";
 
 
 async function fetchProfile(username) {
@@ -242,7 +243,7 @@ const DjProfile = async ({ params }) => {
             <div className="relative flex-shrink-0 -mt-20 md:-mt-24">
               <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-2xl">
                 <Image
-                  src={profile.profilep || "/images/default-avatar.png"}
+                  src={optimizeCloudinaryUrl(profile.profilep) || "/images/default-avatar.png"}
                   alt={profile.djName || username}
                   fill
                   className="object-cover"

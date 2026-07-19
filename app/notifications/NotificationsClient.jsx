@@ -5,6 +5,7 @@ import { FaEnvelopeOpen, FaEnvelope, FaHeart, FaUserPlus, FaComment, FaSpinner }
 import toast from "react-hot-toast";
 import Image from "next/image";
 import { useInView } from "react-intersection-observer";
+import { optimizeCloudinaryUrl } from "@/lib/cloudinary";
 
 export default function NotificationsClient({ initialNotifications, initialUnreadCount, totalCount }) {
   const [notifications, setNotifications] = useState(initialNotifications);
@@ -176,7 +177,7 @@ export default function NotificationsClient({ initialNotifications, initialUnrea
                     <div className="relative group/avatar cursor-pointer">
                       <Image
                         priority={true}
-                        src={notification.sender?.profilep || "/default-avatar.png"}
+                        src={optimizeCloudinaryUrl(notification.sender?.profilep) || "/default-avatar.png"}
                         alt={`${notification.sender?.username || "User"} avatar`}
                         className="w-14 h-14 rounded-full object-cover ring-2 ring-white dark:ring-gray-700 shadow-md group-hover/avatar:ring-indigo-400 transition-colors duration-300"
                         height={56}
@@ -212,7 +213,7 @@ export default function NotificationsClient({ initialNotifications, initialUnrea
                         <div className="flex items-center space-x-3 p-3 bg-white/40 dark:bg-gray-700/40 backdrop-blur-md rounded-xl border border-white/20 dark:border-white/10 hover:bg-white/60 dark:hover:bg-gray-600/60 shadow-sm transition-colors duration-200">
                           {notification.mixtape.imgthumb && (
                             <Image
-                              src={notification.mixtape.imgthumb}
+                              src={optimizeCloudinaryUrl(notification.mixtape.imgthumb)}
                               alt={notification.mixtape.title}
                               className="w-10 h-10 rounded-lg object-cover shadow-sm"
                               height={40}
