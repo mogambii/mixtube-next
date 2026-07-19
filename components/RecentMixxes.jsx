@@ -1,35 +1,18 @@
 import MixCard from "@/app/(components)/MixCard";
-import prisma from "@/lib/prismadb";
 import React from "react";
 import { FaCompactDisc } from "react-icons/fa";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
-const RecentMixxes = async ({ username }) => {
-  const [data, totalCount] = await Promise.all([
-    prisma.user.findUnique({
-      where: { username },
-      include: {
-        mixtapes: {
-          orderBy: { time: "desc" },
-          take: 10,
-        },
-      },
-    }),
-    prisma.mixtape.count({
-      where: {
-        user: { username },
-      },
-    }),
-  ]);
+const RecentMixxes = ({ username, mixtapes, totalCount }) => {
 
-  if (!data || !data.mixtapes?.length) {
+  if (!mixtapes || mixtapes.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800/80 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/60 overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-700/60">
+      <div className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-3xl shadow-lg border border-white/20 dark:border-white/10 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/20 dark:border-white/10">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-            <span className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
-              <FaCompactDisc className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span className="p-2 bg-indigo-50/50 dark:bg-indigo-900/30 rounded-lg">
+              <FaCompactDisc className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
             </span>
             Latest Mixtapes
           </h2>
@@ -44,48 +27,46 @@ const RecentMixxes = async ({ username }) => {
   const hasMore = totalCount > 10;
 
   return (
-    <div className="bg-white dark:bg-gray-800/80 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/60 overflow-hidden">
+    <div className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-3xl shadow-lg border border-white/20 dark:border-white/10 overflow-hidden">
       {/* Section header */}
-      <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-gray-700/60">
+      <div className="flex items-center justify-between px-6 py-5 border-b border-white/20 dark:border-white/10">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-          <span className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
-            <FaCompactDisc className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <span className="p-2 bg-indigo-50/50 dark:bg-indigo-900/30 rounded-lg">
+            <FaCompactDisc className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
           </span>
           Latest Mixtapes
         </h2>
-        <span className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-semibold px-3 py-1.5 rounded-full border border-indigo-100 dark:border-indigo-800/40">
+        <span className="bg-white/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 text-xs font-semibold px-3 py-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-sm">
           {totalCount} {totalCount === 1 ? "mixtape" : "mixtapes"}
         </span>
       </div>
 
       {/* Mixtape list */}
-      <div className="divide-y divide-gray-50 dark:divide-gray-700/40 grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 p-6">
-        {data.mixtapes.map((mix) => (
-          <MixCard
-            key={mix.id}
-            link={`/mix/${mix.unique}`}
-            title={mix.title}
-            year={mix.time}
-            img={mix.imgthumb}
-            downloads={mix.totalDownloads}
-            Djname={mix.djName}
-            plays={mix.totalPlays}
-          />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-6">
+        {mixtapes.map((mix) => (
+          <div key={mix.unique} className="w-full">
+            <MixCard
+              link={`/mix/${mix.unique}`}
+              title={mix.title}
+              img={mix.imgthumb}
+              downloads={mix.totalDownloads}
+              Djname={mix.djName}
+              plays={mix.totalPlays}
+            />
+          </div>
         ))}
       </div>
 
-      {/* View all link — only shown when there are more than 10 */}
-      {hasMore && (
-        <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/40">
-          <Link
-            href={`/dj/${username}/mixxes`}
-            className="group flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors duration-200"
-          >
-            View all {totalCount} mixtapes
-            <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-200" />
-          </Link>
-        </div>
-      )}
+      {/* View all link — always shown */}
+      <div className="px-6 py-4 border-t border-white/20 dark:border-white/10 bg-white/30 dark:bg-gray-800/30">
+        <Link
+          href={`/dj/${username}/mixxes`}
+          className="group flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-white/40 dark:bg-gray-900/40 hover:bg-white/70 dark:hover:bg-gray-700/70 border border-white/20 dark:border-white/5 transition-all duration-300 shadow-sm hover:shadow-md"
+        >
+          View all mixtapes
+          <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+        </Link>
+      </div>
     </div>
   );
 };

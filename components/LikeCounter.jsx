@@ -40,15 +40,13 @@ const LikeCounter = ({ initialCount, mixtapeId }) => {
   }, [count]);
 
   return (
-    <div className={`bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 flex items-center transform transition-all duration-500 hover:scale-105 ${isAnimating ? 'shadow-md ring-1 ring-red-300 dark:ring-red-700' : 'hover:shadow-md'}`}>
-      <div className={`p-3 rounded-lg mr-4 transition-all duration-500 ${isAnimating ? 'bg-red-200 dark:bg-red-800/50 scale-110' : 'bg-red-100 dark:bg-red-900/30'}`}>
-        <FaHeart className={`h-5 w-5 transition-all duration-500 ${isAnimating ? 'text-red-600 dark:text-red-400 scale-110' : 'text-red-500 dark:text-red-400'}`} />
+    <div className={`bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-2xl p-4 flex items-center gap-4 transition-all duration-500 ${isAnimating ? "ring-2 ring-red-400/50 shadow-lg shadow-red-500/10" : ""}`}>
+      <div className={`p-3 rounded-xl transition-all duration-500 ${isAnimating ? "bg-red-500/20 scale-110" : "bg-red-500/10"}`}>
+        <FaHeart className={`h-5 w-5 transition-all duration-500 ${isAnimating ? "text-red-500 scale-110" : "text-red-400"}`} />
       </div>
       <div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Likes
-        </p>
-        <p className={`text-xl font-bold transition-all duration-500 ${isAnimating ? 'text-red-600 dark:text-red-400 scale-105 transform' : 'text-gray-800 dark:text-gray-200'}`}>
+        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Likes</p>
+        <p className={`text-xl font-bold transition-all duration-500 ${isAnimating ? "text-red-500" : "text-gray-900 dark:text-white"}`}>
           {count.toLocaleString()}
         </p>
       </div>

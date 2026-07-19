@@ -11,9 +11,7 @@ import {
 } from "lucide-react";
 import { FaMicrophone, FaArrowRight } from "react-icons/fa";
 
-// Dynamically import MpNav and NavMenu for performance optimization
-const MpNav = dynamic(() => import("./(components)/MpNav"));
-const NavMenu = dynamic(() => import("@/components/NavMenu"));
+const SearchInputTrigger = dynamic(() => import("./(components)/SearchInputTrigger"));
 
 export const metadata = {
   title: "Stream & Download the Best DJ Mixtapes | MixTapped Music",
@@ -50,93 +48,41 @@ export const metadata = {
 
 export default function Mainpage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 dark:from-gray-950 dark:to-gray-900">
-      {/* Sticky header with blur effect */}
-      <header
-        className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-950/80 border-b border-gray-200/80 dark:border-gray-800/80 shadow-sm"
-        role="banner"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link
-              href="/search"
-              className="flex-shrink-0 flex items-center"
-              aria-label="Search Mixtapes"
-            >
-              <MpNav place="Search Mixtapes" />
-            </Link>
-
-            <div className="flex items-center space-x-4">
-              <NavMenu />
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-b rounded-2xl mx-2 p-2 from-white to-slate-50 dark:from-gray-950 dark:to-gray-900">
+      {/* Page Content */}
 
       <main className="max-w-7xl mx-auto px-4 pt-6 pb-10" role="main">
-        {/* Hero banner with enhanced gradient and visual elements */}
-        <section className="mb-10 rounded-2xl overflow-hidden shadow-md relative">
-          {/* Light mode background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-700 opacity-90 dark:opacity-0"></div>
-          {/* Dark mode background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-900 to-purple-900 opacity-0 dark:opacity-90"></div>
-          {/* Pattern overlay */}
-          <div className="absolute inset-0 bg-[url('/pattern-bg.png')] mix-blend-overlay opacity-20"></div>
-          {/* Animated particles effect */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-0 left-0 w-2 h-2 rounded-full bg-white opacity-30 animate-float-slow"></div>
-            <div className="absolute top-1/4 right-1/4 w-3 h-3 rounded-full bg-white opacity-20 animate-float-medium"></div>
-            <div className="absolute bottom-1/3 left-1/2 w-2 h-2 rounded-full bg-white opacity-25 animate-float-fast"></div>
-            <div className="absolute bottom-1/4 right-1/3 w-1 h-1 rounded-full bg-white opacity-30 animate-float-slow"></div>
-            <div className="absolute top-1/2 left-1/4 w-2 h-2 rounded-full bg-white opacity-25 animate-float-medium"></div>
-            <div className="absolute top-3/4 right-1/2 w-3 h-3 rounded-full bg-white opacity-20 animate-float-fast"></div>
+        {/* Hero banner with premium glassmorphic aesthetic */}
+        <section className="mb-12 mt-2 rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(8,_112,_184,_0.1)] dark:shadow-[0_20px_50px_rgba(0,_0,_0,_0.5)] relative">
+          {/* Deep vibrant gradients */}
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-600 opacity-95 dark:opacity-40"></div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/30 to-transparent dark:from-blue-900/40"></div>
+          <div className="absolute inset-0 bg-[url('/pattern-bg.png')] mix-blend-overlay opacity-30 dark:opacity-10"></div>
+          
+          {/* Floating animated orbs */}
+          <div className="absolute inset-0 overflow-hidden mix-blend-screen opacity-50 dark:opacity-20 pointer-events-none">
+            <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full bg-fuchsia-400 blur-[80px] animate-blob-drift-0"></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 rounded-full bg-indigo-400 blur-[80px] animate-blob-drift-1"></div>
           </div>
 
-          <div className="relative p-8 md:p-12 lg:p-16">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight drop-shadow-md">
-                Discover and Share the Best DJ
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-indigo-100 dark:from-blue-300 dark:to-indigo-200 ml-2">
-                  Mixtapes
+          <div className="relative p-10 md:p-16 lg:p-20 z-10 flex flex-col items-center justify-center min-h-[400px]">
+            <div className="max-w-4xl mx-auto text-center w-full">
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-righteous text-white mb-6 tracking-wide drop-shadow-xl">
+                Discover the Best
+                <span className="block mt-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white drop-shadow-lg">
+                  DJ Mixtapes
                 </span>
               </h1>
-              <p className="text-lg text-white dark:text-slate-200 mb-8 max-w-2xl mx-auto leading-relaxed opacity-90">
-                Find your favorite mixes from top DJs around the world or create
-                your own DJ profile and share your music with a global audience
+              <p className="text-lg md:text-xl text-white/90 dark:text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed font-medium">
+                Stream trending mixes from top DJs around the world, or upload your own and share your sound globally.
               </p>
-
-              <div className="flex flex-wrap justify-center gap-4">
-                {/* Discover DJs */}
-                <Link
-                  href="/discoverdjs"
-                  className="group px-6 py-3 bg-white dark:bg-indigo-600 hover:bg-gray-100 dark:hover:bg-indigo-700 text-indigo-600 dark:text-white rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
-                >
-                  <PlayCircle
-                    className="h-5 w-5 mr-2 transition-transform group-hover:scale-110"
-                    strokeWidth={2}
-                  />
-                  <span>Discover DJs</span>
-                </Link>
-
-                {/* Search Mixtapes */}
-                <Link
-                  href="/search"
-                  className="group px-6 py-3 bg-indigo-600/10 dark:bg-slate-800 hover:bg-indigo-600/20 dark:hover:bg-slate-700 text-indigo-700 dark:text-white border border-indigo-200 text-blue-950 dark:border-slate-600 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
-                >
-                  <Search
-                    className="h-5 w-5 mr-2 transition-transform group-hover:scale-110"
-                    strokeWidth={2}
-                  />
-                  <span>Search Mixtapes</span>
-                </Link>
-              </div>
             </div>
           </div>
         </section>
 
         {/* Top mixtapes section */}
         <section
-          className="mb-10 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-slate-100 dark:border-gray-700"
+          className="mb-12 bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-[2rem] p-2 md:p-4 shadow-xl border border-white/50 dark:border-white/5"
           aria-labelledby="top-mixtapes-heading"
         >
           <TopMixtapes />
@@ -144,60 +90,46 @@ export default function Mainpage() {
 
         {/* New mixtapes section */}
         <section
-          className="mb-10 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-slate-100 dark:border-gray-700"
+          className="mb-12 bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-[2rem] p-2 md:p-4 shadow-xl border border-white/50 dark:border-white/5"
           aria-labelledby="new-mixtapes-heading"
         >
           <NewMixtapes />
         </section>
 
         {/* Dual CTA section */}
-        <section className="mb-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section className="mb-12 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {/* Music Fans CTA */}
-          <div className="rounded-xl overflow-hidden shadow-md relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-indigo-800 opacity-100 dark:opacity-0"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-800 to-purple-900 opacity-0 dark:opacity-100"></div>
-            <div className="absolute inset-0 bg-[url('/pattern-bg.png')] mix-blend-overlay opacity-10"></div>
+          <div className="group rounded-[2rem] overflow-hidden shadow-xl relative transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/20">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-700 opacity-90 dark:opacity-80 transition-opacity group-hover:opacity-100"></div>
+            <div className="absolute inset-0 bg-[url('/pattern-bg.png')] mix-blend-overlay opacity-20"></div>
 
-            <div className="relative p-8 text-white h-full flex flex-col">
-              <div className="text-center flex-1 flex flex-col justify-center">
-                <div className="mb-4 inline-flex justify-center">
-                  <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center">
-                    <PlayCircle
-                      className="h-8 w-8 text-white"
-                      strokeWidth={1.5}
-                    />
+            <div className="relative p-10 text-white h-full flex flex-col">
+              <div className="flex flex-col flex-1">
+                <div className="mb-6 inline-flex">
+                  <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-inner">
+                    <PlayCircle className="h-8 w-8 text-white" strokeWidth={1.5} />
                   </div>
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold mb-3 drop-shadow-sm">
-                  For Music Fans
+                <h2 className="text-2xl md:text-3xl font-bold font-righteous mb-4 drop-shadow-sm tracking-wide">
+                  For Listeners
                 </h2>
-                <p className="text-indigo-100 dark:text-indigo-200 mb-6 max-w-md mx-auto">
-                  Create an account to save your favorite mixtapes, create
-                  playlists, and follow your favorite DJs.
+                <p className="text-indigo-50 dark:text-indigo-100 mb-8 max-w-md leading-relaxed text-lg">
+                  Save your favorite mixtapes, build custom playlists, and follow the world's best DJs.
                 </p>
-                <div className="flex flex-wrap justify-center gap-3 mt-auto">
-                  {/* Sign In */}
+                <div className="flex flex-wrap gap-4 mt-auto">
                   <Link
                     href="/login"
-                    className="group inline-flex items-center px-5 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-indigo-50 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
+                    className="inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-full font-bold hover:scale-105 transition-all shadow-lg"
                   >
-                    <LogIn
-                      className="h-4 w-4 mr-2 transition-transform group-hover:scale-110"
-                      strokeWidth={2}
-                    />
-                    Sign In
+                    <LogIn className="h-5 w-5 mr-2" strokeWidth={2.5} />
+                    Log In
                   </Link>
-
-                  {/* Create Account */}
                   <Link
                     href="/signup"
-                    className="group inline-flex items-center px-5 py-2 bg-indigo-900/30 backdrop-blur-sm hover:bg-indigo-900/40 text-white border border-indigo-300/30 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg text-sm"
+                    className="inline-flex items-center px-6 py-3 bg-black/20 hover:bg-black/30 backdrop-blur-md text-white border border-white/20 rounded-full font-bold hover:scale-105 transition-all shadow-lg"
                   >
-                    <UserPlus
-                      className="h-4 w-4 mr-2 transition-transform group-hover:scale-110"
-                      strokeWidth={2}
-                    />
-                    Create Account
+                    <UserPlus className="h-5 w-5 mr-2" strokeWidth={2.5} />
+                    Sign Up
                   </Link>
                 </div>
               </div>
@@ -205,37 +137,32 @@ export default function Mainpage() {
           </div>
 
           {/* DJs CTA */}
-          <div className="rounded-xl overflow-hidden shadow-md relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 opacity-100 dark:opacity-0"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-800 to-indigo-900 opacity-0 dark:opacity-100"></div>
-            <div className="absolute inset-0 bg-[url('/pattern-bg.png')] mix-blend-overlay opacity-10"></div>
+          <div className="group rounded-[2rem] overflow-hidden shadow-xl relative transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/20">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-700 opacity-90 dark:opacity-80 transition-opacity group-hover:opacity-100"></div>
+            <div className="absolute inset-0 bg-[url('/pattern-bg.png')] mix-blend-overlay opacity-20"></div>
 
-            <div className="relative p-8 text-white h-full flex flex-col">
-              <div className="text-center flex-1 flex flex-col justify-center">
-                <div className="mb-4 inline-flex justify-center">
-                  <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center">
-                    <FaMicrophone className="h-8 w-8 text-white" />
+            <div className="relative p-10 text-white h-full flex flex-col">
+              <div className="flex flex-col flex-1">
+                <div className="mb-6 inline-flex">
+                  <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-inner">
+                    <FaMicrophone className="h-7 w-7 text-white" />
                   </div>
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold mb-3 drop-shadow-sm">
+                <h2 className="text-2xl md:text-3xl font-bold font-righteous mb-4 drop-shadow-sm tracking-wide">
                   For DJs & Artists
                 </h2>
-                <p className="text-blue-100 dark:text-blue-200 mb-6 max-w-md mx-auto">
-                  Create your DJ profile, upload mixtapes, and connect with fans
-                  through our dedicated DJ platform.
+                <p className="text-blue-50 dark:text-blue-100 mb-8 max-w-md leading-relaxed text-lg">
+                  Create your profile, upload your exclusive mixes, and grow your audience worldwide.
                 </p>
-                <div className="flex justify-center mt-auto">
+                <div className="flex mt-auto">
                   <a
                     href="https://dj.mixtapped.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group inline-flex items-center px-5 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
+                    className="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-full font-bold hover:scale-105 transition-all shadow-lg"
                   >
-                    <ExternalLink
-                      className="h-4 w-4 mr-2 transition-transform group-hover:scale-110"
-                      strokeWidth={2}
-                    />
-                    DJ Portal
+                    <ExternalLink className="h-5 w-5 mr-2" strokeWidth={2.5} />
+                    Open DJ Portal
                   </a>
                 </div>
               </div>
@@ -244,82 +171,78 @@ export default function Mainpage() {
         </section>
 
         {/* How It Works section */}
-        <section className="mb-10 bg-white dark:bg-gray-800/90 rounded-xl p-8 shadow-md border border-slate-100 dark:border-gray-700">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+        <section className="mb-12 bg-white/30 dark:bg-gray-900/30 backdrop-blur-xl rounded-[2rem] p-10 shadow-lg border border-white/40 dark:border-white/5">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold font-righteous text-gray-900 dark:text-white mb-4 tracking-wide">
               How MixTapped Works
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              MixTapped connects music fans with talented DJs from around the
-              world through our dedicated platform.
+            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">
+              Connecting music fans with talented DJs from around the world through a premium dedicated platform.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="relative">
-              <div className="absolute -left-3 top-0 w-8 h-8 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-lg shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6">
+            <div className="relative group">
+              <div className="w-12 h-12 mb-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">
                 1
               </div>
-              <div className="pl-6 border-l-2 border-indigo-100 dark:border-indigo-900/50 h-full">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                   For Music Fans
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-3">
-                  Create a free account to discover, stream, and download
-                  mixtapes. Follow your favorite DJs and create playlists.
+                <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                  Discover, stream, and download mixtapes instantly. Follow your favorite DJs and curate your ultimate playlist.
                 </p>
                 <Link
                   href="/signup"
-                  className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors inline-flex items-center"
+                  className="text-indigo-600 dark:text-indigo-400 font-bold hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors inline-flex items-center group-hover:translate-x-1"
                 >
-                  Sign up as a listener
-                  <FaArrowRight className="h-4 w-4 ml-1" />
+                  Join the platform
+                  <FaArrowRight className="h-4 w-4 ml-2" />
                 </Link>
               </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute -left-3 top-0 w-8 h-8 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-lg shadow-sm">
+            <div className="relative group">
+              <div className="w-12 h-12 mb-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">
                 2
               </div>
-              <div className="pl-6 border-l-2 border-indigo-100 dark:border-indigo-900/50 h-full">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                   For DJs & Artists
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-3">
-                  Create your DJ profile on our dedicated DJ portal. Upload
-                  mixtapes, track plays, and grow your audience.
+                <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                  Upload mixtapes, track your engagement metrics, and push your sound to a rapidly growing audience.
                 </p>
                 <Link
                   href="https://dj.mixtapped.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors inline-flex items-center"
+                  className="text-blue-600 dark:text-blue-400 font-bold hover:text-blue-700 dark:hover:text-blue-300 transition-colors inline-flex items-center group-hover:translate-x-1"
                 >
                   Visit DJ portal
-                  <FaArrowRight className="h-4 w-4 ml-1" />
+                  <FaArrowRight className="h-4 w-4 ml-2" />
                 </Link>
               </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute -left-3 top-0 w-8 h-8 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-lg shadow-sm">
+            <div className="relative group">
+              <div className="w-12 h-12 mb-6 bg-gradient-to-br from-fuchsia-500 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">
                 3
               </div>
-              <div className="pl-6 border-l-2 border-indigo-100 dark:border-indigo-900/50 h-full">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                   Connect & Share
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-3">
-                  Discover new music, share mixtapes with friends, and connect
-                  with a global community of music lovers.
+                <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                  Immerse yourself in global sounds, share heavy mixes with friends, and join the music community.
                 </p>
                 <Link
-                  href="/discoverdjs"
-                  className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors inline-flex items-center"
+                  href="/discover"
+                  className="text-fuchsia-600 dark:text-fuchsia-400 font-bold hover:text-fuchsia-700 dark:hover:text-fuchsia-300 transition-colors inline-flex items-center group-hover:translate-x-1"
                 >
-                  Explore trending DJs
-                  <FaArrowRight className="h-4 w-4 ml-1" />
+                  Explore now
+                  <FaArrowRight className="h-4 w-4 ml-2" />
                 </Link>
               </div>
             </div>

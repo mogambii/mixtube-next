@@ -11,6 +11,7 @@ import { authOptions } from "./api/auth/[...nextauth]/route";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import RegisterSW from "./register-sw";
 import PwaInstallPrompt from "./(components)/PwaInstallPrompt";
+import SearchModal from "./(components)/SearchModal";
 import { Orbitron } from "next/font/google";
 import { Righteous } from "next/font/google";
 
@@ -62,9 +63,12 @@ export default async function RootLayout({ children }) {
             <div className="dark:bg-gray-900 min-h-screen">
               <RegisterSW />
               <PwaInstallPrompt />
+              <SearchModal />
               <Toaster position="top-center" />
-              <header className="p-3">
-                <Navbar />
+              <header className="sticky top-0 z-50 p-3 sm:p-4 pointer-events-none">
+                <div className="pointer-events-auto">
+                  <Navbar />
+                </div>
               </header>
               <GoogleAnalytics gaId="G-C87ETLJK5C"/>
               <main className="mx-5">{children}</main>

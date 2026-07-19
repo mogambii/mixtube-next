@@ -27,11 +27,12 @@ function useDebounce(value, delay) {
 
 // Skeleton loader
 const ProfileCardSkeleton = () => (
-  <div className="block rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-md h-full w-full p-1">
-    <div className="flex flex-col items-center h-full w-full p-3 sm:p-4">
-      <Skeleton className="w-16 h-16 sm:w-20 sm:h-20 md:w-32 md:h-32 rounded-full mb-3 sm:mb-4" />
-      <Skeleton className="h-5 w-3/4 mb-2" />
-      <Skeleton className="h-4 w-1/2" />
+  <div className="block rounded-2xl overflow-hidden bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-sm h-full w-full p-4 sm:p-5">
+    <div className="flex flex-col items-center h-full w-full">
+      <Skeleton className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 rounded-full mb-3 sm:mb-4 opacity-50" />
+      <div className="w-full text-center mt-auto flex flex-col items-center">
+        <Skeleton className="h-5 w-3/4 mb-2 opacity-50" />
+      </div>
     </div>
   </div>
 );
@@ -136,19 +137,19 @@ const DjSearchModal = ({ isOpen, onClose }) => {
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center overflow-y-auto pt-16 pb-8"
+      className="fixed inset-0 bg-black/40 backdrop-blur-md z-50 flex items-start justify-center overflow-y-auto pt-16 pb-8"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-4xl mx-4 max-h-[85vh] flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out">
+      <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-3xl rounded-3xl shadow-2xl w-full max-w-4xl mx-4 max-h-[35vh] flex flex-col overflow-hidden border border-white/40 dark:border-white/10 transition-all duration-300 ease-in-out">
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10 backdrop-blur-md backdrop-saturate-150">
+        <div className="p-4 sm:p-6 border-b border-white/20 dark:border-white/10 sticky top-0 bg-white/20 dark:bg-gray-800/20 z-10 backdrop-blur-xl">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                 {isSearching ? (
-                  <FaSpinner className="animate-spin text-indigo-500 dark:text-indigo-400" />
+                  <FaSpinner className="animate-spin text-indigo-500" />
                 ) : isTyping ? null : (
-                  <FaMagnifyingGlass className="text-indigo-500 dark:text-indigo-400" />
+                  <FaMagnifyingGlass className="text-gray-400 dark:text-gray-500" />
                 )}
               </div>
               <input
@@ -156,7 +157,7 @@ const DjSearchModal = ({ isOpen, onClose }) => {
                 value={searchInput}
                 onChange={handleSearchChange}
                 placeholder="Search for DJs by name..."
-                className="w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg border-0 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 shadow-inner transition-all duration-200"
+                className="w-full pl-11 pr-10 py-3.5 bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-white/10 focus:ring-2 focus:ring-indigo-500/50 shadow-inner transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
                 autoFocus
               />
               {searchInput && (
@@ -165,30 +166,30 @@ const DjSearchModal = ({ isOpen, onClose }) => {
                     setSearchInput("");
                     setLastSearchedTerm("");
                   }}
-                  className="absolute inset-y-0 right-3 flex items-center"
+                  className="absolute inset-y-0 right-3 flex items-center p-2"
                   aria-label="Clear search"
                 >
-                  <MdClose className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" />
+                  <MdClose className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" />
                 </button>
               )}
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105"
+              className="p-3 rounded-2xl bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-white/10 hover:bg-white/60 dark:hover:bg-gray-700/60 transition-all duration-300"
               aria-label="Close search"
             >
-              <MdClose size={24} className="text-gray-700 dark:text-gray-300" />
+              <MdClose size={22} className="text-gray-700 dark:text-gray-300" />
             </button>
           </div>
 
           {debouncedSearchTerm && (
-            <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-center animate-fadeIn">
+            <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 flex items-center animate-fadeIn">
               <span className="font-medium">Searching for:</span>
-              <span className="ml-2 bg-indigo-100 dark:bg-indigo-900/30 px-2 py-0.5 rounded-md text-indigo-700 dark:text-indigo-300 font-medium">
+              <span className="ml-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-indigo-200 dark:border-indigo-500/30 px-3 py-1 rounded-lg text-indigo-600 dark:text-indigo-400 font-medium">
                 {debouncedSearchTerm}
               </span>
               {isTyping && (
-                <span className="ml-2 text-xs text-indigo-500 dark:text-indigo-400 italic animate-pulse">
+                <span className="ml-3 text-xs text-indigo-500 dark:text-indigo-400 italic animate-pulse">
                   typing...
                 </span>
               )}
@@ -207,16 +208,15 @@ const DjSearchModal = ({ isOpen, onClose }) => {
           )}
 
           {hasNoResults && !isSearching && (
-            <div className="flex flex-col items-center justify-center min-h-svh py-12 text-center animate-fadeIn">
-              <div className="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-full mb-4 shadow-inner">
-                <MdManageSearch className="h-12 w-12 text-indigo-500 dark:text-indigo-400" />
+            <div className="flex flex-col items-center justify-center min-h-[50vh] py-12 text-center animate-fadeIn">
+              <div className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 rounded-full mb-5 shadow-lg">
+                <MdManageSearch className="h-10 w-10 text-indigo-500 dark:text-indigo-400" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 No DJs found
               </h3>
               <p className="text-gray-600 dark:text-gray-400 max-w-md">
-                We couldn&apos;t find any DJs matching &quot;{searchInput}
-                &quot;. Try a different search term.
+                We couldn&apos;t find any DJs matching &quot;<span className="text-indigo-500">{searchInput}</span>&quot;. Try a different search term.
               </p>
             </div>
           )}
@@ -231,7 +231,7 @@ const DjSearchModal = ({ isOpen, onClose }) => {
                 {searchResults.map((dj) => (
                   <div
                     key={dj.username}
-                    className="w-full h-full hover:scale-105 transition-all duration-200 hover:shadow-lg rounded-xl overflow-hidden"
+                    className="w-full h-full block"
                   >
                     <Link
                       href={`/dj/${dj.username}`}
@@ -255,16 +255,15 @@ const DjSearchModal = ({ isOpen, onClose }) => {
           )}
 
           {!isSearching && searchResults.length === 0 && !hasNoResults && (
-            <div className="flex flex-col items-center justify-center py-12 text-center animate-fadeIn min-h-svh">
-              <div className="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-full mb-4 shadow-inner">
-                <FaMagnifyingGlass className="h-12 w-12 text-indigo-500 dark:text-indigo-400" />
+            <div className="flex flex-col items-center justify-center py-12 text-center animate-fadeIn min-h-[50vh]">
+              <div className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 rounded-full mb-5 shadow-lg">
+                <FaMagnifyingGlass className="h-10 w-10 text-indigo-500 dark:text-indigo-400" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 Search for DJs
               </h3>
               <p className="text-gray-600 dark:text-gray-400 max-w-md">
-                Type a DJ name in the search box above to find your favorite
-                DJs.
+                Type a DJ name in the search box above to find your favorite DJs.
               </p>
             </div>
           )}

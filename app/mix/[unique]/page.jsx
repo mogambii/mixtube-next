@@ -63,6 +63,19 @@ async function getMixtape(unique) {
             profilep: true,
           },
         },
+        comments: {
+          orderBy: { createdAt: "desc" },
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                djName: true,
+                profilep: true,
+              },
+            },
+          },
+        },
       },
     });
     return res;
@@ -258,7 +271,7 @@ export default async function MixTape({ params }) {
 
       <div className="relative max-w-6xl mx-auto mt-4 md:-mt-16 lg:-mt-20 z-10 md:z-20 px-4 sm:px-6">
         {/* Mixtape Information */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden">
+        <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl border border-white/20 dark:border-white/5 rounded-3xl shadow-2xl overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Cover Art */}
             <div className="w-full md:w-1/3 lg:w-1/4 p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center">
@@ -313,10 +326,10 @@ export default async function MixTape({ params }) {
             </div>
 
             {/* Stats and Info Section */}
-            <div className="w-full md:w-2/3 lg:w-3/4 p-6 md:p-8 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900/90">
+            <div className="w-full md:w-2/3 lg:w-3/4 p-6 md:p-8 bg-transparent">
               <div className="flex flex-col h-full">
                 {/* Primary Action Bar (Play & Download) */}
-                <div className="flex flex-col md:flex-row items-center justify-between mb-5 pb-8 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex flex-col md:flex-row items-center justify-between mb-5 pb-6 border-b border-gray-200/60 dark:border-white/10">
                   <div className="text-center md:text-left w-full md:w-auto mb-6 md:mb-0">
                     <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">Ready to listen?</p>
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Stream or Download</h3>
@@ -357,16 +370,14 @@ export default async function MixTape({ params }) {
                 </div>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 flex items-center transform transition-transform hover:scale-105 hover:shadow-md">
-                    <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg mr-4">
-                      <FaDownload className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+                  <div className="bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-2xl p-4 flex items-center gap-4">
+                    <div className="p-3 bg-indigo-500/10 rounded-xl">
+                      <FaDownload className="h-5 w-5 text-indigo-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Downloads
-                      </p>
-                      <p className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Downloads</p>
+                      <p className="text-xl font-bold text-gray-900 dark:text-white">
                         {mix.totalDownloads.toLocaleString()}
                       </p>
                     </div>
@@ -377,15 +388,13 @@ export default async function MixTape({ params }) {
                     mixtapeId={unique}
                   />
 
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 flex items-center transform transition-transform hover:scale-105 hover:shadow-md">
-                    <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg mr-4">
-                      <FaRegCirclePlay className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                  <div className="bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-2xl p-4 flex items-center gap-4">
+                    <div className="p-3 bg-fuchsia-500/10 rounded-xl">
+                      <FaRegCirclePlay className="h-5 w-5 text-fuchsia-500" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Plays
-                      </p>
-                      <p className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Plays</p>
+                      <p className="text-xl font-bold text-gray-900 dark:text-white">
                         {mix.totalPlays.toLocaleString()}
                       </p>
                     </div>
@@ -397,72 +406,44 @@ export default async function MixTape({ params }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-5 sm:p-6 rounded-xl shadow-lg mt-6 border border-gray-100 dark:border-gray-700 backdrop-blur-sm">
-          <div className="mb-3">
-            {/* MoreHorizontal replaces the "..." dots SVG */}
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center mb-1">
-              <MoreHorizontal
-                className="h-5 w-5 mr-2 text-indigo-500"
-                strokeWidth={2}
-              />
-              Actions
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Interact with this mixtape
-            </p>
-          </div>
+        <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl p-5 sm:p-6 rounded-3xl shadow-xl mt-6 border border-white/20 dark:border-white/5">
+          <p className="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-4">Actions</p>
+          <div className="flex flex-wrap gap-3">
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            {/* Share Button */}
-            <div className="relative group">
-              <div className="bg-white dark:bg-gray-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-xl p-3 flex flex-col items-center transition-all duration-300 shadow-sm hover:shadow border border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-800 h-full">
-                <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mb-2">
-                  <Share id={unique} />
-                </div>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Share
-                </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Send to friends
-                </span>
-                {/* ArrowRight replaces the badge arrow SVG */}
-                <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500 text-white text-xs">
-                    <ArrowRight className="h-3 w-3" strokeWidth={2.5} />
-                  </span>
-                </div>
+            {/* Share */}
+            <div className="flex-1 min-w-[140px] bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-2xl p-4 flex items-center gap-3 hover:bg-indigo-500/10 hover:border-indigo-400/30 transition-all duration-200 group cursor-pointer">
+              <div className="p-2.5 bg-indigo-500/10 rounded-xl group-hover:bg-indigo-500/20 transition-colors">
+                <Share id={unique} />
+              </div>
+              <div>
+                <p className="font-semibold text-sm text-gray-900 dark:text-white">Share</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Send to friends</p>
               </div>
             </div>
 
-            {/* Like Button */}
+            {/* Like */}
             {session && (
-              <div className="relative group">
-                <div
-                  className={`bg-white dark:bg-gray-800/80 ${
-                    liked
-                      ? "bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700 shadow-md"
-                      : "hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800/50"
-                  } rounded-xl p-3 flex flex-col items-center transition-all duration-500 shadow-sm hover:shadow-md border border-gray-100 dark:border-gray-700 h-full transform hover:scale-[1.02]`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-2">
-                    <LikeBtn
-                      id={unique}
-                      likedparam={liked}
-                      initialCount={mix.totalLikes}
-                    />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <div className={`flex-1 min-w-[140px] border rounded-2xl p-4 flex items-center gap-3 transition-all duration-200 group cursor-pointer ${
+                liked
+                  ? "bg-red-500/10 border-red-400/30"
+                  : "bg-white/30 dark:bg-white/5 border-white/40 dark:border-white/10 hover:bg-red-500/10 hover:border-red-400/30"
+              }`}>
+                <div className={`p-2.5 rounded-xl transition-colors ${
+                  liked ? "bg-red-500/20" : "bg-red-500/10 group-hover:bg-red-500/20"
+                }`}>
+                  <LikeBtn
+                    id={unique}
+                    likedparam={liked}
+                    initialCount={mix.totalLikes}
+                  />
+                </div>
+                <div>
+                  <p className="font-semibold text-sm text-gray-900 dark:text-white">
                     {liked ? "Liked" : "Like"}
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
                     {liked ? "Remove favorite" : "Add to favorites"}
-                  </span>
-                  {/* Heart replaces the badge heart SVG */}
-                  <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white text-xs">
-                      <Heart className="h-3 w-3" strokeWidth={2.5} />
-                    </span>
-                  </div>
+                  </p>
                 </div>
               </div>
             )}
@@ -471,7 +452,7 @@ export default async function MixTape({ params }) {
         </div>
 
         {/* Description Section */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mt-6 border border-gray-100 dark:border-gray-700">
+        <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl p-6 rounded-3xl shadow-xl mt-6 border border-white/20 dark:border-white/5">
           {/* Info replaces the "i" circle SVG */}
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
             <Info className="h-5 w-5 mr-2 text-indigo-500" strokeWidth={2} />
@@ -496,7 +477,7 @@ export default async function MixTape({ params }) {
         </div>
 
         {/* DJ Profile */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mt-6 border border-gray-100 dark:border-gray-700">
+        <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl p-6 rounded-3xl shadow-xl mt-6 border border-white/20 dark:border-white/5">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <Link
               href={`/dj/${mix.user.username}`}
@@ -540,78 +521,41 @@ export default async function MixTape({ params }) {
 
         {/* Related Mixtapes Section */}
         {relatedMixtapes.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-lg mt-6 border border-gray-100 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              {/* FaMusic replaces the music-staff SVG */}
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center">
-                <FaMusic className="h-5 w-5 mr-2 text-indigo-500" />
+          <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl p-4 sm:p-6 rounded-3xl shadow-xl mt-6 border border-white/20 dark:border-white/5">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="p-2 bg-indigo-500/10 rounded-xl">
+                <FaMusic className="h-4 w-4 text-indigo-500" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                 More {(mix.genre || "").split(",")[0].trim()} Mixtapes
               </h3>
             </div>
 
-            {/* Mobile scrollable row */}
-            <div className="sm:hidden -mx-4 px-4 overflow-x-auto pb-4">
-              <div className="flex space-x-3 w-max">
-                {relatedMixtapes.map((relatedMix) => (
-                  <Link
-                    href={`/mix/${relatedMix.unique}`}
-                    key={relatedMix.unique}
-                    className="group flex-shrink-0 w-36"
-                  >
-                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg overflow-hidden shadow-md transition-all active:scale-95 touch-manipulation">
-                      <div className="relative aspect-square w-36 h-36">
-                        <Image
-                          src={relatedMix.cover}
-                          alt={relatedMix.title}
-                          fill
-                          className="object-cover"
-                          sizes="144px"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-2">
-                          <div>
-                            <h4 className="text-sm font-medium text-white truncate">
-                              {relatedMix.title}
-                            </h4>
-                            <p className="text-xs text-gray-300 truncate">
-                              {relatedMix.djName}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Desktop grid */}
-            <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Unified scrollable grid — horizontal on mobile, 4-col on desktop */}
+            <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-3 overflow-x-auto pb-2 sm:pb-0 -mx-1 px-1">
               {relatedMixtapes.map((relatedMix) => (
                 <Link
                   href={`/mix/${relatedMix.unique}`}
                   key={relatedMix.unique}
-                  className="group"
+                  className="group flex-shrink-0 w-36 sm:w-auto"
                 >
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg overflow-hidden shadow-md transition-all group-hover:shadow-lg group-hover:scale-[1.02]">
+                  <div className="bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-2xl overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:shadow-indigo-500/10 group-hover:-translate-y-0.5">
                     <div className="relative aspect-square">
                       <Image
                         src={relatedMix.cover}
                         alt={relatedMix.title}
                         fill
-                        className="object-cover"
-                        sizes="(max-width: 1024px) 50vw, 25vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 640px) 144px, (max-width: 1024px) 50vw, 25vw"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-3">
-                        <span className="text-white text-sm font-medium">
-                          View Mixtape
-                        </span>
-                      </div>
+                      {/* Always-visible gradient at the bottom */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                     </div>
                     <div className="p-3">
-                      <h4 className="font-medium text-gray-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      <h4 className="font-bold text-sm text-gray-900 dark:text-white truncate group-hover:text-indigo-500 transition-colors">
                         {relatedMix.title}
                       </h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">
                         {relatedMix.djName}
                       </p>
                     </div>
@@ -623,15 +567,7 @@ export default async function MixTape({ params }) {
         )}
 
         {/* Comments Section */}
-        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-lg mt-6 border border-gray-100 dark:border-gray-700 mb-12">
-          {/* MessageSquare replaces the chat-bubble SVG */}
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center">
-            <MessageSquare
-              className="h-5 w-5 mr-2 text-indigo-500"
-              strokeWidth={2}
-            />
-            Comments
-          </h3>
+        <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl p-4 sm:p-6 rounded-3xl shadow-xl mt-6 border border-white/20 dark:border-white/5 mb-12">
           <CommentsPage comments={mix.comments} unique={unique} />
         </div>
       </div>

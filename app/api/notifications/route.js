@@ -147,9 +147,9 @@ export async function PATCH(request) {
 
     const { notificationIds } = await request.json();
 
-    if (!notificationIds || !Array.isArray(notificationIds)) {
+    if (!notificationIds) {
       return NextResponse.json(
-        { error: "Notification IDs array is required" },
+        { error: "Notification IDs are required" },
         { status: 400 }
       );
     }
@@ -164,12 +164,22 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    let queryCondition = { userId: user.id };
+
+    if (notificationIds === "all") {
+      queryCondition.read = false;
+    } else if (Array.isArray(notificationIds)) {
+      queryCondition.id = { in: notificationIds };
+    } else {
+      return NextResponse.json(
+        { error: "Invalid notification IDs format" },
+        { status: 400 }
+      );
+    }
+
     // Mark notifications as read
     await prisma.notification.updateMany({
-      where: {
-        id: { in: notificationIds },
-        userId: user.id,
-      },
+      where: queryCondition,
       data: {
         read: true,
       },

@@ -18,15 +18,23 @@ module.exports = {
       'lg': '1024px',
       'xl': '1280px'
     },
-    extend: {
+      extend: {
       animation: {
         'subtle-float': 'subtle-float 30s ease-in-out infinite alternate',
+        'blob-drift-0': 'blob-drift 20s infinite alternate',
+        'blob-drift-1': 'blob-drift 25s infinite alternate-reverse',
       },
       keyframes: {
         'subtle-float': {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-5px)' },
         },
+        'blob-drift': {
+          '0%': { transform: 'translate(0px, 0px) scale(1)' },
+          '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+          '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+          '100%': { transform: 'translate(0px, 0px) scale(1)' },
+        }
       },
       animationDelay: {
         '0': '0ms',

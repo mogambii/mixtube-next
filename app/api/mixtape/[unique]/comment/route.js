@@ -18,6 +18,16 @@ export async function POST(req, { params }) {
       return NextResponse.json({ message: "Comment cannot be empty" }, { status: 400 });
     }
 
+    // Get the actual user from DB using email (session.user.id may be Google's sub ID, not the DB CUID)
+    const dbUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
+
+    if (!dbUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
     // Get mixtape ID from unique identifier
     const mixtape = await prisma.mixtape.findUnique({
       where: { unique },
@@ -32,7 +42,7 @@ export async function POST(req, { params }) {
       data: {
         content: content.trim(),
         mixtapeId: mixtape.id,
-        userId: session.user.id,
+        userId: dbUser.id,
       },
       include: {
         user: {
@@ -40,20 +50,20 @@ export async function POST(req, { params }) {
             username: true,
             djName: true,
             profilep: true,
-            id:true
+            id: true,
           },
         },
       },
     });
 
     // Create notification for mixtape owner
-    if (mixtape.userId !== session.user.id) {
+    if (mixtape.userId !== dbUser.id) {
       await prisma.notification.create({
         data: {
           type: "COMMENT",
           message: `${session.user.username || session.user.email} commented on your mixtape "${mixtape.title}"`,
           userId: mixtape.userId,
-          senderId: session.user.id,
+          senderId: dbUser.id,
           mixtapeId: mixtape.id,
         },
       });

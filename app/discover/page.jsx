@@ -1,138 +1,67 @@
-"use client";
-import Link from "next/link";
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import { FaSpinner } from "react-icons/fa";
-import MpNav from "../(components)/MpNav";
-import MixCard from "../(components)/MixCard";
-import MixCardSkeleton from "../(components)/MixCardSkeleton";
-import NavMenu from "@/components/NavMenu";
-import { useInView } from "react-intersection-observer";
+import React from "react";
+import prisma from "@/lib/prismadb";
+import SearchInputTrigger from "../(components)/SearchInputTrigger";
+import DiscoverClient from "./DiscoverClient";
 
-const Discovermixxes = () => {
-  useEffect(() => {
-    document.title = "MixTapped - Discover Mixtapes";
-  }, []);
-
-  const [loading, setLoading] = useState(true);
-  const [mixes, setMixes] = useState([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const { ref: loadMoreRef, inView } = useInView();
-  const limit = 12;
-
-  const fetchMixes = async (pageNumber) => {
-    try {
-      const response = await fetch(`/api/discover?page=${pageNumber}`);
-      const data = await response.json();
-      return {
-        mixtapes: data.mixtapes,
-        hasMore: data.mixtapes.length === limit,
-      };
-    } catch (error) {
-      console.error("Error fetching mixes:", error);
-      return { mixtapes: [], hasMore: false };
-    }
-  };
-
-  // Initial load
-  useEffect(() => {
-    const loadInitialMixes = async () => {
-      setLoading(true);
-      const { mixtapes, hasMore } = await fetchMixes(1);
-      setMixes(mixtapes);
-      setHasMore(hasMore);
-      setLoading(false);
-    };
-
-    loadInitialMixes();
-  }, []);
-
-  // Load more when scrolling to bottom
-  useEffect(() => {
-    const loadMore = async () => {
-      if (inView && !loadingMore && hasMore) {
-        setLoadingMore(true);
-        const nextPage = page + 1;
-        const { mixtapes, hasMore: moreAvailable } = await fetchMixes(nextPage);
-        setMixes((prev) => [...prev, ...mixtapes]);
-        setHasMore(moreAvailable);
-        setPage(nextPage);
-        setLoadingMore(false);
-      }
-    };
-
-    loadMore();
-  }, [inView, loadingMore, hasMore, page]);
-
-  return (
-    <>
-      <div className="min-h-screen">
-        <h5 className="dark:text-slate-50 py-2 pl-3 font-righteous">
-          DISCOVER MIXTAPES
-        </h5>
-        <header
-          className="flex justify-between items-center mx-2 p-0"
-          role="banner"
-        >
-          <Link
-            href="/search"
-            className="flex-1 mr-2"
-            aria-label="Search Mixtapes"
-          >
-            <MpNav place="Search Mixtape" />
-          </Link>
-          <NavMenu />
-        </header>
-        <div className="max-w-7xl mx-auto px-4">
-          {loading ? (
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pt-4">
-              {[...Array(12)].map((_, index) => (
-                <div key={index} className="w-full">
-                  <MixCardSkeleton />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div>
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pt-4">
-                {mixes.map((mix) => (
-                  <div
-                    className="w-full transform hover:scale-[1.02] transition-transform duration-200"
-                    key={mix.unique}
-                  >
-                    <MixCard
-                      link={`/mix/${mix.unique}/`}
-                      Djname={mix.djName}
-                      title={mix.title}
-                      img={mix.imgthumb}
-                      downloads={mix.totalDownloads}
-                      plays={mix.totalPlays}
-                    />
-                  </div>
-                ))}
-              </div>
-              {hasMore && (
-                <div
-                  ref={loadMoreRef}
-                  className="flex justify-center py-8 gap-3 items-center text-gray-500 dark:text-gray-400"
-                >
-                  {loadingMore ? (
-                    <>
-                      <FaSpinner className="animate-spin h-5 w-5" />
-                      <span>Loading more mixtapes...</span>
-                    </>
-                  ) : (
-                    <span className="text-sm">Scroll for more</span>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    </>
-  );
+export const metadata = {
+  title: "MixTapped - Discover Mixtapes",
+  description: "Explore the latest mixtapes from top DJs",
 };
 
-export default Discovermixxes;
+// Force dynamic so we get the latest mixtapes on every request
+export const dynamic = "force-dynamic";
+
+export default async function DiscoverPage() {
+  // Fetch initial mixtapes directly on the server
+  const mixtapes = await prisma.mixtape.findMany({
+    orderBy: {
+      totalDownloads: "desc",
+    },
+    select: {
+      id: true,
+      title: true,
+      imgthumb: true,
+      unique: true,
+      djName: true,
+      totalPlays: true,
+      totalDownloads: true,
+    },
+    take: 12,
+  });
+
+  // Serialize to ensure it can be passed to the Client Component
+  const initialMixes = mixtapes.map((mix) => ({
+    ...mix,
+    totalPlays: Number(mix.totalPlays),
+    totalDownloads: Number(mix.totalDownloads),
+  }));
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 rounded-none md:rounded-3xl overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent font-righteous tracking-wide">
+              Discover
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+              Explore the latest mixtapes from top DJs
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="flex-1 md:w-80">
+              <SearchInputTrigger place="Search mixtapes..." />
+            </div>
+          </div>
+        </div>
+
+        {/* Client Component for Grid and Infinite Scroll */}
+        <DiscoverClient initialMixes={initialMixes} />
+        
+      </div>
+    </div>
+  );
+}

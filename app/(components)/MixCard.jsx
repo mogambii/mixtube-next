@@ -17,56 +17,59 @@ const MixCard = ({
     <div className="p-2 w-full">
       <Link
         href={link}
-        className="block transition-all duration-300 hover:translate-y-[-3px]"
+        className="block transition-all duration-300 group"
       >
-        <div className="dark:bg-gray-800/90 bg-white rounded-xl flex flex-col sm:flex-row gap-3 p-3 sm:p-4 w-full shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-3xl rounded-2xl flex flex-col sm:flex-row gap-4 p-3 sm:p-4 w-full shadow-md hover:shadow-lg transition-all duration-500 border border-white/40 dark:border-white/5 overflow-hidden relative">
+          
           {/* Mixtape image with gradient overlay */}
-          <div className="relative w-full sm:w-40 sm:h-40 h-48 flex-shrink-0 overflow-hidden rounded-xl shadow-sm sm:mx-0">
+          <div className="relative w-full sm:w-40 sm:h-40 h-48 flex-shrink-0 overflow-hidden rounded-xl shadow-sm z-10">
             <Image
               priority={loading ? false : true}
               src={img ? img : "https://placehold.co/210x210"}
-              className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
+              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               alt={title}
               height={280}
               width={280}
               loading={loading ? "lazy" : "eager"}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+            {/* Darker bottom gradient for text contrast if needed, plus a subtle colored tint on hover */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500"></div>
+            
           </div>
 
           {/* Content area */}
-          <div className="flex flex-col justify-between flex-1 py-1 text-start w-full min-w-0">
-            <div className="w-full min-w-0 overflow-hidden">
-              <h3 className="font-bold text-gray-900 dark:text-white text-sm uppercase overflow-hidden text-ellipsis line-clamp-2">
+          <div className="flex flex-col justify-between flex-1 py-1 text-start w-full min-w-0 z-10">
+            <div className="w-full min-w-0">
+              <h3 className="font-bold text-gray-900 dark:text-white text-base uppercase overflow-hidden text-ellipsis line-clamp-2 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 {title ? title : "Title"}
               </h3>
-              <div className="flex items-center justify-start mt-1 w-full min-w-0 overflow-hidden">
-                <span className="font-medium text-indigo-600 dark:text-indigo-400 text-xs uppercase mr-1 flex-shrink-0">
+              <div className="flex items-center justify-start mt-2 w-full min-w-0">
+                <span className="font-semibold text-indigo-500 dark:text-indigo-400 text-xs uppercase mr-1.5 flex-shrink-0 tracking-wider">
                   BY:
                 </span>
                 <div className="min-w-0 max-w-full overflow-hidden">
-                  <span className="font-medium text-indigo-600 dark:text-indigo-400 text-xs uppercase truncate block overflow-hidden text-ellipsis whitespace-nowrap">
+                  <span className="font-bold text-gray-600 dark:text-gray-300 text-xs uppercase truncate block whitespace-nowrap">
                     {Djname !== "null" ? Djname : name}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Stats with improved styling */}
-            <div className="flex items-center justify-start gap-4 sm:gap-6 mt-3 sm:mt-2">
-              <div className="flex items-center gap-2 group">
-                <div className="bg-indigo-50 dark:bg-indigo-900/30 p-1.5 rounded-full">
-                  <FaDownload className="text-indigo-600 dark:text-indigo-400 h-3 w-3 sm:h-4 sm:w-4 group-hover:scale-110 transition-transform" />
+            {/* Stats with glow styling */}
+            <div className="flex items-center justify-start gap-4 sm:gap-6 mt-4 sm:mt-2">
+              <div className="flex items-center gap-2 group/stat">
+                <div className="bg-indigo-100/50 dark:bg-indigo-900/30 p-2 rounded-full border border-indigo-200/50 dark:border-indigo-800/30 shadow-sm group-hover/stat:bg-indigo-500 group-hover/stat:shadow-indigo-500/40 transition-all duration-300">
+                  <FaDownload className="text-indigo-600 dark:text-indigo-400 h-3 w-3 sm:h-4 sm:w-4 group-hover/stat:text-white transition-colors" />
                 </div>
-                <h4 className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-medium">
+                <h4 className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-bold">
                   {downloads}
                 </h4>
               </div>
-              <div className="flex items-center gap-2 group">
-                <div className="bg-indigo-50 dark:bg-indigo-900/30 p-1.5 rounded-full">
-                  <FaRegCirclePlay className="text-indigo-600 dark:text-indigo-400 h-3 w-3 sm:h-4 sm:w-4 group-hover:scale-110 transition-transform" />
+              <div className="flex items-center gap-2 group/stat">
+                <div className="bg-fuchsia-100/50 dark:bg-fuchsia-900/30 p-2 rounded-full border border-fuchsia-200/50 dark:border-fuchsia-800/30 shadow-sm group-hover/stat:bg-fuchsia-500 group-hover/stat:shadow-fuchsia-500/40 transition-all duration-300">
+                  <FaRegCirclePlay className="text-fuchsia-600 dark:text-fuchsia-400 h-3 w-3 sm:h-4 sm:w-4 group-hover/stat:text-white transition-colors" />
                 </div>
-                <h4 className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-medium">
+                <h4 className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-bold">
                   {plays}
                 </h4>
               </div>

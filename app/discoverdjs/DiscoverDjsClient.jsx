@@ -7,7 +7,6 @@ import { IoFilterSharp } from "react-icons/io5";
 import { FaSpinner } from "react-icons/fa";
 import Link from "next/link";
 import ProfileCard from "@/components/ProfileCard";
-import NavMenu from "@/components/NavMenu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Music2, Clock, TrendingUp, Users } from "lucide-react";
 import DjSearchModal from "@/app/(components)/DjSearchModal";
@@ -222,20 +221,14 @@ const DiscoverDjsClient = ({
   const FilterButton = ({ value, icon, label }) => (
     <button
       onClick={() => handleFilterChange(value)}
-      className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2
+      className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2
         ${
           activeFilter === value
-            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25"
-            : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-500"
+            ? "bg-gradient-to-r from-indigo-500 to-fuchsia-600 text-white shadow-lg shadow-indigo-500/25 border-transparent"
+            : "bg-white/40 dark:bg-gray-800/40 backdrop-blur-md text-gray-700 dark:text-gray-300 border border-white/40 dark:border-white/10 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:border-indigo-300/50 dark:hover:border-indigo-500/50"
         }`}
     >
-      <span
-        className={
-          activeFilter === value
-            ? "text-white"
-            : "text-indigo-600 dark:text-indigo-400"
-        }
-      >
+      <span className={activeFilter === value ? "text-white" : "text-indigo-500 dark:text-indigo-400"}>
         {icon}
       </span>
       {label}
@@ -245,20 +238,14 @@ const DiscoverDjsClient = ({
   const SortButton = ({ value, label, icon }) => (
     <button
       onClick={() => handleSortChange(value)}
-      className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2
+      className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2
         ${
           sortBy === value
-            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25"
-            : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-500"
+            ? "bg-gradient-to-r from-indigo-500 to-fuchsia-600 text-white shadow-lg shadow-indigo-500/25 border-transparent"
+            : "bg-white/40 dark:bg-gray-800/40 backdrop-blur-md text-gray-700 dark:text-gray-300 border border-white/40 dark:border-white/10 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:border-indigo-300/50 dark:hover:border-indigo-500/50"
         }`}
     >
-      <span
-        className={
-          sortBy === value
-            ? "text-white"
-            : "text-indigo-600 dark:text-indigo-400"
-        }
-      >
+      <span className={sortBy === value ? "text-white" : "text-indigo-500 dark:text-indigo-400"}>
         {icon}
       </span>
       {label}
@@ -267,114 +254,75 @@ const DiscoverDjsClient = ({
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 rounded-lg">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 rounded-none md:rounded-3xl overflow-hidden">
       <DjSearchModal isOpen={isSearchModalOpen} onClose={closeSearchModal} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8">
         <div className="flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between gap-4 mb-8">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg">
-                  <Music2 className="h-6 w-6 text-white" />
-                </div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                  Discover DJs
-                </h1>
-              </div>
-              <p className="text-lg text-gray-600 dark:text-gray-400">
-                Connect with talented DJs and discover amazing music from around
-                the world
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent font-righteous tracking-wide">
+                Discover DJs
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+                Connect with talented DJs and discover amazing music
               </p>
-            </div>
-            <div className="flex-shrink-0">
-              <NavMenu />
             </div>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Search bar + filter toggle */}
-            <div className="relative mx-auto w-full">
-              <div className="relative flex items-center gap-4">
+            <div className="relative w-full">
+              <div className="relative flex items-center gap-3">
                 <div className="relative flex-grow">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <FaMagnifyingGlass className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    <FaMagnifyingGlass className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
                     type="text"
                     placeholder="Search for DJs by name, style, or location..."
-                    className="block w-full pl-12 pr-6 py-4 border border-gray-200 dark:border-gray-700 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent shadow-lg hover:shadow-xl transition-all duration-300 text-lg"
+                    className="block w-full pl-12 pr-6 py-3.5 border border-white/40 dark:border-white/10 rounded-2xl bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-lg hover:shadow-xl transition-all duration-300 text-base"
                     onClick={openSearchModal}
                     readOnly
                   />
                 </div>
                 <button
                   onClick={() => setShowFilters((v) => !v)}
-                  className={`p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center ${
-                    showFilters
-                      ? "ring-2 ring-indigo-500 dark:ring-indigo-400 bg-indigo-50 dark:bg-indigo-900/20"
-                      : ""
+                  className={`p-3.5 rounded-2xl border border-white/40 dark:border-white/10 bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl text-gray-700 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/60 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center ${
+                    showFilters ? "ring-2 ring-indigo-500/50 bg-indigo-50/50 dark:bg-indigo-900/20" : ""
                   }`}
                 >
-                  <IoFilterSharp className="h-6 w-6" />
+                  <IoFilterSharp className="h-6 w-6 text-indigo-500 dark:text-indigo-400" />
                 </button>
               </div>
 
               {/* Filters panel */}
               {showFilters && (
-                <div className="mt-6 animate-in slide-in-from-top-2 duration-300">
-                  <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-2xl space-y-8">
+                <div className="mt-4 animate-in slide-in-from-top-2 duration-300">
+                  <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-3xl p-6 sm:p-8 border border-white/20 dark:border-white/5 shadow-2xl space-y-8">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <IoFilterSharp className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2 uppercase tracking-wide">
+                        <IoFilterSharp className="h-4 w-4 text-indigo-500" />
                         Filter by Category
                       </h3>
-                      <div className="flex flex-wrap gap-3">
-                        <FilterButton
-                          value="all"
-                          label="All DJs"
-                          icon={<Music2 className="h-4 w-4" />}
-                        />
-                        <FilterButton
-                          value="new"
-                          label="New Artists"
-                          icon={<Clock className="h-4 w-4" />}
-                        />
-                        <FilterButton
-                          value="trending"
-                          label="Trending"
-                          icon={<TrendingUp className="h-4 w-4" />}
-                        />
+                      <div className="flex flex-wrap gap-2">
+                        <FilterButton value="all" label="All DJs" icon={<Music2 className="h-4 w-4" />} />
+                        <FilterButton value="new" label="New Artists" icon={<Clock className="h-4 w-4" />} />
+                        <FilterButton value="trending" label="Trending" icon={<TrendingUp className="h-4 w-4" />} />
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2 uppercase tracking-wide">
+                        <TrendingUp className="h-4 w-4 text-indigo-500" />
                         Sort Options
                       </h3>
-                      <div className="flex flex-wrap gap-3">
-                        <SortButton
-                          value="popular"
-                          label="Most Popular"
-                          icon={<TrendingUp className="h-4 w-4" />}
-                        />
-                        <SortButton
-                          value="name"
-                          label="Alphabetical"
-                          icon={<Music2 className="h-4 w-4" />}
-                        />
-                        <SortButton
-                          value="followers"
-                          label="Most Followers"
-                          icon={<Users className="h-4 w-4" />}
-                        />
-                        <SortButton
-                          value="newest"
-                          label="Recently Joined"
-                          icon={<Clock className="h-4 w-4" />}
-                        />
+                      <div className="flex flex-wrap gap-2">
+                        <SortButton value="popular" label="Most Popular" icon={<TrendingUp className="h-4 w-4" />} />
+                        <SortButton value="name" label="Alphabetical" icon={<Music2 className="h-4 w-4" />} />
+                        <SortButton value="followers" label="Most Followers" icon={<Users className="h-4 w-4" />} />
+                        <SortButton value="newest" label="Recently Joined" icon={<Clock className="h-4 w-4" />} />
                       </div>
                     </div>
                   </div>
@@ -387,9 +335,10 @@ const DiscoverDjsClient = ({
               {/* Filter/sort change — show skeleton grid */}
               {isFiltering ? (
                 <div className="space-y-8">
-                  <div className="flex items-center justify-center">
-                    <div className="bg-white dark:bg-gray-800 p-4 rounded-full shadow-lg">
-                      <FaSpinner className="h-6 w-6 text-indigo-500 animate-spin" />
+                  <div className="flex items-center justify-center py-12">
+                    <div className="flex items-center gap-3 px-6 py-3 bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-full shadow-lg">
+                      <FaSpinner className="h-5 w-5 text-indigo-500 animate-spin" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Updating results...</span>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6 px-2 sm:px-4 w-full">
@@ -455,15 +404,15 @@ const DiscoverDjsClient = ({
                   </div>
 
                   {/* DJ grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6 w-full">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 sm:gap-4 w-full">
                     {results.map((dj, index) => (
                       <div
                         key={`${dj.username}-${index}`}
-                        className="flex justify-center hover:-translate-y-2 hover:scale-105 transition-all duration-300 ease-out"
+                        className="flex justify-center"
                       >
                         <Link
                           href={`/dj/${dj.username}`}
-                          className="w-full h-full group"
+                          className="w-full h-full group block"
                         >
                           <div className="w-full h-full p-1">
                             <div className="relative overflow-hidden rounded-xl">
@@ -494,18 +443,19 @@ const DiscoverDjsClient = ({
                   {/* Footer states */}
                   <div className="flex justify-center items-center py-12 mt-8">
                     {loadingMore && (
-                      <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
-                        <FaSpinner className="h-6 w-6 text-indigo-500 animate-spin" />
+                      <div className="flex items-center gap-3 px-5 py-2.5 bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-full shadow-lg">
+                        <FaSpinner className="h-4 w-4 text-indigo-500 animate-spin" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Loading more...</span>
                       </div>
                     )}
 
                     {!hasMore && results.length > initialLimit && (
                       <div className="text-center py-8">
-                        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-2xl shadow-lg">
-                          <p className="font-medium">
+                        <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl border border-white/20 dark:border-white/5 px-8 py-4 rounded-3xl shadow-lg">
+                          <p className="font-medium text-gray-900 dark:text-white">
                             🎉 You&apos;ve discovered all available DJs!
                           </p>
-                          <p className="text-sm opacity-90 mt-1">
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             Check back later for new artists
                           </p>
                         </div>

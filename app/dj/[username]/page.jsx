@@ -14,7 +14,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prismadb";
 import RecentMixxes from "@/components/RecentMixxes";
 
-// ─── Data fetching ────────────────────────────────────────────────────────────
 
 async function fetchProfile(username) {
   try {
@@ -26,6 +25,19 @@ async function fetchProfile(username) {
         following: true,
         _count: {
           select: { mixtapes: true },
+        },
+        mixtapes: {
+          take: 10,
+          orderBy: { time: "desc" },
+          select: {
+            title: true,
+            imgthumb: true,
+            unique: true,
+            djName: true,
+            stats: {
+              select: { plays: true, downloads: true },
+            },
+          },
         },
       },
     });
@@ -56,6 +68,7 @@ async function fetchProfile(username) {
       id: response.id,
       username: response.username,
       djName: response.djName,
+      email: response.email,
       profilep: response.profilep,
       bio: response.bio,
       createdAt: response.createdAt,
@@ -67,6 +80,14 @@ async function fetchProfile(username) {
       totalPlays: totalStats.plays,
       contacts: response.contacts,
       socialMediaHandles: response.socialMediaHandles,
+      recentMixtapes: response.mixtapes.map((mix) => ({
+        title: mix.title,
+        imgthumb: mix.imgthumb,
+        unique: mix.unique,
+        djName: mix.djName,
+        totalPlays: mix.stats.reduce((sum, stat) => sum + stat.plays, 0),
+        totalDownloads: mix.stats.reduce((sum, stat) => sum + stat.downloads, 0),
+      })),
     };
   } catch (error) {
     console.error("fetchProfile error:", error);
@@ -142,13 +163,13 @@ export async function generateMetadata({ params }) {
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 const StatCard = ({ icon: Icon, label, value, accent = "indigo" }) => (
-  <div className="group relative bg-white dark:bg-gray-800/80 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 overflow-hidden">
+  <div className="group relative bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-3xl p-5 shadow-lg border border-white/20 dark:border-white/10 hover:shadow-xl hover:bg-white/60 dark:hover:bg-gray-700/60 transition-all duration-300 overflow-hidden">
     {/* Subtle hover glow */}
     <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/5 group-hover:to-purple-500/5 transition-all duration-500 rounded-2xl" />
 
     <div className="relative flex items-center gap-4">
-      <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl ring-1 ring-indigo-100 dark:ring-indigo-800/40 group-hover:scale-110 transition-transform duration-300">
-        <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+      <div className="p-3 bg-white/60 dark:bg-indigo-900/40 backdrop-blur-md rounded-2xl border border-white/40 dark:border-white/5 group-hover:scale-110 transition-transform duration-300">
+        <Icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
       </div>
       <div>
         <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">
@@ -166,11 +187,15 @@ const StatCard = ({ icon: Icon, label, value, accent = "indigo" }) => (
 
 const DjProfile = async ({ params }) => {
   const { username } = await params;
+  const session = await getServerSession(authOptions);
+  const loggedInEmail = session?.user?.email;
 
   const [profile, isFollowing] = await Promise.all([
     fetchProfile(username),
     checkIsFollowing(username),
   ]);
+
+  const isOwnProfile = Boolean(profile?.email && loggedInEmail && profile.email === loggedInEmail);
 
   if (!profile) {
     return (
@@ -198,21 +223,24 @@ const DjProfile = async ({ params }) => {
     : "Unknown";
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20">
       {/* ── Hero / Profile Header ─────────────────────────────────────────── */}
-      <div className="relative bg-white dark:bg-gray-900 overflow-hidden">
+      <div className="relative overflow-hidden mb-8">
         {/* Decorative gradient banner */}
-        <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 opacity-90" />
-        {/* Noise texture overlay */}
-        <div className="absolute top-0 left-0 right-0 h-48 bg-[url('/images/noise.png')] opacity-[0.08] mix-blend-overlay pointer-events-none" />
-        {/* Soft vignette at bottom of banner */}
-        <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-transparent to-white dark:to-gray-900" />
+        <div className="absolute top-0 left-0 right-0 h-56 bg-gradient-to-br from-indigo-600 via-purple-600 to-fuchsia-600 opacity-90" />
+        
+        {/* Animated pulsing orbs in background */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" />
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000" />
 
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 pt-10 pb-8">
-          <div className="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8">
+        {/* Soft vignette at bottom of banner */}
+        <div className="absolute top-12 left-0 right-0 h-44 bg-gradient-to-b from-transparent to-gray-50 dark:to-gray-950" />
+
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 pt-16 pb-8">
+          <div className="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8 bg-white/40 dark:bg-gray-800/40 backdrop-blur-3xl p-6 sm:p-8 rounded-3xl border border-white/20 dark:border-white/10 shadow-2xl mt-8">
             {/* Avatar */}
-            <div className="relative flex-shrink-0 mt-4">
-              <div className="relative w-32 h-32 md:w-36 md:h-36 rounded-2xl overflow-hidden ring-4 ring-white dark:ring-gray-800 shadow-2xl">
+            <div className="relative flex-shrink-0 -mt-20 md:-mt-24">
+              <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-2xl">
                 <Image
                   src={profile.profilep || "/images/default-avatar.png"}
                   alt={profile.djName || username}
@@ -244,14 +272,16 @@ const DjProfile = async ({ params }) => {
 
               {/* Bio */}
               {profile.bio && (
-                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed max-w-xl mb-5 bg-gray-50 dark:bg-gray-800/60 rounded-xl px-4 py-3 border border-gray-100 dark:border-gray-700/50">
+                <p className="text-gray-700 dark:text-gray-200 text-sm leading-relaxed max-w-xl mb-6 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl rounded-2xl px-5 py-4 border border-white/20 dark:border-white/5 shadow-inner line-clamp-4">
                   {profile.bio}
                 </p>
               )}
 
               {/* Actions row */}
               <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start items-center">
-                <Follow username={username} following={isFollowing} />
+                {!isOwnProfile && (
+                  <Follow username={username} following={isFollowing} />
+                )}
                 <ContactsDisplay
                   className="justify-center"
                   username={username}
@@ -293,7 +323,11 @@ const DjProfile = async ({ params }) => {
         {/* ── Mixtapes section ──────────────────────────────────────────── */}
 
         <div className="p-0">
-          <RecentMixxes username={username} />
+          <RecentMixxes 
+            username={username} 
+            mixtapes={profile.recentMixtapes} 
+            totalCount={profile.totalMixtapes} 
+          />
         </div>
       </div>
     </div>

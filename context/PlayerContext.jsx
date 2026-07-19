@@ -24,20 +24,28 @@ export function PlayerProvider({ children }) {
       }
 
       const mixData = await response.json();
-      let url;
-      //check if audio is compressed
 
-      if (mixData.compressed) {
-        url = mixData.compressedUrl;
+      let audioUrl;
+      if (mixData.hlsUrl) {
+        // Best: HLS adaptive streaming
+        audioUrl = mixData.hlsUrl;
       } else {
-        url = mixData.audio;
+        // Fallback: CDN MP3 (compressed or raw)
+        const rawUrl = mixData.compressed ? mixData.compressedUrl : mixData.audio;
+        const filename = rawUrl?.split("/").pop();
+        audioUrl = filename
+          ? `https://files.mixtapped.com/${encodeURIComponent(filename)}`
+          : rawUrl;
       }
-      const filename = url.split("/").pop();
+
       setCurrentMix({
-        id,
-        audio: `https://files.mixtapped.com/${encodeURIComponent(filename)}`,
+        id:       id,
+        audio:    audioUrl,
         imgthumb: mixData.imgthumb,
-        title: mixData.title,
+        title:    mixData.title,
+        djName:   mixData.djName,
+        genre:    mixData.genre,
+        waveform: mixData.waveformUrl,
       });
     } catch (error) {
       console.error("Error loading mix:", error);

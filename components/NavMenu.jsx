@@ -6,7 +6,6 @@ import { Disc2, Music } from "lucide-react";
 
 const NavMenu = () => {
   const [open, setOpen] = useState(false);
-  const menuRef = useRef(null);
   const pathname = usePathname();
 
   const toggleMenu = () => setOpen((prev) => !prev);
@@ -16,9 +15,13 @@ const NavMenu = () => {
     setOpen(false);
   }, [pathname]);
 
-  // Close menu on outside click
+  const menuRef = useRef(null);
+
+  // Handle outside clicks and escape key
   useEffect(() => {
-    if (!open) return;
+    const handleEscKey = (event) => {
+      if (event.key === "Escape") setOpen(false);
+    };
 
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -26,151 +29,98 @@ const NavMenu = () => {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    if (open) {
+      document.addEventListener("keydown", handleEscKey);
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
     return () => {
+      document.removeEventListener("keydown", handleEscKey);
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [open]);
 
-  // Close menu on escape key press
-  useEffect(() => {
-    if (!open) return;
-
-    const handleEscKey = (event) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", handleEscKey);
-    return () => {
-      document.removeEventListener("keydown", handleEscKey);
-    };
-  }, [open]);
-
   const menuItems = [
-    { href: "/discover", label: "All Mixxes", icon: <Music size={16} /> },
-    { href: "/discoverdjs", label: "All DJs", icon: <Disc2 size={16} /> },
+    { href: "/discover", label: "All Mixxes", icon: <Music size={24} /> },
+    { href: "/discoverdjs", label: "All DJs", icon: <Disc2 size={24} /> },
   ];
 
   const isActive = (href) => pathname === href;
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Desktop Menu */}
-      <nav className="hidden md:flex gap-x-3">
-        {menuItems.map((item) => {
-          const active = isActive(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`rounded-full px-4 py-2 font-medium text-sm transition-all duration-200 ease-out ${
-                active
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg hover:shadow-indigo-500/40"
-                  : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 ring-1 ring-gray-300 dark:ring-gray-600 hover:shadow-md"
-              }`}
-              aria-current={active ? "page" : undefined}
-            >
-              <span className="flex items-center gap-1.5">
-                {item.icon && <span className="text-xs">{item.icon}</span>}
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Mobile Menu Button */}
+      {/* Hamburger Button */}
       <button
         onClick={toggleMenu}
         aria-label="Toggle navigation menu"
         aria-expanded={open}
-        aria-controls="mobile-menu"
-        className={`md:hidden rounded-full p-2 transition-all duration-200 ${
+        className={`p-2 rounded-full transition-all duration-300 relative z-[110] ${
           open
-            ? "ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
-            : "ring-1 ring-gray-300 dark:ring-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-        } relative z-10 focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+            ? "bg-indigo-500/10 text-indigo-500"
+            : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+        }`}
       >
-        <div className="relative w-5 h-5">
+        <div className="relative w-5 h-4 flex flex-col justify-between">
           <span
-            className={`absolute top-1/2 left-0 block w-5 h-0.5 rounded-full transition-all duration-300 ${
-              open
-                ? "bg-indigo-600 dark:bg-indigo-400 rotate-45 translate-y-0"
-                : "bg-gray-600 dark:bg-gray-300 -translate-y-1.5"
+            className={`w-full h-[2px] rounded-full transition-all duration-300 origin-left ${
+              open ? "bg-indigo-500 rotate-45 translate-x-[2px] -translate-y-[1px]" : "bg-current"
             }`}
           />
           <span
-            className={`absolute top-1/2 left-0 block w-5 h-0.5 rounded-full transition-all duration-300 ${
-              open
-                ? "bg-indigo-600 dark:bg-indigo-400 opacity-0"
-                : "bg-gray-600 dark:bg-gray-300 opacity-100"
+            className={`w-full h-[2px] rounded-full transition-all duration-300 ${
+              open ? "opacity-0" : "bg-current"
             }`}
           />
           <span
-            className={`absolute top-1/2 left-0 block w-5 h-0.5 rounded-full transition-all duration-300 ${
-              open
-                ? "bg-indigo-600 dark:bg-indigo-400 -rotate-45 translate-y-0"
-                : "bg-gray-600 dark:bg-gray-300 translate-y-1.5"
+            className={`w-full h-[2px] rounded-full transition-all duration-300 origin-left ${
+              open ? "bg-indigo-500 -rotate-45 translate-x-[2px] translate-y-[1px]" : "bg-current"
             }`}
           />
         </div>
       </button>
 
-      {/* Mobile Menu */}
+      {/* Dropdown Modal */}
       {open && (
-        <div
-          id="mobile-menu"
-          className="md:hidden absolute top-full right-0 mt-2 w-56 rounded-lg shadow-xl bg-white dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-700 z-50 animate-fade-in"
-        >
-          <div className="py-1 px-1">
-            {menuItems.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-2 px-4 py-2.5 my-1 text-sm rounded-md transition-all duration-200 ${
-                    active
-                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium shadow-md"
-                      : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/80"
-                  }`}
-                  onClick={() => setOpen(false)}
-                  aria-current={active ? "page" : undefined}
-                >
-                  <span className="flex items-center gap-2 w-full">
-                    {item.icon && (
-                      <span className="text-base">{item.icon}</span>
-                    )}
-                    {item.label}
-                  </span>
-                  {active && (
-                    <span className="ml-auto h-2 w-2 rounded-full bg-white/80"></span>
-                  )}
-                </Link>
-              );
-            })}
+        <>
+          {/* Modal Content anchored to the button */}
+          <div className="absolute top-[calc(100%+1rem)] right-0 w-64 rounded-3xl p-4 bg-white/90 dark:bg-gray-950/90 backdrop-blur-xl shadow-2xl border border-gray-100 dark:border-white/10 z-[105] animate-in slide-in-from-top-2 fade-in duration-200">
+            <h3 className="text-xs font-semibold tracking-widest text-gray-400 dark:text-gray-500 uppercase mb-3 px-2">
+              Navigation
+            </h3>
+            
+            <div className="flex flex-col gap-2">
+              {menuItems.map((item) => {
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className={`flex items-center gap-3 p-3 rounded-2xl transition-all duration-200 group ${
+                      active
+                        ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20"
+                        : "text-gray-700 dark:text-gray-200 hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm"
+                    }`}
+                  >
+                    <div
+                      className={`p-2 rounded-xl transition-colors ${
+                        active
+                          ? "bg-white/20"
+                          : "bg-indigo-50 dark:bg-gray-800 text-indigo-500 dark:text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white"
+                      }`}
+                    >
+                      {item.icon}
+                    </div>
+                    <span className={`text-base font-bold ${active ? "" : "group-hover:text-indigo-600 dark:group-hover:text-white"}`}>
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </>
       )}
-
-      {/* Add this to your global CSS for the fade-in animation */}
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-5px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.15s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 };

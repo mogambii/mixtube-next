@@ -10,10 +10,14 @@ export async function GET(req, { params }) {
       select: {
         unique: true,
         title: true,
+        djName: true,
+        genre: true,
         audio: true,
         imgthumb: true,
         compressed: true,
         compressedUrl: true,
+        hlsUrl: true,
+        waveformUrl: true,
       },
     });
 

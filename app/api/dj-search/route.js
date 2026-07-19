@@ -17,38 +17,45 @@ export async function GET(request) {
   try {
     // Build where clause based on filter
     let whereClause = {
-      type: "DJ", // Filter for DJ users only
+      type: { in: ["DJ", "dj", "Dj"] }, // Filter for DJ users only (case insensitive)
     };
 
     // Enhanced search query with case-insensitive matching
     if (query && query.trim()) {
       const searchTerm = query.trim();
-      whereClause.OR = [
-        {
-          username: {
-            contains: searchTerm,
-            mode: "insensitive",
+      whereClause = {
+        AND: [
+          { type: { in: ["DJ", "dj", "Dj"] } },
+          {
+            OR: [
+              {
+                username: {
+                  contains: searchTerm,
+                  mode: "insensitive",
+                },
+              },
+              {
+                djName: {
+                  contains: searchTerm,
+                  mode: "insensitive",
+                },
+              },
+              {
+                name: {
+                  contains: searchTerm,
+                  mode: "insensitive",
+                },
+              },
+              {
+                bio: {
+                  contains: searchTerm,
+                  mode: "insensitive",
+                },
+              },
+            ],
           },
-        },
-        {
-          djName: {
-            contains: searchTerm,
-            mode: "insensitive",
-          },
-        },
-        {
-          name: {
-            contains: searchTerm,
-            mode: "insensitive",
-          },
-        },
-        {
-          bio: {
-            contains: searchTerm,
-            mode: "insensitive",
-          },
-        },
-      ];
+        ],
+      };
     }
 
     // Determine sort order
