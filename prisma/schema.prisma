@@ -119,6 +119,8 @@ model Mixtape {
   unique      String    @unique
   compressed  Boolean   @default(false)
   compressedUrl String?   @default("")
+  hlsUrl        String?   @default("")
+  waveformUrl   String?   @default("")
   djName      String    @default("Unknown DJ")
   userId      String    @db.ObjectId
 

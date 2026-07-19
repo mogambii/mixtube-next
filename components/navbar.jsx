@@ -16,7 +16,7 @@ async function Navbar() {
       {/* Brand / Logo */}
       <div className="flex items-center gap-4">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative group-hover:scale-105 transition-transform duration-300">
+          <div className="hidden md:block relative group-hover:scale-105 transition-transform duration-300">
             <Image
               src="https://i.ibb.co/17dxyfD/a5282d7a00d9ec58056a5.png"
               alt="mixtapped Logo"
@@ -47,7 +47,7 @@ async function Navbar() {
         ) : (
           <div className="flex items-center gap-x-1 sm:gap-x-2">
             <SearchTrigger />
-            <Link href="/login">
+            <Link href="/login" className="hidden sm:block">
               <button className="rounded-full px-4 py-2 font-medium text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
                 Login
               </button>
