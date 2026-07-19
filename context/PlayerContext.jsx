@@ -38,17 +38,12 @@ export function PlayerProvider({ children }) {
           : rawUrl;
       }
 
-      // Build CDN waveform URL from stored waveformUrl or construct it from unique
       let waveformUrl = null;
       if (mixData.waveformUrl) {
-        const waveformFilename = mixData.waveformUrl.split("/").pop();
         // If it contains a path-style structure, pass through CDN directly
         waveformUrl = mixData.waveformUrl.startsWith("https://files.mixtapped.com")
           ? mixData.waveformUrl
           : `https://files.mixtapped.com/hls/${id}/waveform.json`;
-      } else {
-        // Fallback: try the standard CDN path pattern
-        waveformUrl = `https://files.mixtapped.com/hls/${id}/waveform.json`;
       }
 
       setCurrentMix({
