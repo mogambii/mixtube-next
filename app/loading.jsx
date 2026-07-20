@@ -2,7 +2,7 @@ import React from "react";
 
 const loading = () => {
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-950">
+    <div className="flex flex-col items-center justify-center min-h-svh w-full">
 
 
       {/* Logo mark */}

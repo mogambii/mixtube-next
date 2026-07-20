@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { useTheme } from "next-themes";
 
 const BAR_GAP = 2; // px gap between bars
 
 export default function Waveform({ url, progress, onSeek, isPlaying }) {
+  const { resolvedTheme } = useTheme();
+  const isLight = resolvedTheme === 'light';
   const [peaks, setPeaks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hoverX, setHoverX] = useState(null);
@@ -67,7 +70,9 @@ export default function Waveform({ url, progress, onSeek, isPlaying }) {
         ctx.shadowColor = "rgba(99, 102, 241, 0.4)";
         ctx.shadowBlur = 6;
       } else {
-        ctx.fillStyle = hovered ? "rgba(255,255,255,0.28)" : "rgba(255,255,255,0.15)";
+        ctx.fillStyle = hovered 
+          ? (isLight ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.28)") 
+          : (isLight ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.15)");
         ctx.shadowBlur = 0;
       }
       ctx.fill();
@@ -135,7 +140,7 @@ export default function Waveform({ url, progress, onSeek, isPlaying }) {
   }, [url]);
 
   // ── Redraw whenever peaks, progress or hoverX change ──────────────────────
-  useEffect(() => { draw(); }, [peaks, progress, hoverX, draw]);
+  useEffect(() => { draw(); }, [peaks, progress, hoverX, draw, isLight]);
 
   // ── ResizeObserver: redraw on container size change ────────────────────────
   useEffect(() => {
@@ -179,7 +184,7 @@ export default function Waveform({ url, progress, onSeek, isPlaying }) {
       {/* Hover scrubber line */}
       {hoverX !== null && (
         <div
-          className="absolute top-0 bottom-0 w-px bg-white/50 z-10 pointer-events-none shadow-[0_0_6px_rgba(255,255,255,0.6)]"
+          className="absolute top-0 bottom-0 w-px bg-gray-900/40 dark:bg-white/50 z-10 pointer-events-none shadow-[0_0_6px_rgba(0,0,0,0.3)] dark:shadow-[0_0_6px_rgba(255,255,255,0.6)]"
           style={{ left: `${hoverX}%` }}
         />
       )}

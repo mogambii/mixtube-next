@@ -73,6 +73,23 @@ function AudioPlayer() {
     };
   }, []);
 
+  // ── Close expanded player (also exits native fullscreen if active) ─────────
+  // Prevents the "blank screen" bug: if the browser is still in fullscreen
+  // on expandedPlayerRef when we animate the panel away, the tab is left
+  // showing an empty fullscreen surface since the fullscreen element itself
+  // never got dismissed.
+  const closeExpandedPlayer = useCallback(() => {
+    if (document.fullscreenElement) {
+      const exit =
+        document.exitFullscreen?.bind(document) ||
+        document.webkitExitFullscreen?.bind(document) ||
+        document.mozCancelFullScreen?.bind(document);
+      Promise.resolve(exit?.()).finally(() => setIsExpanded(false));
+    } else {
+      setIsExpanded(false);
+    }
+  }, []);
+
   // ── Playlist state ─────────────────────────────────────────────────────────
   const [playlist, setPlaylist] = useState([]);
   const [playlistIndex, setPlaylistIndex] = useState(0);
@@ -295,11 +312,11 @@ function AudioPlayer() {
   // ── Close expanded on Escape ───────────────────────────────────────────────
   useEffect(() => {
     const handler = (e) => {
-      if (e.key === "Escape" && isExpanded) setIsExpanded(false);
+      if (e.key === "Escape" && isExpanded) closeExpandedPlayer();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [isExpanded]);
+  }, [isExpanded, closeExpandedPlayer]);
 
   // ── Track end / auto-advance ───────────────────────────────────────────────
   const handleTrackEnd = useCallback(() => {
@@ -508,13 +525,19 @@ function AudioPlayer() {
         {/* Animated Apple Music–style background */}
         <AnimatedBackground imgSrc={currentMix.imgthumb} isPlaying={isPlaying} />
 
+        {/* Contrast scrim — guarantees text/icons stay legible */}
+        <div
+          className="absolute inset-0 bg-white/30 dark:bg-black/35 pointer-events-none"
+          aria-hidden="true"
+        />
+
         {/* Content */}
         <div className="relative h-full flex flex-col overflow-hidden max-w-[1800px] mx-auto w-full">
           {/* Header bar */}
           <div className="flex items-center justify-between px-5 pt-6 pb-3 flex-shrink-0">
             <button
-              onClick={() => setIsExpanded(false)}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/20 text-white/70 hover:text-white hover:bg-white/10 backdrop-blur-md transition-all"
+              onClick={closeExpandedPlayer}
+              className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-gray-100/50 dark:bg-black/20 text-gray-700 dark:text-white/70 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 backdrop-blur-md transition-all"
               aria-label="Collapse player"
             >
               <ChevronDown className="h-5 w-5" />
@@ -525,7 +548,7 @@ function AudioPlayer() {
               {/* Fullscreen toggle */}
               <button
                 onClick={toggleFullscreen}
-                className="p-1.5 rounded-full bg-black/20 text-white/50 hover:text-white hover:bg-white/10 backdrop-blur-md transition-all"
+                className="p-1.5 rounded-full bg-gray-100/50 dark:bg-black/20 text-gray-600 dark:text-white/50 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 backdrop-blur-md transition-all"
                 aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
                 title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
               >
@@ -541,8 +564,8 @@ function AudioPlayer() {
                 onClick={() => setShowPlaylist((p) => !p)}
                 className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium transition-all border backdrop-blur-md ${
                   showPlaylist
-                    ? "bg-indigo-500/30 text-indigo-100 border-indigo-400/30 shadow-[0_0_15px_rgba(99,102,241,0.3)]"
-                    : "bg-black/20 text-white/70 border-white/10 hover:border-white/30 hover:text-white"
+                    ? "bg-indigo-100 dark:bg-indigo-500/30 text-indigo-700 dark:text-indigo-100 border-indigo-300 dark:border-indigo-400/30 shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+                    : "bg-gray-100/50 dark:bg-black/20 text-gray-700 dark:text-white/70 border-gray-300/50 dark:border-white/10 hover:border-gray-400/50 dark:hover:border-white/30 hover:text-gray-900 dark:hover:text-white"
                 }`}
                 aria-label="Toggle queue"
               >
@@ -579,7 +602,7 @@ function AudioPlayer() {
 
                   {/* Card */}
                   <div
-                    className={`relative w-full h-full rounded-2xl overflow-hidden bg-gray-900 border border-white/5 transition-all duration-700 z-10 ${
+                    className={`relative w-full h-full rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-white/5 transition-all duration-700 z-10 ${
                       isPlaying
                         ? "shadow-[0_20px_60px_rgba(0,0,0,0.6)] scale-100"
                         : "shadow-[0_10px_30px_rgba(0,0,0,0.3)] scale-95"
@@ -603,18 +626,18 @@ function AudioPlayer() {
 
                     {/* Vinyl ring overlay */}
                     <div
-                      className={`absolute inset-0 rounded-full m-[30%] border border-white/20 pointer-events-none transition-opacity ${isPlaying ? "opacity-100" : "opacity-0"}`}
+                      className={`absolute inset-0 rounded-full m-[30%] border border-gray-300 dark:border-white/20 pointer-events-none transition-opacity ${isPlaying ? "opacity-100" : "opacity-0"}`}
                       style={{ animation: isPlaying ? "spin 8s linear infinite" : "none" }}
                     />
 
                     {/* Playing bars overlay */}
                     {isPlaying && (
-                      <div className="absolute inset-0 bg-black/10 flex items-end justify-start p-3 pointer-events-none">
+                      <div className="absolute inset-0 bg-white/30 dark:bg-black/10 flex items-end justify-start p-3 pointer-events-none">
                         <div className="flex items-end gap-[3px] h-6" aria-hidden="true">
                           {[1, 2, 3, 4].map((i) => (
                             <span
                               key={i}
-                              className="w-[3px] rounded-full bg-white"
+                              className="w-[3px] rounded-full bg-gray-800 dark:bg-white"
                               style={{
                                 animation: `music-bar${(i % 3) + 1} ${0.5 + i * 0.1}s ease-in-out infinite`,
                                 height: "60%",
@@ -635,7 +658,7 @@ function AudioPlayer() {
                     genres.map((g) => (
                       <span
                         key={g}
-                        className="px-2.5 py-0.5 bg-white/10 backdrop-blur-sm text-white/80 text-[10px] font-semibold uppercase tracking-wide rounded-full border border-white/10"
+                        className="px-2.5 py-0.5 bg-gray-200/50 dark:bg-white/10 backdrop-blur-sm text-gray-700 dark:text-white/80 text-[10px] font-semibold uppercase tracking-wide rounded-full border border-gray-300/50 dark:border-white/10"
                       >
                         {g}
                       </span>
@@ -645,14 +668,14 @@ function AudioPlayer() {
 
                 <Link
                   href={`/mix/${currentMix.id}`}
-                  onClick={() => setIsExpanded(false)}
-                  className="block text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent truncate hover:from-indigo-200 hover:to-fuchsia-200 transition-all duration-300"
+                  onClick={closeExpandedPlayer}
+                  className="block text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-600 dark:from-white dark:via-white/90 dark:to-white/70 bg-clip-text text-transparent truncate hover:from-indigo-600 hover:to-fuchsia-600 dark:hover:from-indigo-200 dark:hover:to-fuchsia-200 transition-all duration-300"
                 >
                   {currentMix.title}
                 </Link>
 
                 {currentMix.djName && (
-                  <p className="text-white/50 text-sm mt-1 font-medium tracking-wide">
+                  <p className="text-gray-500 dark:text-white/50 text-sm mt-1 font-medium tracking-wide">
                     {currentMix.djName}
                   </p>
                 )}
@@ -676,7 +699,7 @@ function AudioPlayer() {
                 ) : (
                   <div
                     ref={expandedProgressRef}
-                    className="relative w-full h-1.5 bg-white/20 rounded-full cursor-pointer group mt-8 mb-4"
+                    className="relative w-full h-1.5 bg-gray-200 dark:bg-white/20 rounded-full cursor-pointer group mt-8 mb-4"
                     onClick={(e) => handleSeek(e, expandedProgressRef)}
                     onMouseMove={(e) => handleMouseMove(e, expandedProgressRef)}
                     onMouseLeave={() => setTooltipTime(null)}
@@ -691,7 +714,7 @@ function AudioPlayer() {
                     />
                     {/* Thumb */}
                     <div
-                      className="absolute h-4 w-4 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity -mt-[5px]"
+                      className="absolute h-4 w-4 bg-indigo-600 dark:bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity -mt-[5px]"
                       style={{ left: `${progress}%`, transform: "translateX(-50%)" }}
                     />
                     {tooltipTime && (
@@ -704,7 +727,7 @@ function AudioPlayer() {
                     )}
                   </div>
                 )}
-                <div className="flex justify-between text-[10px] text-white/50 mt-1.5">
+                <div className="flex justify-between text-[10px] text-gray-500 dark:text-white/50 mt-1.5">
                   <span>{currentTimeDisplay}</span>
                   <span>{durationDisplay}</span>
                 </div>
@@ -716,8 +739,8 @@ function AudioPlayer() {
                   onClick={toggleShuffle}
                   className={`p-2 rounded-full transition-all duration-200 ${
                     isShuffle
-                      ? "text-fuchsia-400 bg-fuchsia-500/20 shadow-[0_0_12px_rgba(217,70,239,0.3)]"
-                      : "text-white/30 hover:text-white/70"
+                      ? "text-fuchsia-600 bg-fuchsia-100 dark:text-fuchsia-400 dark:bg-fuchsia-500/20 shadow-[0_0_12px_rgba(217,70,239,0.3)]"
+                      : "text-gray-400 dark:text-white/30 hover:text-gray-700 dark:hover:text-white/70"
                   }`}
                   aria-label="Shuffle"
                 >
@@ -726,7 +749,7 @@ function AudioPlayer() {
 
                 <button
                   onClick={handleRewind}
-                  className="p-2.5 text-white/60 hover:text-white transition-all duration-200 hover:scale-110 active:scale-90 rounded-full hover:bg-white/10"
+                  className="p-2.5 text-gray-500 dark:text-white/60 hover:text-gray-900 dark:hover:text-white transition-all duration-200 hover:scale-110 active:scale-90 rounded-full hover:bg-gray-200/50 dark:hover:bg-white/10"
                   aria-label="Previous"
                 >
                   <LiaStepBackwardSolid size={28} />
@@ -738,25 +761,25 @@ function AudioPlayer() {
                   className={`w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 ${
                     isPlaying
                       ? "bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-600 shadow-[0_0_30px_rgba(139,92,246,0.5)]"
-                      : "bg-white shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+                      : "bg-gray-900 dark:bg-white shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
                   }`}
                   aria-label={isPlaying ? "Pause" : "Play"}
                 >
                   {isBuffering ? (
                     <FaSpinner
-                      className={`h-6 w-6 animate-spin ${isPlaying ? "text-white" : "text-indigo-600"}`}
+                      className={`h-6 w-6 animate-spin ${isPlaying ? "text-white" : "text-white dark:text-indigo-600"}`}
                     />
                   ) : isPlaying ? (
                     <RiPauseLine size={28} className="text-white" />
                   ) : (
-                    <RiPlayFill size={28} className="text-indigo-700 ml-1" />
+                    <RiPlayFill size={28} className="text-white dark:text-indigo-700 ml-1" />
                   )}
                 </button>
 
                 <button
                   onClick={handleNext}
                   disabled={getNextIndex(playlistIndex) === null}
-                  className="p-2.5 text-white/60 hover:text-white transition-all duration-200 hover:scale-110 active:scale-90 rounded-full hover:bg-white/10 disabled:opacity-20"
+                  className="p-2.5 text-gray-500 dark:text-white/60 hover:text-gray-900 dark:hover:text-white transition-all duration-200 hover:scale-110 active:scale-90 rounded-full hover:bg-gray-200/50 dark:hover:bg-white/10 disabled:opacity-20"
                   aria-label="Next"
                 >
                   <LiaStepForwardSolid size={28} />
@@ -766,8 +789,8 @@ function AudioPlayer() {
                   onClick={cycleRepeat}
                   className={`p-2 rounded-full transition-all duration-200 ${
                     repeat !== REPEAT.NONE
-                      ? "text-fuchsia-400 bg-fuchsia-500/20 shadow-[0_0_12px_rgba(217,70,239,0.3)]"
-                      : "text-white/30 hover:text-white/70"
+                      ? "text-fuchsia-600 bg-fuchsia-100 dark:text-fuchsia-400 dark:bg-fuchsia-500/20 shadow-[0_0_12px_rgba(217,70,239,0.3)]"
+                      : "text-gray-400 dark:text-white/30 hover:text-gray-700 dark:hover:text-white/70"
                   }`}
                   aria-label={`Repeat: ${repeat}`}
                 >
@@ -783,7 +806,7 @@ function AudioPlayer() {
               <div className="flex items-center justify-center gap-3 pb-6 flex-shrink-0">
                 <button
                   onClick={toggleMute}
-                  className="text-white/40 hover:text-white transition-colors flex-shrink-0"
+                  className="text-gray-500 dark:text-white/40 hover:text-gray-900 dark:hover:text-white transition-colors flex-shrink-0"
                   aria-label={isMuted ? "Unmute" : "Mute"}
                 >
                   {isMuted || volume === 0 ? (
@@ -800,21 +823,21 @@ function AudioPlayer() {
                     step={0.01}
                     value={isMuted ? 0 : volume}
                     onChange={handleVolumeChange}
-                    className="w-full h-1 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md"
+                    className="w-full h-1 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gray-900 dark:[&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md"
                     style={{
                       background: `linear-gradient(to right, rgb(139 92 246) ${(isMuted ? 0 : volume) * 100}%, rgba(255,255,255,0.12) ${(isMuted ? 0 : volume) * 100}%)`,
                     }}
                     aria-label="Volume"
                   />
                 </div>
-                <span className="text-[10px] text-white/30 w-7 text-right font-mono">
+                <span className="text-[10px] text-gray-400 dark:text-white/30 w-7 text-right font-mono">
                   {Math.round((isMuted ? 0 : volume) * 100)}
                 </span>
               </div>
 
               {/* Playlist position */}
               {playlist.length > 1 && (
-                <p className="text-center text-[10px] text-white/30 pb-4 flex-shrink-0">
+                <p className="text-center text-[10px] text-gray-400 dark:text-white/30 pb-4 flex-shrink-0">
                   {playlistIndex + 1} of {playlist.length}
                 </p>
               )}
@@ -822,19 +845,19 @@ function AudioPlayer() {
 
             {/* Playlist panel */}
             {showPlaylist && (
-              <div className="hidden sm:flex flex-col border-l border-white/10 flex-shrink-0" style={{ width: 'clamp(280px, 35%, 480px)' }}>
-                <div className="px-4 py-3 border-b border-white/10 flex-shrink-0">
-                  <h3 className="text-sm font-semibold text-white/80 flex items-center gap-2">
-                    <ListMusic className="h-4 w-4 text-indigo-400" />
+              <div className="hidden sm:flex flex-col border-l border-gray-200/50 dark:border-white/10 flex-shrink-0" style={{ width: 'clamp(280px, 35%, 480px)' }}>
+                <div className="px-4 py-3 border-b border-gray-200/50 dark:border-white/10 flex-shrink-0">
+                  <h3 className="text-sm font-semibold text-gray-800 dark:text-white/80 flex items-center gap-2">
+                    <ListMusic className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                     Up Next
-                    <span className="text-white/40 text-xs font-normal">
+                    <span className="text-gray-500 dark:text-white/40 text-xs font-normal">
                       ({playlist.length} tracks)
                     </span>
                   </h3>
                 </div>
                 <div
                   ref={playlistRef}
-                  className="flex-1 overflow-y-auto divide-y divide-white/5"
+                  className="flex-1 overflow-y-auto divide-y divide-gray-200/50 dark:divide-white/5"
                 >
                   {isLoadingPlaylist ? (
                     <div className="flex items-center justify-center py-12">
@@ -850,8 +873,8 @@ function AudioPlayer() {
                           onClick={() => playFromIndex(idx)}
                           className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-all ${
                             isActive
-                              ? "bg-indigo-500/20"
-                              : "hover:bg-white/5"
+                              ? "bg-indigo-100 dark:bg-indigo-500/20"
+                              : "hover:bg-gray-100/50 dark:hover:bg-white/5"
                           }`}
                         >
                           <div className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden">
@@ -864,17 +887,17 @@ function AudioPlayer() {
                                 sizes="40px"
                               />
                             ) : (
-                              <div className="w-full h-full bg-indigo-900/60 flex items-center justify-center">
+                              <div className="w-full h-full bg-indigo-100 dark:bg-indigo-900/60 flex items-center justify-center">
                                 <Music2 className="h-4 w-4 text-indigo-400" />
                               </div>
                             )}
                             {isActive && isPlaying && (
-                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                              <div className="absolute inset-0 bg-white/50 dark:bg-black/50 flex items-center justify-center">
                                 <div className="flex gap-[2px] items-end h-3 text-white">
                                   {[1, 2, 3].map((i) => (
                                     <span
                                       key={i}
-                                      className="w-[2px] rounded-full bg-white"
+                                      className="w-[2px] rounded-full bg-indigo-600 dark:bg-white"
                                       style={{
                                         animation: `music-bar${i} ${0.5 + i * 0.1}s ease-in-out infinite`,
                                         height: "60%",
@@ -889,19 +912,19 @@ function AudioPlayer() {
                             <p
                               className={`text-xs font-semibold truncate ${
                                 isActive
-                                  ? "text-indigo-300"
-                                  : "text-white/80"
+                                  ? "text-indigo-600 dark:text-indigo-300"
+                                  : "text-gray-800 dark:text-white/80"
                               }`}
                             >
                               {track.title}
                             </p>
-                            <p className="text-[10px] text-white/40 truncate">
+                            <p className="text-[10px] text-gray-500 dark:text-white/40 truncate">
                               {track.djName}
                             </p>
                           </div>
                           <span
                             className={`text-[10px] font-mono flex-shrink-0 ${
-                              isActive ? "text-indigo-400" : "text-white/30"
+                              isActive ? "text-indigo-600 dark:text-indigo-400" : "text-gray-400 dark:text-white/30"
                             }`}
                           >
                             {isActive ? "▶" : String(idx + 1).padStart(2, "0")}
@@ -917,10 +940,10 @@ function AudioPlayer() {
 
           {/* Mobile queue (below controls, scrollable) */}
           {showPlaylist && (
-            <div className="sm:hidden flex-shrink-0 border-t border-white/10 max-h-[220px] overflow-y-auto">
-              <div className="px-4 py-2 border-b border-white/5">
-                <p className="text-xs font-semibold text-white/60 flex items-center gap-2">
-                  <ListMusic className="h-3.5 w-3.5 text-indigo-400" /> Queue
+            <div className="sm:hidden flex-shrink-0 border-t border-gray-200/50 dark:border-white/10 max-h-[220px] overflow-y-auto">
+              <div className="px-4 py-2 border-b border-gray-200/50 dark:border-white/5">
+                <p className="text-xs font-semibold text-gray-700 dark:text-white/60 flex items-center gap-2">
+                  <ListMusic className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" /> Queue
                 </p>
               </div>
               {isLoadingPlaylist ? (
@@ -935,7 +958,7 @@ function AudioPlayer() {
                       key={track.unique || track.id || idx}
                       onClick={() => playFromIndex(idx)}
                       className={`w-full flex items-center gap-3 px-4 py-2 text-left ${
-                        isActive ? "bg-indigo-500/20" : "hover:bg-white/5"
+                        isActive ? "bg-indigo-100 dark:bg-indigo-500/20" : "hover:bg-gray-100/50 dark:hover:bg-white/5"
                       }`}
                     >
                       <div className="relative w-8 h-8 flex-shrink-0 rounded-md overflow-hidden">
@@ -948,18 +971,18 @@ function AudioPlayer() {
                             sizes="32px"
                           />
                         ) : (
-                          <div className="w-full h-full bg-indigo-900/60 flex items-center justify-center">
+                          <div className="w-full h-full bg-indigo-100 dark:bg-indigo-900/60 flex items-center justify-center">
                             <Music2 className="h-3 w-3 text-indigo-400" />
                           </div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-[11px] font-semibold truncate ${isActive ? "text-indigo-300" : "text-white/70"}`}>
+                        <p className={`text-[11px] font-semibold truncate ${isActive ? "text-indigo-600 dark:text-indigo-300" : "text-gray-800 dark:text-white/70"}`}>
                           {track.title}
                         </p>
-                        <p className="text-[9px] text-white/40 truncate">{track.djName}</p>
+                        <p className="text-[9px] text-gray-500 dark:text-white/40 truncate">{track.djName}</p>
                       </div>
-                      {isActive && <span className="text-[10px] text-indigo-400">▶</span>}
+                      {isActive && <span className="text-[10px] text-indigo-600 dark:text-indigo-400">▶</span>}
                     </button>
                   );
                 })
@@ -978,8 +1001,7 @@ function AudioPlayer() {
         {/* Thin progress line at very top of bar */}
         <div
           ref={progressRef}
-          className="relative w-full h-1 bg-white/10 cursor-pointer group"
-          style={{ background: "rgba(255,255,255,0.08)" }}
+          className="relative w-full h-1 bg-black/10 dark:bg-white/10 cursor-pointer group"
           onClick={(e) => handleSeek(e, progressRef)}
           onMouseMove={(e) => handleMouseMove(e, progressRef)}
           onMouseLeave={() => setTooltipTime(null)}
@@ -1007,7 +1029,7 @@ function AudioPlayer() {
         </div>
 
         {/* Bar body */}
-        <div className="bg-gray-950/90 backdrop-blur-2xl border-t border-white/8 px-3 sm:px-5 py-2.5 sm:py-3 shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
+        <div className="bg-white/80 dark:bg-gray-950/90 backdrop-blur-2xl border-t border-black/5 dark:border-white/10 px-3 sm:px-5 py-2.5 sm:py-3 shadow-[0_-4px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
           <div className="max-w-7xl mx-auto flex items-center gap-3">
             {/* Album art — click to expand */}
             <button
@@ -1052,7 +1074,7 @@ function AudioPlayer() {
               className="flex-1 min-w-0 text-left"
               aria-label="Open full player"
             >
-              <p className="text-xs sm:text-sm font-semibold text-white truncate leading-tight">
+              <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">
                 {currentMix.title}
               </p>
               <div className="flex items-center gap-2 mt-0.5">
@@ -1070,7 +1092,7 @@ function AudioPlayer() {
                     ))}
                   </div>
                 )}
-                <span className="text-[10px] text-white/40">
+                <span className="text-[10px] text-gray-500 dark:text-white/40">
                   {currentTimeDisplay} / {durationDisplay}
                 </span>
               </div>
@@ -1081,7 +1103,7 @@ function AudioPlayer() {
               {/* Prev — hidden on very small screens */}
               <button
                 onClick={handleRewind}
-                className="hidden xs:flex p-1.5 text-white/50 hover:text-white transition-colors rounded-full hover:bg-white/10"
+                className="hidden xs:flex p-1.5 text-gray-500 hover:text-gray-900 hover:bg-black/5 dark:text-white/50 dark:hover:text-white dark:hover:bg-white/10 transition-colors rounded-full"
                 aria-label="Previous"
               >
                 <LiaStepBackwardSolid size={18} />
@@ -1093,7 +1115,7 @@ function AudioPlayer() {
                 className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg ${
                   isPlaying
                     ? "bg-gradient-to-br from-indigo-500 to-purple-600"
-                    : "bg-white"
+                    : "bg-gray-900 dark:bg-white"
                 }`}
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
@@ -1104,7 +1126,7 @@ function AudioPlayer() {
                 ) : isPlaying ? (
                   <RiPauseLine size={16} className="text-white" />
                 ) : (
-                  <RiPlayFill size={16} className="text-indigo-700 ml-0.5" />
+                  <RiPlayFill size={16} className="text-white dark:text-indigo-700 ml-0.5" />
                 )}
               </button>
 
@@ -1112,7 +1134,7 @@ function AudioPlayer() {
               <button
                 onClick={handleNext}
                 disabled={getNextIndex(playlistIndex) === null}
-                className="p-1.5 text-white/50 hover:text-white transition-colors rounded-full hover:bg-white/10 disabled:opacity-30"
+                className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-black/5 dark:text-white/50 dark:hover:text-white dark:hover:bg-white/10 transition-colors rounded-full disabled:opacity-30"
                 aria-label="Next"
               >
                 <LiaStepForwardSolid size={18} />
@@ -1124,7 +1146,7 @@ function AudioPlayer() {
                   setIsExpanded(true);
                   setShowPlaylist(true);
                 }}
-                className="hidden sm:flex p-1.5 text-white/40 hover:text-white/80 transition-colors rounded-full hover:bg-white/10"
+                className="hidden sm:flex p-1.5 text-gray-500 hover:text-gray-900 hover:bg-black/5 dark:text-white/40 dark:hover:text-white/80 dark:hover:bg-white/10 transition-colors rounded-full"
                 aria-label="Open queue"
               >
                 <ListMusic className="h-4 w-4" />
@@ -1133,7 +1155,7 @@ function AudioPlayer() {
               {/* Expand arrow */}
               <button
                 onClick={() => setIsExpanded(true)}
-                className="hidden sm:flex p-1.5 text-white/30 hover:text-white/70 transition-colors"
+                className="hidden sm:flex p-1.5 text-gray-400 hover:text-gray-800 dark:text-white/30 dark:hover:text-white/70 transition-colors"
                 aria-label="Expand player"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>

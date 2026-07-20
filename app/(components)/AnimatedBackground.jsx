@@ -95,12 +95,12 @@ export default function AnimatedBackground({ imgSrc, isPlaying }) {
   const [c0, c1, c2, c3] = colors;
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-gray-950" aria-hidden="true">
+    <div className="absolute inset-0 overflow-hidden bg-gray-50 dark:bg-gray-950" aria-hidden="true">
       {/* Animated blobs */}
       <div className="absolute inset-0">
         {/* Blob 0 — top-left */}
         <div
-          className="absolute rounded-full mix-blend-screen"
+          className="absolute rounded-full mix-blend-multiply dark:mix-blend-screen"
           style={{
             width: "70%",
             height: "70%",
@@ -114,7 +114,7 @@ export default function AnimatedBackground({ imgSrc, isPlaying }) {
         />
         {/* Blob 1 — top-right */}
         <div
-          className="absolute rounded-full mix-blend-screen"
+          className="absolute rounded-full mix-blend-multiply dark:mix-blend-screen"
           style={{
             width: "65%",
             height: "65%",
@@ -128,7 +128,7 @@ export default function AnimatedBackground({ imgSrc, isPlaying }) {
         />
         {/* Blob 2 — bottom-left */}
         <div
-          className="absolute rounded-full mix-blend-screen"
+          className="absolute rounded-full mix-blend-multiply dark:mix-blend-screen"
           style={{
             width: "60%",
             height: "60%",
@@ -142,7 +142,7 @@ export default function AnimatedBackground({ imgSrc, isPlaying }) {
         />
         {/* Blob 3 — bottom-right */}
         <div
-          className="absolute rounded-full mix-blend-screen"
+          className="absolute rounded-full mix-blend-multiply dark:mix-blend-screen"
           style={{
             width: "55%",
             height: "55%",
@@ -156,7 +156,7 @@ export default function AnimatedBackground({ imgSrc, isPlaying }) {
         />
         {/* Centre accent — pulses when playing */}
         <div
-          className="absolute rounded-full mix-blend-screen"
+          className="absolute rounded-full mix-blend-multiply dark:mix-blend-screen"
           style={{
             width: "40%",
             height: "40%",
@@ -172,10 +172,10 @@ export default function AnimatedBackground({ imgSrc, isPlaying }) {
         />
       </div>
 
-      {/* Heavy dark overlay so text stays readable */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
-      {/* Bottom fade to near-black */}
-      <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/70 to-transparent" />
+      {/* Heavy dark/light overlay so text stays readable */}
+      <div className="absolute inset-0 bg-white/40 dark:bg-black/60 backdrop-blur-[2px]" />
+      {/* Bottom fade to near-background */}
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-gray-50/70 dark:from-gray-950 dark:via-gray-950/70 to-transparent" />
 
       {/* Keyframe definitions injected inline */}
       <style>{`
