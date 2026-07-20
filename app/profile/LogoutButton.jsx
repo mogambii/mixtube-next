@@ -6,12 +6,24 @@ import { LogOut } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 
+const DJ_PANEL_URL = process.env.NEXT_PUBLIC_DJ_PANEL_URL || "https://dj.mixtapped.com";
+
 export default function LogoutButton() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
+
   const handleLogout = async () => {
     setLoading(true);
-    await signOut({ callbackUrl: "/" });
+    try {
+      // Trigger session clear on the DJ panel via a hidden request
+      await fetch(`${DJ_PANEL_URL}/api/auth/signout-sync`, {
+        method: "GET",
+        mode: "no-cors", // cross-origin, we just need the cookie to be cleared
+        credentials: "include",
+      }).catch(() => {}); // Don't block signout if this fails
+    } finally {
+      await signOut({ callbackUrl: "/" });
+    }
   };
 
   if (!session) return null;
