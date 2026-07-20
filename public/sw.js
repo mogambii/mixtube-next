@@ -6,7 +6,7 @@
   - Cache busting via version
 */
 
-const VERSION = "v1";
+const VERSION = "v2";
 const APP_SHELL = ["/", "/offline", "/manifest.json", "/og.jpg"];
 
 self.addEventListener("install", (event) => {
