@@ -16,9 +16,9 @@ const Download_btn = ({ id, iconOnly = false, className = "" }) => {
 
     setIsDownloading(true);
 
-    const externalLink =
-      "https://www.profitableratecpm.com/y5ffkwhme?key=17359f4bbc9a1475cdac44bd6fdc0a88";
-    const popup = window.open(externalLink, "_blank");
+    // const externalLink =
+    //   "https://www.profitableratecpm.com/y5ffkwhme?key=17359f4bbc9a1475cdac44bd6fdc0a88";
+    // const popup = window.open(externalLink, "_blank");
 
     try {
       const response = await fetch(`/api/mixtape/download/${id}`, {
@@ -30,7 +30,7 @@ const Download_btn = ({ id, iconOnly = false, className = "" }) => {
 
       if (!response.ok) {
         const error = await response.json();
-        if (popup) popup.close();
+        // if (popup) popup.close();
         throw new Error(error.message || "Failed to update download count");
       }
 
