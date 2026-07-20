@@ -14,16 +14,7 @@ export default function LogoutButton() {
 
   const handleLogout = async () => {
     setLoading(true);
-    try {
-      // Trigger session clear on the DJ panel via a hidden request
-      await fetch(`${DJ_PANEL_URL}/api/auth/signout-sync`, {
-        method: "GET",
-        mode: "no-cors", // cross-origin, we just need the cookie to be cleared
-        credentials: "include",
-      }).catch(() => {}); // Don't block signout if this fails
-    } finally {
-      await signOut({ callbackUrl: "/" });
-    }
+    await signOut({ callbackUrl: "/" });
   };
 
   if (!session) return null;
