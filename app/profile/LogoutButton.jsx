@@ -14,6 +14,8 @@ export default function LogoutButton() {
 
   const handleLogout = async () => {
     setLoading(true);
+    // Aggressively clear old domain-specific cookies that override the shared cookie
+    await fetch("/api/auth/clear-cookies", { method: "POST" }).catch(() => {});
     await signOut({ callbackUrl: "/" });
   };
 
