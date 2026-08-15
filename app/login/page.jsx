@@ -10,10 +10,11 @@ export const metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
-      <main className="container mx-auto py-10 px-4">
-        <Login />
-      </main>
+    <div className="min-h-[calc(100vh-5rem)] bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+      {/* Background ambient lighting blobs */}
+      <div className="absolute top-10 right-10 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-10 left-10 w-96 h-96 bg-purple-500/10 dark:bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
+      <Login />
     </div>
   );
 }

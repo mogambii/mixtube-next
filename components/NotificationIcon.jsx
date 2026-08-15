@@ -30,7 +30,6 @@ export default function NotificationIcon() {
   useEffect(() => {
     if (session) {
       fetchUnreadCount();
-      // Poll for new notifications every 30 seconds
       const interval = setInterval(fetchUnreadCount, 30000);
       return () => clearInterval(interval);
     } else {
@@ -38,7 +37,6 @@ export default function NotificationIcon() {
     }
   }, [session, fetchUnreadCount]);
 
-  // Listen for custom events to update count (e.g., when user follows/likes)
   useEffect(() => {
     const handleNotificationUpdate = () => {
       fetchUnreadCount();
@@ -48,26 +46,25 @@ export default function NotificationIcon() {
     return () => window.removeEventListener('notification-update', handleNotificationUpdate);
   }, [fetchUnreadCount]);
 
+  if (!session) return null;
+
   return (
-    <div className="flex items-center gap-4">
-      {session && (
-        <Link
-          href="/notifications"
-          className="relative flex items-center text-lg text-gray-800 dark:text-slate-100 hover:text-primary transition-colors group"
-        >
-          <FaBell 
-            className={`flex items-center justify-center transition-transform group-hover:scale-110 ${
-              isLoading ? 'animate-pulse' : ''
-            }`} 
-            size={20} 
-          />
-          {unreadCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold animate-bounce">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </Link>
+    <Link
+      href="/notifications"
+      className="relative p-1.5 sm:p-2 flex items-center justify-center text-gray-800 dark:text-slate-100 hover:text-primary transition-colors group rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0"
+      aria-label="Notifications"
+    >
+      <FaBell 
+        className={`transition-transform group-hover:scale-110 ${
+          isLoading ? 'animate-pulse' : ''
+        }`} 
+        size={17} 
+      />
+      {unreadCount > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 sm:h-4.5 sm:w-4.5 flex items-center justify-center font-bold animate-bounce leading-none">
+          {unreadCount > 99 ? '99+' : unreadCount}
+        </span>
       )}
-    </div>
+    </Link>
   );
 }

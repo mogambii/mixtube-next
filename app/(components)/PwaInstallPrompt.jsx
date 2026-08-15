@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 
 const DISMISS_KEY = "pwa-install-dismissed-at";
 const INSTALLED_KEY = "pwa-installed";
-const SNOOZE_MS = 1000 * 60 * 60 * 24 * 3; // 3 days
 
 export default function PwaInstallPrompt() {
   const [promptEvent, setPromptEvent] = useState(null);
@@ -15,11 +14,11 @@ export default function PwaInstallPrompt() {
   const shouldShow = useMemo(() => {
     if (typeof window === "undefined") return false;
     if (isStandalone) return false;
-    let dismissedAt = 0;
+    let dismissed = false;
     try {
-      dismissedAt = Number(window.localStorage.getItem(DISMISS_KEY) || 0);
+      dismissed = Boolean(window.localStorage.getItem(DISMISS_KEY));
     } catch {}
-    if (dismissedAt && Date.now() - dismissedAt < SNOOZE_MS) return false;
+    if (dismissed) return false;
     let installed = "0";
     try {
       installed = window.localStorage.getItem(INSTALLED_KEY) || "0";
@@ -89,7 +88,7 @@ export default function PwaInstallPrompt() {
 
   const handleDismiss = () => {
     try {
-      localStorage.setItem(DISMISS_KEY, String(Date.now()));
+      localStorage.setItem(DISMISS_KEY, "1");
     } catch {}
     setIsVisible(false);
   };
@@ -135,5 +134,3 @@ export default function PwaInstallPrompt() {
     </div>
   );
 }
-
-

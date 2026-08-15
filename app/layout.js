@@ -2,7 +2,7 @@ import "./globals.css";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/navbar";
 import { Toaster } from "react-hot-toast";
-import { GoogleAnalytics } from '@next/third-parties/google'
+import { GoogleAnalytics } from '@next/third-parties/google';
 import AudioPlayer from "./(components)/AudioPlayer";
 import { PlayerProvider } from "@/context/PlayerContext";
 import SessionProvider from "@/providers/SessionProvider";
@@ -12,8 +12,7 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import RegisterSW from "./register-sw";
 import PwaInstallPrompt from "./(components)/PwaInstallPrompt";
 import SearchModal from "./(components)/SearchModal";
-import { Orbitron } from "next/font/google";
-import { Righteous } from "next/font/google";
+import { Orbitron, Righteous } from "next/font/google";
 
 export const orbitron = Orbitron({
   subsets: ["latin"],
@@ -57,28 +56,28 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${orbitron.variable} ${righteous.variable}`}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <SessionProvider session={session}>
-          <PlayerProvider>
-            <div className="dark:bg-gray-900 min-h-screen">
-              <RegisterSW />
-              <PwaInstallPrompt />
-              <SearchModal />
-              <Toaster position="top-center" />
-              <header className="sticky top-0 z-50 p-3 sm:p-4 pointer-events-none">
-                <div className="pointer-events-auto">
-                  <Navbar />
-                </div>
-              </header>
-              <GoogleAnalytics gaId="G-C87ETLJK5C"/>
-              <main className="mx-5">{children}</main>
-              <AudioPlayer/>
-              <footer>
-                <Footer />
-              </footer>
-            </div>
-          </PlayerProvider>
-        </SessionProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <SessionProvider session={session}>
+            <PlayerProvider>
+              <div className="dark:bg-gray-900 min-h-screen">
+                <RegisterSW />
+                <PwaInstallPrompt />
+                <SearchModal />
+                <Toaster position="top-center" />
+                <header className="sticky top-0 z-50 p-2 sm:p-4 pointer-events-none">
+                  <div className="pointer-events-auto">
+                    <Navbar />
+                  </div>
+                </header>
+                <GoogleAnalytics gaId="G-C87ETLJK5C"/>
+                <main className="mx-3 sm:mx-5">{children}</main>
+                <AudioPlayer/>
+                <footer>
+                  <Footer />
+                </footer>
+              </div>
+            </PlayerProvider>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

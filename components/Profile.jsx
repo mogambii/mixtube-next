@@ -11,11 +11,11 @@ export default function ProfileIcon() {
   const { name, image, email } = session.user;
 
   return (
-    <Link href="/profile">
-      <button className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition">
-        <Avatar>
-          <AvatarImage src={image} size={4} alt={name} />
-          <AvatarFallback>
+    <Link href="/profile" aria-label="Profile">
+      <button className="flex items-center justify-center p-0.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition shrink-0">
+        <Avatar className="h-7 w-7 sm:h-9 sm:w-9">
+          <AvatarImage src={image} alt={name} />
+          <AvatarFallback className="text-xs font-semibold">
             {name?.charAt(0).toUpperCase() || email?.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
