@@ -97,22 +97,34 @@ const Login = () => {
       const callbackInput = document.createElement("input");
       callbackInput.type = "hidden";
       callbackInput.name = "callbackUrl";
-      callbackInput.value = window.location.origin;
+      callbackInput.value = `${window.location.origin}/auth/popup-callback`;
       form.appendChild(callbackInput);
 
       document.body.appendChild(form);
       form.submit();
       document.body.removeChild(form);
 
-      // 4. Poll for popup closure
+      // 4. Poll and listen for popup closure/message
       if (popup) {
-        const checkPopup = setInterval(() => {
-          if (popup.closed) {
+        const handleMessage = (event) => {
+          if (event.data?.type === "GOOGLE_SIGNIN_SUCCESS") {
+            window.removeEventListener("message", handleMessage);
             clearInterval(checkPopup);
+            if (!popup.closed) popup.close();
             router.push("/");
             router.refresh();
           }
-        }, 1000);
+        };
+        window.addEventListener("message", handleMessage);
+
+        const checkPopup = setInterval(() => {
+          if (popup.closed) {
+            clearInterval(checkPopup);
+            window.removeEventListener("message", handleMessage);
+            router.push("/");
+            router.refresh();
+          }
+        }, 500);
       }
     } catch (err) {
       if (popup) popup.close();
