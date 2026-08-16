@@ -93,7 +93,7 @@ export default async function TopMixList() {
   }
 
   return (
-    <section className="py-8 px-4">
+    <section className="py-3 sm:py-8 px-1 sm:px-4">
       <div className="container mx-auto">
         <div className="flex items-center mb-6">
           <div className="w-1.5 h-8 bg-indigo-600 rounded-full mr-3"></div>

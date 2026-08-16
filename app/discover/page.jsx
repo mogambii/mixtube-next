@@ -37,8 +37,8 @@ export default async function DiscoverPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 rounded-none md:rounded-3xl overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 rounded-3xl overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-6">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">

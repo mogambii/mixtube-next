@@ -70,7 +70,7 @@ export default async function RootLayout({ children }) {
                   </div>
                 </header>
                 <GoogleAnalytics gaId="G-C87ETLJK5C"/>
-                <main className="mx-3 sm:mx-5">{children}</main>
+                <main className="max-w-7xl mx-auto px-1.5 sm:px-4 pb-8 sm:pb-12">{children}</main>
                 <AudioPlayer/>
                 <footer>
                   <Footer />

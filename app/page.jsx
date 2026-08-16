@@ -48,12 +48,12 @@ export const metadata = {
 
 export default function Mainpage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b rounded-2xl mx-2 p-2 from-white to-slate-50 dark:from-gray-950 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b rounded-2xl p-0 sm:p-2 from-white to-slate-50 dark:from-gray-950 dark:to-gray-900">
       {/* Page Content */}
 
-      <main className="max-w-7xl mx-auto px-4 pt-6 pb-10" role="main">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 pt-3 sm:pt-6 pb-10" role="main">
         {/* Hero banner with premium glassmorphic aesthetic */}
-        <section className="mb-12 mt-2 rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(8,_112,_184,_0.1)] dark:shadow-[0_20px_50px_rgba(0,_0,_0,_0.5)] relative">
+        <section className="mb-6 sm:mb-12 mt-1 sm:mt-2 rounded-2xl sm:rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(8,_112,_184,_0.1)] dark:shadow-[0_20px_50px_rgba(0,_0,_0,_0.5)] relative">
           {/* Deep vibrant gradients */}
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-600 opacity-95 dark:opacity-40"></div>
           <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/30 to-transparent dark:from-blue-900/40"></div>
@@ -65,15 +65,15 @@ export default function Mainpage() {
             <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 rounded-full bg-indigo-400 blur-[80px] animate-blob-drift-1"></div>
           </div>
 
-          <div className="relative p-10 md:p-16 lg:p-20 z-10 flex flex-col items-center justify-center min-h-[400px]">
+          <div className="relative p-6 sm:p-12 md:p-16 lg:p-20 z-10 flex flex-col items-center justify-center min-h-[280px] sm:min-h-[400px]">
             <div className="max-w-4xl mx-auto text-center w-full">
-              <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-righteous text-white mb-6 tracking-wide drop-shadow-xl">
+              <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold font-righteous text-white mb-4 sm:mb-6 tracking-wide drop-shadow-xl">
                 Discover the Best
-                <span className="block mt-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white drop-shadow-lg">
+                <span className="block mt-1 sm:mt-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white drop-shadow-lg">
                   DJ Mixtapes
                 </span>
               </h1>
-              <p className="text-lg md:text-xl text-white/90 dark:text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed font-medium">
+              <p className="text-sm sm:text-xl text-white/90 dark:text-white/80 mb-6 sm:mb-10 max-w-2xl mx-auto leading-relaxed font-medium">
                 Stream trending mixes from top DJs around the world, or upload your own and share your sound globally.
               </p>
             </div>
@@ -82,7 +82,7 @@ export default function Mainpage() {
 
         {/* Top mixtapes section */}
         <section
-          className="mb-12 bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-[2rem] p-2 md:p-4 shadow-xl border border-white/50 dark:border-white/5"
+          className="mb-6 sm:mb-12 bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-2xl sm:rounded-[2rem] p-1 sm:p-4 shadow-xl border border-white/50 dark:border-white/5"
           aria-labelledby="top-mixtapes-heading"
         >
           <TopMixtapes />
@@ -90,7 +90,7 @@ export default function Mainpage() {
 
         {/* New mixtapes section */}
         <section
-          className="mb-12 bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-[2rem] p-2 md:p-4 shadow-xl border border-white/50 dark:border-white/5"
+          className="mb-6 sm:mb-12 bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-2xl sm:rounded-[2rem] p-1 sm:p-4 shadow-xl border border-white/50 dark:border-white/5"
           aria-labelledby="new-mixtapes-heading"
         >
           <NewMixtapes />

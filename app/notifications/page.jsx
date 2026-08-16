@@ -69,7 +69,7 @@ export default async function NotificationsPage() {
   }));
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen rounded-none md:rounded-3xl overflow-hidden">
+    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen rounded-3xl overflow-hidden">
       <NotificationsClient 
         initialNotifications={formattedNotifications} 
         initialUnreadCount={unreadCount} 

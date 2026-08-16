@@ -15,15 +15,15 @@ const MixCard = ({
   loading,
 }) => {
   return (
-    <div className="p-2 w-full">
+    <div className="p-1 sm:p-2 w-full">
       <Link
         href={link}
         className="block transition-all duration-300 group"
       >
-        <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-3xl rounded-2xl flex flex-col sm:flex-row gap-4 p-3 sm:p-4 w-full shadow-md hover:shadow-lg transition-all duration-500 border border-white/40 dark:border-white/5 overflow-hidden relative">
+        <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-3xl rounded-2xl flex flex-row items-center gap-3 sm:gap-4 p-2.5 sm:p-4 w-full shadow-md hover:shadow-lg transition-all duration-500 border border-white/40 dark:border-white/5 overflow-hidden relative">
           
           {/* Mixtape image with gradient overlay */}
-          <div className="relative w-full sm:w-40 sm:h-40 h-48 flex-shrink-0 overflow-hidden rounded-xl shadow-sm z-10">
+          <div className="relative w-24 h-24 sm:w-40 sm:h-40 flex-shrink-0 overflow-hidden rounded-xl shadow-sm z-10">
             <Image
               priority={loading ? false : true}
               src={img ? optimizeCloudinaryUrl(img) : "https://placehold.co/210x210"}
@@ -57,7 +57,7 @@ const MixCard = ({
             </div>
 
             {/* Stats with glow styling */}
-            <div className="flex items-center justify-start gap-4 sm:gap-6 mt-4 sm:mt-2">
+            <div className="flex items-center justify-start gap-4 sm:gap-6 mt-2">
               <div className="flex items-center gap-2 group/stat">
                 <div className="bg-indigo-100/50 dark:bg-indigo-900/30 p-2 rounded-full border border-indigo-200/50 dark:border-indigo-800/30 shadow-sm group-hover/stat:bg-indigo-500 group-hover/stat:shadow-indigo-500/40 transition-all duration-300">
                   <FaDownload className="text-indigo-600 dark:text-indigo-400 h-3 w-3 sm:h-4 sm:w-4 group-hover/stat:text-white transition-colors" />

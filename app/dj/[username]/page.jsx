@@ -226,7 +226,7 @@ const DjProfile = async ({ params }) => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20">
       {/* ── Hero / Profile Header ─────────────────────────────────────────── */}
-      <div className="relative overflow-hidden mb-8">
+      <div className="relative overflow-hidden mb-8 rounded-lg">
         {/* Decorative gradient banner */}
         <div className="absolute top-0 left-0 right-0 h-56 bg-gradient-to-br from-indigo-600 via-purple-600 to-fuchsia-600 opacity-90" />
         

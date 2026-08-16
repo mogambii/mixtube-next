@@ -145,7 +145,8 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { notificationIds } = await request.json();
+    const body = await request.json().catch(() => ({}));
+    const notificationIds = body.notificationIds || body.id || body.notificationId;
 
     if (!notificationIds) {
       return NextResponse.json(
@@ -170,6 +171,8 @@ export async function PATCH(request) {
       queryCondition.read = false;
     } else if (Array.isArray(notificationIds)) {
       queryCondition.id = { in: notificationIds };
+    } else if (typeof notificationIds === "string") {
+      queryCondition.id = notificationIds;
     } else {
       return NextResponse.json(
         { error: "Invalid notification IDs format" },

@@ -55,10 +55,10 @@ function calculateProfileCompletion(user) {
 
 async function getProfile(email) {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/user/profile?email=${encodeURIComponent(email)}`,
-      { cache: "no-store" },
-    );
+    const url = email
+      ? `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/user/profile?email=${encodeURIComponent(email)}`
+      : `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/user/profile`;
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch profile");
     return res.json();
   } catch (err) {
@@ -81,7 +81,7 @@ function StatCard({ icon: Icon, value, label, accent = "indigo" }) {
     teal:   "bg-teal-500/10 text-teal-500",
   };
   return (
-    <div className="flex flex-col items-center gap-1.5 px-4 py-4 rounded-2xl bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 backdrop-blur-sm flex-1 min-w-[100px]">
+    <div className="flex flex-col items-center gap-1.5 px-2.5 sm:px-4 py-3 sm:py-4 rounded-2xl bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 backdrop-blur-sm flex-1 min-w-[80px] sm:min-w-[100px]">
       <div className={`p-2 rounded-xl ${colors[accent]}`}>
         <Icon className="h-4 w-4" />
       </div>
@@ -156,8 +156,8 @@ export default async function ProfilePage() {
   const displayName = isDJ && user.djName ? user.djName : user.name;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 rounded-3xl overflow-hidden p-4 ">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-5">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 rounded-3xl overflow-hidden p-1 sm:p-4">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-5">
 
         {/* ── Profile Card ── */}
         <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/20 dark:border-white/5">
@@ -180,7 +180,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* Body */}
-          <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-3xl relative px-5 pb-6">
+          <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-3xl relative px-3.5 sm:px-5 pb-5 sm:pb-6">
             {/* Avatar */}
             <div className="absolute left-5 -top-12 sm:-top-14">
               <div className="relative">
@@ -305,14 +305,14 @@ export default async function ProfilePage() {
 
           {/* Following */}
           <TabsContent value="following" className="mt-4">
-            <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-3xl border border-white/20 dark:border-white/5 p-4">
-              <UserList email={user.email} />
+            <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-3xl border border-white/20 dark:border-white/5 p-2 sm:p-4">
+              <UserList />
             </div>
           </TabsContent>
 
           {/* Settings */}
           <TabsContent value="settings" className="mt-4">
-            <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-3xl border border-white/20 dark:border-white/5 p-4 space-y-3">
+            <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl rounded-3xl border border-white/20 dark:border-white/5 p-2 sm:p-4 space-y-3">
 
               <SettingsRow icon={Share2} label="Share Profile" description="Share your public profile with others">
                 <ShareProfileDialog username={user.name} />

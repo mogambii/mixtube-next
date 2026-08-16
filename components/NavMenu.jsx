@@ -66,13 +66,13 @@ const NavMenu = () => {
         onClick={toggleMenu}
         aria-label="Toggle navigation menu"
         aria-expanded={open}
-        className={`p-1.5 sm:p-2 rounded-full transition-all duration-300 relative z-[110] ${
+        className={`p-1.5 sm:p-2 rounded-full transition-all duration-300 relative z-[110] flex items-center justify-center shrink-0 ${
           open
             ? "bg-indigo-500/10 text-indigo-500"
             : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
         }`}
       >
-        <div className="relative w-4 h-3.5 sm:w-5 sm:h-4 flex flex-col justify-between">
+        <div className="relative w-4 h-4 sm:w-5 sm:h-5 flex flex-col justify-between py-[2px] sm:py-[3px]">
           <span
             className={`w-full h-[2px] rounded-full transition-all duration-300 origin-left ${
               open ? "bg-indigo-500 rotate-45 translate-x-[2px] -translate-y-[1px]" : "bg-current"

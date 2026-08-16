@@ -12,7 +12,7 @@ import Link from "next/link";
 // ─── skeleton row ─────────────────────────────────────────────────────────────
 
 const UserRowSkeleton = () => (
-  <div className="flex items-center justify-between px-4 py-3">
+  <div className="flex items-center justify-between px-2.5 sm:px-4 py-2.5 sm:py-3">
     <div className="flex items-center gap-3">
       <Skeleton className="h-11 w-11 rounded-full flex-shrink-0" />
       <div className="space-y-1.5">
@@ -53,7 +53,7 @@ const EmptyState = () => (
 
 const UserRow = ({ user, index }) => (
   <div
-    className="group flex items-center justify-between px-4 py-3 rounded-2xl transition-colors duration-150 hover:bg-gray-50 dark:hover:bg-gray-800/60"
+    className="group flex items-center justify-between px-2.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl transition-colors duration-150 hover:bg-gray-50 dark:hover:bg-gray-800/60"
     style={{ animationDelay: `${index * 40}ms` }}
   >
     <Link
@@ -110,7 +110,7 @@ export default function UserList({ email }) {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `/api/user/following?email=${encodeURIComponent(email)}&page=${page}&limit=8`,
+        `/api/user/following?page=${page}&limit=8`,
       );
       const data = await res.json();
       if (data.users.length < 8) setHasMore(false);
@@ -133,7 +133,7 @@ export default function UserList({ email }) {
   return (
     <div className="rounded-2xl border border-gray-100 dark:border-gray-700/50 bg-white dark:bg-gray-900 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700/50">
+      <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-b border-gray-100 dark:border-gray-700/50">
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4 text-indigo-500" />
           <span className="text-sm font-semibold text-gray-900 dark:text-white">

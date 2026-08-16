@@ -254,7 +254,7 @@ const DiscoverDjsClient = ({
 
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 rounded-none md:rounded-3xl overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 rounded-3xl overflow-hidden">
       <DjSearchModal isOpen={isSearchModalOpen} onClose={closeSearchModal} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8">
