@@ -527,7 +527,15 @@ export default async function MixTape({ params }) {
                 <FaMusic className="h-4 w-4 text-indigo-500" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                More {(mix.genre || "").split(",")[0].trim()} Mixtapes
+                More {(() => {
+                  const gList = (mix.genre || "")
+                    .split(",")
+                    .map((g) => g.trim())
+                    .filter(Boolean);
+                  if (gList.length === 0) return "";
+                  if (gList.length === 1) return `${gList[0]} `;
+                  return `${gList.slice(0, -1).join(", ")} & ${gList[gList.length - 1]} `;
+                })()}Mixtapes
               </h3>
             </div>
 
