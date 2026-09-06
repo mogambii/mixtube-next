@@ -6,15 +6,15 @@ export const dynamic = "force-dynamic";
 export default async function TopMixList() {
   const getRecords = async () => {
     try {
-      const threeMonthsAgo = new Date();
-      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      const oneMonthsAgo = new Date();
+      oneMonthsAgo.setMonth(oneMonthsAgo.getMonth() - 1);
 
-      // Aggregate stats from the last 3 months per mixtape
+      // Aggregate stats from the last month per mixtape
       const trendingStats = await prisma.stats.groupBy({
         by: ["mixtapeId"],
         where: {
           date: {
-            gte: threeMonthsAgo,
+            gte: oneMonthsAgo,
           },
         },
         _sum: {
