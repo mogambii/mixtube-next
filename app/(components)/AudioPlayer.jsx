@@ -806,16 +806,16 @@ function AudioPlayer() {
               <div className="flex items-center justify-center gap-3 pb-6 flex-shrink-0">
                 <button
                   onClick={toggleMute}
-                  className="text-gray-500 dark:text-white/40 hover:text-gray-900 dark:hover:text-white transition-colors flex-shrink-0"
+                  className="p-2 rounded-full text-gray-600 dark:text-white/60 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-white/10 transition-all flex-shrink-0"
                   aria-label={isMuted ? "Unmute" : "Mute"}
                 >
                   {isMuted || volume === 0 ? (
-                    <VolumeX className="h-4 w-4" />
+                    <VolumeX className="h-4 w-4 text-red-500 dark:text-red-400" />
                   ) : (
                     <Volume2 className="h-4 w-4" />
                   )}
                 </button>
-                <div className="relative flex items-center w-28 sm:w-36">
+                <div className="relative flex items-center w-32 sm:w-44 py-2 group">
                   <input
                     type="range"
                     min={0}
@@ -823,16 +823,13 @@ function AudioPlayer() {
                     step={0.01}
                     value={isMuted ? 0 : volume}
                     onChange={handleVolumeChange}
-                    className="w-full h-1 appearance-none rounded-full cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gray-900 dark:[&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-md"
+                    className="w-full h-1.5 appearance-none rounded-full cursor-pointer bg-transparent focus:outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-0 [&::-webkit-slider-thumb]:h-0 [&::-moz-range-thumb]:w-0 [&::-moz-range-thumb]:h-0"
                     style={{
-                      background: `linear-gradient(to right, rgb(139 92 246) ${(isMuted ? 0 : volume) * 100}%, rgba(255,255,255,0.12) ${(isMuted ? 0 : volume) * 100}%)`,
+                      background: `linear-gradient(to right, #6366f1 0%, #a855f7 ${(isMuted ? 0 : volume) * 100}%, rgba(128,128,128,0.25) ${(isMuted ? 0 : volume) * 100}%)`,
                     }}
                     aria-label="Volume"
                   />
                 </div>
-                <span className="text-[10px] text-gray-400 dark:text-white/30 w-7 text-right font-mono">
-                  {Math.round((isMuted ? 0 : volume) * 100)}
-                </span>
               </div>
 
               {/* Playlist position */}
