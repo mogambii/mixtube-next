@@ -152,12 +152,6 @@ const MixxesPage = async ({ params }) => {
               {profile.djName || username}
             </span>
           </div>
-
-          {/* Total count badge */}
-          <span className="ml-auto bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-100 dark:border-indigo-800/40 flex-shrink-0">
-            {profile.totalMixtapes}{" "}
-            {profile.totalMixtapes === 1 ? "mixtape" : "mixtapes"}
-          </span>
         </div>
       </div>
 

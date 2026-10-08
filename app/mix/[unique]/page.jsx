@@ -1,44 +1,31 @@
 import React from "react";
-import { FaDownload, FaHeart, FaRegCirclePlay } from "react-icons/fa6";
-import { FaCalendarAlt, FaMusic } from "react-icons/fa";
 import {
   AlertCircle,
-  MoreHorizontal,
-  ArrowRight,
+  Headphones,
+  Download,
   Heart,
-  Plus,
-  ArrowDown,
+  Calendar,
   Info,
   ChevronRight,
-  MessageSquare,
+  Mic2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import CommentsPage from "@/app/(components)/Comments";
-import DownloadBtn from "@/components/Download_btn";
-import Share from "@/components/Share";
-import LikeBtn, { LikeProvider } from "@/components/Like-btn";
 import LikeCounter from "@/components/LikeCounter";
-import AudioAdd from "@/app/(components)/AudioAdd";
+import MixHeroActions from "../components/MixHeroActions";
+import RelatedSlider from "../components/RelatedSlider";
 import { getServerSession } from "next-auth";
-import dynamic from "next/dynamic";
 import prisma from "@/lib/prismadb";
-
-// Dynamically import the LikeProvider with no SSR to avoid hydration issues
-const DynamicLikeProvider = dynamic(() =>
-  import("@/components/Like-btn").then((mod) => mod.LikeProvider),
-);
 
 async function checkLikeStatus(email, mixtapeId) {
   if (!email) {
-    return;
+    return false;
   }
   try {
     const res = await fetch(
       `http://localhost:3000/api/mixtape/user/${mixtapeId}/liked?email=${email}`,
-      {
-        cache: "no-cache",
-      },
+      { cache: "no-cache" }
     );
     if (!res.ok) throw new Error("Failed to check like status");
     const results = await res.json();
@@ -49,18 +36,17 @@ async function checkLikeStatus(email, mixtapeId) {
   }
 }
 
-// Fetch mixtape data by unique
 async function getMixtape(unique) {
   try {
     const res = await prisma.mixtape.findUnique({
-      where: {
-        unique: unique,
-      },
+      where: { unique },
       include: {
         user: {
           select: {
             username: true,
             profilep: true,
+            bio: true,
+            djName: true,
           },
         },
         comments: {
@@ -80,7 +66,7 @@ async function getMixtape(unique) {
     });
     return res;
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error fetching mixtape:", error);
     return null;
   }
 }
@@ -93,11 +79,11 @@ export async function generateMetadata({ params }) {
   const imageUrl = mix?.cover || defaultImageUrl;
 
   return {
-    title: mix ? `${mix.title} | mixtapped` : "Mixtape Not Found",
+    title: mix ? `${mix.title} | Mixtapped` : "Mixtape Not Found",
     description:
-      `${mix?.desc} mix on mixtapped | stream, play and download| by  ${
-        mix?.djName || mix?.name
-      }` || `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtapped.`,
+      `${mix?.desc} mix on Mixtapped | Stream, play and download by ${
+        mix?.djName || mix?.user?.username
+      }` || `Explore ${mix?.djName}'s mixtape on Mixtapped.`,
     keywords: [
       "mixtape",
       "music",
@@ -105,19 +91,18 @@ export async function generateMetadata({ params }) {
       mix?.genre || "genre",
       mix?.title || "mixtape",
       "Mixtapped",
-      mix?.djName || mix?.name,
+      mix?.djName || mix?.user?.username,
     ],
     openGraph: {
-      title: `${mix?.title || "Mixtape"} | mixtapped`,
+      title: `${mix?.title || "Mixtape"} | Mixtapped`,
       description:
-        mix?.desc ||
-        `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtapped.`,
+        mix?.desc || `Explore ${mix?.djName}'s mixtape on Mixtapped.`,
       images: [
         {
           url: imageUrl,
           width: 1200,
           height: 630,
-          alt: `${mix?.djName || mix?.name}'s mixtape cover`,
+          alt: `${mix?.djName}'s mixtape cover`,
         },
       ],
       type: "music.song",
@@ -126,12 +111,11 @@ export async function generateMetadata({ params }) {
       card: "summary_large_image",
       title: `${mix?.title || "Mixtape"} | Mixtapped`,
       description:
-        mix?.desc ||
-        `Explore ${mix?.djName || mix?.name}'s mixtape on Mixtapped.`,
+        mix?.desc || `Explore ${mix?.djName}'s mixtape on Mixtapped.`,
       images: [imageUrl],
     },
     alternates: {
-      canonical: `https://mixtapped.com/mixtape/${unique}`,
+      canonical: `https://mixtapped.com/mix/${unique}`,
     },
   };
 }
@@ -148,16 +132,15 @@ export default async function MixTape({ params }) {
     try {
       const res = await fetch(
         `http://localhost:3000/api/mixtape/related?genre=${encodeURIComponent(
-          mixtape.genre,
-        )}&excludeId=${currentId}&limit=4`,
-        { cache: "no-cache" },
+          mixtape.genre
+        )}&excludeId=${currentId}&limit=10`,
+        { cache: "no-cache" }
       );
 
       if (!res.ok) {
-        console.warn("Falling back to recent mixtapes API");
         const recentRes = await fetch(
-          `http://localhost:3000/api/mixtape/recent?limit=4`,
-          { cache: "no-cache" },
+          `http://localhost:3000/api/mixtape/recent?limit=10`,
+          { cache: "no-cache" }
         );
         if (!recentRes.ok) throw new Error("Failed to fetch mixtapes");
         const recentData = await recentRes.json();
@@ -176,22 +159,20 @@ export default async function MixTape({ params }) {
 
   if (!mix) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-        {/* AlertCircle replaces the hand-drawn warning SVG */}
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-950 p-4">
         <AlertCircle
-          className="w-24 h-24 mb-6 text-indigo-500 dark:text-indigo-400"
+          className="w-20 h-20 mb-6 text-indigo-500 dark:text-indigo-400"
           strokeWidth={1.5}
         />
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
           Mixtape Not Found
         </h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
-          The mixtape you&apos;re looking for doesn&apos;t exist or has been
-          removed.
+          The mixtape you&apos;re looking for doesn&apos;t exist or has been removed.
         </p>
         <Link
           href="/"
-          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
+          className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-2xl transition-colors shadow-lg shadow-indigo-500/25"
         >
           Return to Home
         </Link>
@@ -199,383 +180,203 @@ export default async function MixTape({ params }) {
     );
   }
 
+  const genres = (mix.genre || "Music")
+    .split(",")
+    .map((g) => g.trim())
+    .filter(Boolean);
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-16">
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "MusicAlbum",
-          "@id": `https://mixtapped.com/mixtape/${unique}`,
+          "@id": `https://mixtapped.com/mix/${unique}`,
           name: mix.title,
           description: mix.desc,
           byArtist: { "@type": "Person", name: mix.djName },
           genre: mix.genre,
-          image: mix.cover,
+          image: mix.cover || mix.imgthumb,
           datePublished: mix.time,
-          track: {
-            "@type": "MusicRecording",
-            name: mix.title,
-            duration: "N/A",
-            inAlbum: mix.title,
-          },
         })}
       </script>
 
-      {/* Hero Section with Cover Art */}
-      <div className="relative w-full h-56 sm:h-72 md:h-96 lg:h-[28rem] overflow-hidden rounded-md group">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/90 z-10"></div>
+      {/* ── Top Ambient Hero Banner ── */}
+      <div className="relative w-full overflow-hidden bg-gray-950 border-b border-white/10 pt-8 pb-10 sm:py-14 px-4 sm:px-6 lg:px-8">
+        {/* Ambient Blur Backdrop */}
         <div
-          className="absolute inset-0 bg-cover bg-center blur-sm opacity-80 transform scale-110 animate-subtle-float transition-all duration-3000"
-          style={{
-            backgroundImage: `url(${mix.imgthumb})`,
-            animation: "subtle-float 30s ease-in-out infinite alternate",
-            transformOrigin: "center",
-          }}
-        ></div>
-        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/50 to-purple-900/40 mix-blend-overlay transition-opacity duration-1000 group-hover:opacity-70"></div>
-        <div className="absolute inset-0 bg-[url('/images/noise.png')] opacity-[0.05] group-hover:opacity-[0.08] mix-blend-overlay pointer-events-none transition-opacity duration-1000"></div>
+          className="absolute inset-0 bg-cover bg-center blur-3xl opacity-30 scale-125 transform pointer-events-none"
+          style={{ backgroundImage: `url(${mix.imgthumb})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-950/70 via-gray-950/90 to-gray-950 pointer-events-none" />
 
-        {/* Floating music note decorations — FaMusic replaces both inline music-note SVGs */}
-        <div className="absolute top-1/4 left-1/4 w-8 h-8 text-white/20 animate-float-slow pointer-events-none flex items-center justify-center">
-          <FaMusic />
-        </div>
-        <div className="absolute top-1/3 right-1/4 w-6 h-6 text-white/15 animate-float-medium pointer-events-none flex items-center justify-center">
-          <FaMusic />
-        </div>
+        {/* Main Hero Container */}
+        <div className="relative max-w-6xl mx-auto z-10 flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-10">
 
-        {/* Centered title overlay */}
-        <div className="absolute inset-0 z-20 flex flex-col justify-center items-center p-4 sm:p-6 md:p-8">
-          <div className="max-w-3xl w-full mx-auto bg-black/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10 shadow-2xl transform translate-y-0 transition-all duration-700 group-hover:scale-105">
-            <div className="flex items-center justify-center flex-wrap gap-1.5 mb-1">
-              {(mix.genre || "Unknown").split(",").map((g) => g.trim()).filter(Boolean).map((g) => (
-                <span key={g} className="px-3 py-1 bg-indigo-600/80 rounded-full text-xs text-white font-medium">
-                  {g}
-                </span>
-              ))}
+          {/* 1. Artwork */}
+          <div className="relative flex-shrink-0">
+            <div className="relative w-48 h-48 sm:w-60 sm:h-60 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/15">
+              <Image
+                src={mix.imgthumb}
+                alt={mix.title}
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 640px) 192px, (max-width: 768px) 240px, 288px"
+              />
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg text-center">
+          </div>
+
+          {/* 2. Metadata & Title Content */}
+          <div className="flex-1 text-center md:text-left space-y-3.5 w-full">
+            {/* Category / Genre Tag Line */}
+            <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-bold uppercase tracking-widest text-indigo-400">
+              <span>Mixtape</span>
+              <span>•</span>
+              <span>{genres.join(" / ")}</span>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-sm">
               {mix.title}
             </h1>
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-gray-300 text-sm sm:text-base">By</span>
+
+            {/* DJ Info */}
+            <div className="flex items-center justify-center md:justify-start gap-2 pt-0.5">
               <Link
                 href={`/dj/${mix.user.username}`}
-                className="text-indigo-300 hover:text-indigo-200 text-sm sm:text-base font-medium hover:underline transition-colors"
+                className="group flex items-center gap-2 text-gray-200 hover:text-white font-semibold transition-colors"
               >
-                {mix.djName}
+                <div className="relative w-7 h-7 rounded-full overflow-hidden border border-indigo-500/40 group-hover:border-indigo-400 transition-colors">
+                  <Image
+                    src={mix.user.profilep}
+                    alt={mix.djName}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex items-center gap-1.5 text-sm sm:text-base">
+                  <Mic2 className="h-4 w-4 text-indigo-400" />
+                  <span>{mix.djName}</span>
+                </div>
               </Link>
+            </div>
+
+            {/* Minimal Subdued Metadata Line */}
+            <div className="flex items-center justify-center md:justify-start gap-2 text-xs sm:text-sm text-gray-400 font-normal flex-wrap">
+              <span className="flex items-center gap-1 text-gray-300">
+                <Headphones className="h-3.5 w-3.5 text-gray-400" />
+                <span>{mix.totalPlays.toLocaleString()} plays</span>
+              </span>
+              <span className="text-gray-600">•</span>
+              <span className="flex items-center gap-1 text-gray-300">
+                <Download className="h-3.5 w-3.5 text-gray-400" />
+                <span>{mix.totalDownloads.toLocaleString()} downloads</span>
+              </span>
+              <span className="text-gray-600">•</span>
+              <span className="flex items-center gap-1 text-gray-300">
+                <Heart className="h-3.5 w-3.5 text-gray-400" />
+                <LikeCounter initialCount={mix.totalLikes} mixtapeId={unique} compact={true} />
+              </span>
+              <span className="text-gray-600">•</span>
+              <span className="flex items-center gap-1 text-gray-400">
+                <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                <span>
+                  {new Date(mix.time).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </span>
+            </div>
+
+            {/* ── 3. HERO ACTION BAR ── */}
+            <div className="pt-2">
+              <MixHeroActions
+                id={unique}
+                title={mix.title}
+                initialLiked={liked}
+                initialLikesCount={mix.totalLikes}
+              />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="relative max-w-6xl mx-auto mt-4 md:-mt-16 lg:-mt-20 z-10 md:z-20 px-4 sm:px-6">
-        {/* Mixtape Information */}
-        <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl border border-white/20 dark:border-white/5 rounded-3xl shadow-2xl overflow-hidden">
-          <div className="flex flex-col md:flex-row">
-            {/* Cover Art */}
-            <div className="w-full md:w-1/3 lg:w-1/4 p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center">
-              <div className="relative group w-full max-w-[250px] md:max-w-none">
-                <div className="absolute inset-0 rounded-full bg-black shadow-xl transform scale-[0.85] group-hover:scale-[0.9] transition-transform duration-700 ease-out"></div>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-gray-900 to-gray-800 transform scale-[0.4] group-hover:scale-[0.45] transition-transform duration-700 ease-out">
-                  <div className="absolute inset-0 rounded-full border-4 border-gray-700 transform scale-[0.5]"></div>
-                  <div className="absolute inset-0 rounded-full border border-gray-600 transform scale-[0.2]"></div>
-                </div>
+      {/* ── Main Page Content ── */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8 space-y-6">
 
-                <div className="relative aspect-square rounded-xl overflow-hidden shadow-2xl ring-4 ring-indigo-400/20 dark:ring-white/10 transform transition-all duration-500 ease-out group-hover:shadow-indigo-500/30 group-hover:scale-[1.02] before:absolute before:inset-0 before:z-10 before:bg-gradient-to-br before:from-black/0 before:via-black/0 before:to-black/30 before:opacity-60 group-hover:before:opacity-80 before:transition-opacity">
-                  <div
-                    className="absolute inset-0 z-20 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out transform translate-x-full group-hover:translate-x-[-180%] pointer-events-none"
-                    style={{
-                      width: "250%",
-                      height: "500%",
-                      top: "-100%",
-                      left: "-100%",
-                      transition:
-                        "opacity 0.7s ease-in-out, transform 1.5s ease-in-out",
-                    }}
-                  ></div>
-
-                  <Image
-                    src={mix.imgthumb}
-                    alt={mix.title}
-                    fill
-                    className="object-cover transition-all duration-10000 ease-in-out group-hover:scale-110 group-hover:rotate-1 z-0"
-                    sizes="(max-width: 768px) 250px, 25vw"
-                    priority
-                  />
-
-                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-80 transition-opacity duration-500"></div>
-
-                  <div className="absolute bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-black/80 to-transparent p-3 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center">
-                          <FaMusic className="h-3 w-3 text-white" />
-                        </div>
-                        <span className="text-xs text-white font-medium">
-                          {mix.totalPlays.toLocaleString()} plays
-                        </span>
-                      </div>
-                      <span className="text-xs text-white/80">
-                        {new Date(mix.time).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Stats and Info Section */}
-            <div className="w-full md:w-2/3 lg:w-3/4 p-6 md:p-8 bg-transparent">
-              <div className="flex flex-col h-full">
-                {/* Primary Action Bar (Play & Download) */}
-                <div className="flex flex-col md:flex-row items-center justify-between mb-5 pb-6 border-b border-gray-200/60 dark:border-white/10">
-                  <div className="text-center md:text-left w-full md:w-auto mb-6 md:mb-0">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">Ready to listen?</p>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Stream or Download</h3>
-                  </div>
-                  
-                  <div className="flex flex-row items-center justify-center sm:justify-end space-x-6 w-full md:w-auto">
-                    {/* Primary Play CTA - Glass Circular */}
-                    <div className="relative group bg-white/20 dark:bg-gray-800/40 backdrop-blur-lg border border-gray-200/50 dark:border-gray-600/50 shadow-xl hover:bg-white/30 dark:hover:bg-gray-700/60 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 rounded-full transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center w-16 h-16 sm:w-16 sm:h-16 flex-shrink-0 cursor-pointer">
-                      <AudioAdd id={mix.unique} iconOnly={true} className="w-full h-full group-hover:scale-110 transition-transform" />
-                      <div className="absolute inset-0 rounded-full shadow-[0_0_15px_rgba(79,70,229,0.2)] dark:shadow-[0_0_15px_rgba(129,140,248,0.2)] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-                    </div>
-                    
-                    {/* Primary Download CTA - Glass Circular */}
-                    <div className="relative group bg-white/20 dark:bg-gray-800/40 backdrop-blur-lg border border-gray-200/50 dark:border-gray-600/50 shadow-xl hover:bg-white/30 dark:hover:bg-gray-700/60 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 rounded-full transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center w-16 h-16 sm:w-16 sm:h-16 flex-shrink-0 cursor-pointer">
-                      <DownloadBtn id={mix.unique} iconOnly={true} className="w-full h-full group-hover:scale-110 transition-transform" />
-                      <div className="absolute inset-0 rounded-full shadow-[0_0_15px_rgba(34,197,94,0.2)] dark:shadow-[0_0_15px_rgba(74,222,128,0.2)] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Release Date */}
-                <div className="mb-8 flex items-center">
-                  <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg mr-4">
-                    <FaCalendarAlt className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Released
-                    </p>
-                    <p className="font-medium text-gray-800 dark:text-gray-200">
-                      {new Date(mix.time).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
-                  <div className="bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-2xl p-4 flex items-center gap-4">
-                    <div className="p-3 bg-indigo-500/10 rounded-xl">
-                      <FaDownload className="h-5 w-5 text-indigo-500" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Downloads</p>
-                      <p className="text-xl font-bold text-gray-900 dark:text-white">
-                        {mix.totalDownloads.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  <LikeCounter
-                    initialCount={mix.totalLikes}
-                    mixtapeId={unique}
-                  />
-
-                  <div className="bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-2xl p-4 flex items-center gap-4">
-                    <div className="p-3 bg-fuchsia-500/10 rounded-xl">
-                      <FaRegCirclePlay className="h-5 w-5 text-fuchsia-500" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Plays</p>
-                      <p className="text-xl font-bold text-gray-900 dark:text-white">
-                        {mix.totalPlays.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl p-5 sm:p-6 rounded-3xl shadow-xl mt-6 border border-white/20 dark:border-white/5">
-          <p className="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-widest mb-4">Actions</p>
-          <div className="flex flex-wrap gap-3">
-
-            {/* Share */}
-            <div className="flex-1 min-w-[140px] bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-2xl p-4 flex items-center gap-3 hover:bg-indigo-500/10 hover:border-indigo-400/30 transition-all duration-200 group cursor-pointer">
-              <div className="p-2.5 bg-indigo-500/10 rounded-xl group-hover:bg-indigo-500/20 transition-colors">
-                <Share id={unique} />
-              </div>
-              <div>
-                <p className="font-semibold text-sm text-gray-900 dark:text-white">Share</p>
-                <p className="text-xs text-gray-400 dark:text-gray-500">Send to friends</p>
-              </div>
-            </div>
-
-            {/* Like */}
-            {session && (
-              <div className={`flex-1 min-w-[140px] border rounded-2xl p-4 flex items-center gap-3 transition-all duration-200 group cursor-pointer ${
-                liked
-                  ? "bg-red-500/10 border-red-400/30"
-                  : "bg-white/30 dark:bg-white/5 border-white/40 dark:border-white/10 hover:bg-red-500/10 hover:border-red-400/30"
-              }`}>
-                <div className={`p-2.5 rounded-xl transition-colors ${
-                  liked ? "bg-red-500/20" : "bg-red-500/10 group-hover:bg-red-500/20"
-                }`}>
-                  <LikeBtn
-                    id={unique}
-                    likedparam={liked}
-                    initialCount={mix.totalLikes}
-                  />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-gray-900 dark:text-white">
-                    {liked ? "Liked" : "Like"}
-                  </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">
-                    {liked ? "Remove favorite" : "Add to favorites"}
-                  </p>
-                </div>
-              </div>
-            )}
-
-          </div>
-        </div>
-
-        {/* Description Section */}
-        <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl p-6 rounded-3xl shadow-xl mt-6 border border-white/20 dark:border-white/5">
-          {/* Info replaces the "i" circle SVG */}
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-            <Info className="h-5 w-5 mr-2 text-indigo-500" strokeWidth={2} />
+        {/* About This Mix */}
+        <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-3xl p-6 rounded-3xl border border-white/30 dark:border-white/5 shadow-xl">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            <Info className="h-5 w-5 text-indigo-500" />
             About This Mix
-          </h3>
-          <div className="prose dark:prose-invert max-w-none">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-              {mix.desc ? (
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: mix.desc.replace(
-                      /(https?:\/\/[^\s]+)/g,
-                      '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 hover:underline">$1</a>',
-                    ),
-                  }}
-                />
-              ) : (
-                "No description available for this mixtape."
-              )}
-            </p>
+          </h2>
+          <div className="prose dark:prose-invert max-w-none text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+            {mix.desc ? (
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: mix.desc.replace(
+                    /(https?:\/\/[^\s]+)/g,
+                    '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">$1</a>'
+                  ),
+                }}
+              />
+            ) : (
+              "No description available for this mixtape."
+            )}
           </div>
         </div>
 
-        {/* DJ Profile */}
-        <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl p-6 rounded-3xl shadow-xl mt-6 border border-white/20 dark:border-white/5">
+        {/* DJ Profile Card */}
+        <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-3xl p-6 rounded-3xl border border-white/30 dark:border-white/5 shadow-xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <Link
               href={`/dj/${mix.user.username}`}
               className="group flex items-center gap-4"
             >
-              <div className="relative">
+              <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-indigo-500/30 group-hover:border-indigo-500 transition-colors flex-shrink-0">
                 <Image
                   src={mix.user.profilep}
                   alt={mix.djName}
-                  width={80}
-                  height={80}
-                  className="rounded-full border-2 border-gray-200 dark:border-gray-600 group-hover:border-indigo-500 transition-colors object-cover"
+                  fill
+                  className="object-cover"
                 />
-                <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white dark:border-gray-800"></div>
               </div>
               <div>
-                <p className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                <p className="font-bold text-base sm:text-lg text-gray-900 dark:text-white group-hover:text-indigo-500 transition-colors">
                   {mix.djName}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                   @{mix.user.username}
                 </p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
-                    DJ
-                  </span>
-                </div>
+                {mix.user.bio && (
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-1 max-w-md">
+                    {mix.user.bio}
+                  </p>
+                )}
               </div>
             </Link>
 
-            {/* ChevronRight replaces the ">" arrow SVG */}
             <Link
               href={`/dj/${mix.user.username}`}
-              className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium rounded-lg transition-colors text-sm flex items-center gap-2"
+              className="px-5 py-2.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 font-semibold rounded-2xl transition-colors text-xs sm:text-sm flex items-center gap-2 self-stretch sm:self-auto justify-center"
             >
-              <span>View Profile</span>
-              <ChevronRight className="h-4 w-4" strokeWidth={2} />
+              <span>View DJ Profile</span>
+              <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
 
-        {/* Related Mixtapes Section */}
-        {relatedMixtapes.length > 0 && (
-          <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl p-4 sm:p-6 rounded-3xl shadow-xl mt-6 border border-white/20 dark:border-white/5">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="p-2 bg-indigo-500/10 rounded-xl">
-                <FaMusic className="h-4 w-4 text-indigo-500" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                More {(() => {
-                  const gList = (mix.genre || "")
-                    .split(",")
-                    .map((g) => g.trim())
-                    .filter(Boolean);
-                  if (gList.length === 0) return "";
-                  if (gList.length === 1) return `${gList[0]} `;
-                  return `${gList.slice(0, -1).join(", ")} & ${gList[gList.length - 1]} `;
-                })()}Mixtapes
-              </h3>
-            </div>
-
-            {/* Unified scrollable grid — horizontal on mobile, 4-col on desktop */}
-            <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-3 overflow-x-auto pb-2 sm:pb-0 -mx-1 px-1">
-              {relatedMixtapes.map((relatedMix) => (
-                <Link
-                  href={`/mix/${relatedMix.unique}`}
-                  key={relatedMix.unique}
-                  className="group flex-shrink-0 w-36 sm:w-auto"
-                >
-                  <div className="bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-2xl overflow-hidden transition-all duration-300 group-hover:shadow-lg group-hover:shadow-indigo-500/10 group-hover:-translate-y-0.5">
-                    <div className="relative aspect-square">
-                      <Image
-                        src={relatedMix.cover}
-                        alt={relatedMix.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        sizes="(max-width: 640px) 144px, (max-width: 1024px) 50vw, 25vw"
-                      />
-                      {/* Always-visible gradient at the bottom */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                    </div>
-                    <div className="p-3">
-                      <h4 className="font-bold text-sm text-gray-900 dark:text-white truncate group-hover:text-indigo-500 transition-colors">
-                        {relatedMix.title}
-                      </h4>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">
-                        {relatedMix.djName}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Netflix-style Related Mixtapes Carousel Slider */}
+        <RelatedSlider
+          relatedMixtapes={relatedMixtapes}
+          genreTitle={genres.join(" / ")}
+        />
 
         {/* Comments Section */}
-        <div className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-3xl p-4 sm:p-6 rounded-3xl shadow-xl mt-6 border border-white/20 dark:border-white/5 mb-12">
+        <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-3xl p-6 rounded-3xl border border-white/30 dark:border-white/5 shadow-xl">
           <CommentsPage comments={mix.comments} unique={unique} />
         </div>
       </div>

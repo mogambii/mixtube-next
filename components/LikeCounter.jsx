@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { FaHeart } from "react-icons/fa";
 
-const LikeCounter = ({ initialCount, mixtapeId }) => {
+const LikeCounter = ({ initialCount, mixtapeId, compact = false }) => {
   const [count, setCount] = useState(initialCount || 0);
 
   useEffect(() => {
@@ -38,6 +38,14 @@ const LikeCounter = ({ initialCount, mixtapeId }) => {
     const timer = setTimeout(() => setIsAnimating(false), 1000);
     return () => clearTimeout(timer);
   }, [count]);
+
+  if (compact) {
+    return (
+      <span className={`inline-flex items-center gap-1 transition-colors duration-300 ${isAnimating ? "text-rose-400 font-bold" : ""}`}>
+        {count.toLocaleString()} {count === 1 ? "like" : "likes"}
+      </span>
+    );
+  }
 
   return (
     <div className={`bg-white/30 dark:bg-white/5 border border-white/40 dark:border-white/10 rounded-2xl p-4 flex items-center gap-4 transition-all duration-500 ${isAnimating ? "ring-2 ring-red-400/50 shadow-lg shadow-red-500/10" : ""}`}>

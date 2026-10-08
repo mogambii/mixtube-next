@@ -36,9 +36,6 @@ const RecentMixxes = ({ username, mixtapes, totalCount }) => {
           </span>
           Latest Mixtapes
         </h2>
-        <span className="bg-white/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 text-xs font-semibold px-3 py-1.5 rounded-full border border-white/40 dark:border-white/5 shadow-sm">
-          {totalCount} {totalCount === 1 ? "mixtape" : "mixtapes"}
-        </span>
       </div>
 
       {/* Mixtape list */}
